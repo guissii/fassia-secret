@@ -1,5 +1,4 @@
 import { ShieldCheck, Lock, Truck, Headset } from 'lucide-react';
-import './TrustBadges.css';
 
 export function TrustBadges() {
   const badges = [

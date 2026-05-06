@@ -21,7 +21,6 @@ import {
   Truck,
   X
 } from 'lucide-react';
-import './Header.css';
 
 const menuCategories = [
   {
@@ -236,7 +235,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
           </button>
 
           <div className="mobile-menu-brand" aria-label="Fassia Secret">
-            <img className="mobile-menu-logo" src="/logo.png" alt="Fassia Secret" />
+            <img className="mobile-menu-logo" src="logo.png" alt="Fassia Secret" />
             <div className="mobile-menu-brand-text">
               <div className="mobile-menu-brand-title">Fassia Secret</div>
               <div className="mobile-menu-brand-subtitle">PARAPHARMACIE</div>
@@ -325,7 +324,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
           </button>
 
           <a className="logo" href="#" aria-label="Fassia Secret">
-            <img className="site-logo" src="/logo.png" alt="Fassia Secret" />
+            <img className="site-logo" src="logo.png" alt="Fassia Secret" />
           </a>
           
           <div className="header-search-slot">

@@ -1,4 +1,3 @@
-import './Brands.css';
 import { Leaf } from 'lucide-react';
 
 export function Brands() {

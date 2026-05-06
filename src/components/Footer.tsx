@@ -1,5 +1,4 @@
 import { MapPin, Phone, Mail, Globe, Share2, ShieldCheck } from 'lucide-react';
-import './Footer.css';
 
 export function Footer() {
   return (
@@ -8,7 +7,7 @@ export function Footer() {
         <div className="container grid footer-grid">
           <div className="footer-col">
             <a className="footer-brand" href="#" aria-label="Fassia Secret">
-              <img className="footer-logo" src="/logo.png" alt="Fassia Secret" />
+              <img className="footer-logo" src="logo.png" alt="Fassia Secret" />
             </a>
             <p className="text-muted text-sm mb-lg">
               Votre parapharmacie en ligne de confiance. Produits santé & beauté livrés partout au Maroc.

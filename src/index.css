@@ -60,7 +60,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url('/arrier plan.png');
+  background-image: var(--site-bg-image, none);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

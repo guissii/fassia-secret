@@ -1,5 +1,4 @@
 import { Heart, ShoppingCart, ArrowLeftRight, Leaf, ArrowRight } from 'lucide-react';
-import './ProductSection.css';
 
 interface Product {
   id: number;
@@ -26,7 +25,7 @@ const mockProducts: Product[] = [
     name: "Derma Hydrating Serum",
     description: "Sérum hydratant à l’acide hyaluronique + vitamine B5.",
     price: 180.00,
-    image: "/19bd7403-d2ac-49a4-a584-be5895add421.png",
+    image: "19bd7403-d2ac-49a4-a584-be5895add421.png",
     category: "Visage",
     badge: "Nouveau",
     badgeColor: "var(--color-primary)"
@@ -37,7 +36,7 @@ const mockProducts: Product[] = [
     description: "Gel-crème hydratant avec acide hyaluronique & thé vert.",
     price: 199.00,
     oldPrice: 249.00,
-    image: "/d6f902fd-0b09-48d0-8055-d03094820431.png",
+    image: "d6f902fd-0b09-48d0-8055-d03094820431.png",
     category: "Visage",
     badge: "Promo !",
     badgeColor: "var(--color-primary)"
@@ -48,7 +47,7 @@ const mockProducts: Product[] = [
     description: "Complément alimentaire détox à base d’artichaut & pissenlit.",
     price: 129.00,
     oldPrice: 159.00,
-    image: "/5aa79a5c-fd9e-42f0-bf17-d64dbb490eb8.png",
+    image: "5aa79a5c-fd9e-42f0-bf17-d64dbb490eb8.png",
     category: "Compléments",
     badge: "Promo !",
     badgeColor: "var(--color-primary)"
@@ -58,7 +57,7 @@ const mockProducts: Product[] = [
     name: "Vitamin D3 2000 IU",
     description: "Soutien immunitaire & santé osseuse au quotidien.",
     price: 149.00,
-    image: "/950aa654-e0a2-4875-8451-ca8805a6d44a.png",
+    image: "950aa654-e0a2-4875-8451-ca8805a6d44a.png",
     category: "Santé"
   },
   {
@@ -66,7 +65,7 @@ const mockProducts: Product[] = [
     name: "Routine Huiles & Plantes",
     description: "Sélection d’actifs botaniques pour une peau éclatante.",
     price: 169.00,
-    image: "/4e552387-f2e2-4769-907c-e62bdbe50616.png",
+    image: "4e552387-f2e2-4769-907c-e62bdbe50616.png",
     category: "Bio",
     badge: "Nouveau",
     badgeColor: "var(--color-primary)"

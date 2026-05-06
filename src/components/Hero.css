@@ -151,7 +151,7 @@
   .hero-background {
     min-height: 85vh; /* Taller on mobile to show portrait */
     background-position: center;
-    background-image: url('/image1 2.png') !important;
+    background-image: var(--hero-mobile-bg) !important;
   }
   
   .hero-gradient-overlay {

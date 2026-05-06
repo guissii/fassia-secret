@@ -1,5 +1,4 @@
 import { ArrowRight, Leaf } from 'lucide-react';
-import './Categories.css';
 
 export function Categories() {
   const categories = [
@@ -7,7 +6,7 @@ export function Categories() {
       id: 1,
       title: "Soins du Visage",
       productsCount: "150 PRODUITS",
-      image: "/dd9f7066-738b-4260-b004-c51ed5442367.png",
+      image: "dd9f7066-738b-4260-b004-c51ed5442367.png",
       className: "category-large",
       btnClass: "btn-primary-rounded"
     },
@@ -15,7 +14,7 @@ export function Categories() {
       id: 2,
       title: "Soins des Cheveux",
       productsCount: "120 PRODUITS",
-      image: "/36a4c7fc-c2d8-492c-acee-a8f606be17b7.png",
+      image: "36a4c7fc-c2d8-492c-acee-a8f606be17b7.png",
       className: "category-small",
       btnClass: "btn-primary-rounded"
     },
@@ -23,7 +22,7 @@ export function Categories() {
       id: 3,
       title: "Produits Bio & Naturels",
       productsCount: "200 PRODUITS",
-      image: "/4e552387-f2e2-4769-907c-e62bdbe50616.png",
+      image: "4e552387-f2e2-4769-907c-e62bdbe50616.png",
       className: "category-small",
       btnClass: "btn-primary-rounded"
     }

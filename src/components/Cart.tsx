@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck } from 'lucide-react';
-import './Cart.css';
 
 export interface CartItem {
   id: number;

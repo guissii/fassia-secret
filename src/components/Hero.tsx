@@ -1,10 +1,12 @@
 import { ArrowRight, FlaskConical, Heart, Leaf } from 'lucide-react';
-import './Hero.css';
 
 export function Hero() {
   return (
     <section className="hero-section">
-      <div className="hero-background" style={{ backgroundImage: "url('/ChatGPT Image May 5, 2026, 03_31_21 PM.png')" }}>
+      <div
+        className="hero-background"
+        style={{ backgroundImage: 'url("ChatGPT%20Image%20May%205,%202026,%2003_31_21%20PM.png")' }}
+      >
         <div className="hero-gradient-overlay"></div>
         <div className="container hero-content">
           <div className="hero-text-clean">

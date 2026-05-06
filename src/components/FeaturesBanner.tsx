@@ -1,5 +1,4 @@
 import { Leaf, FlaskConical, Heart, Droplet } from 'lucide-react';
-import './FeaturesBanner.css';
 
 export function FeaturesBanner() {
   const features = [
