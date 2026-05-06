@@ -44,15 +44,15 @@ export function Footer() {
             <ul className="contact-list text-sm text-muted">
               <li className="flex gap-sm items-center">
                 <MapPin size={16} className="text-primary" />
-                <span>Immeuble Nakhil 3, Rue Roda, Guéliz, Marrakech</span>
+                <span>Adresse masquee</span>
               </li>
               <li className="flex gap-sm items-center">
                 <Phone size={16} className="text-primary" />
-                <span>+212-524-423823</span>
+                <span>Telephone masque</span>
               </li>
               <li className="flex gap-sm items-center">
                 <Mail size={16} className="text-primary" />
-                <span>contact@paranewera.com</span>
+                <span>Email masque</span>
               </li>
             </ul>
           </div>
