@@ -23,7 +23,7 @@ import {
   X
 } from 'lucide-react';
 
-const menuCategories = [
+const desktopMenuCategories = [
   {
     title: "CORPS",
     items: ["Déodorants", "Gels Douche", "Gommage & Exfoliants", "Hydratation & Nutrition", "Parfums Femmes", "Rasage & Épilation", "Savons", "Soins des Mains & Pieds", "Soins des Ongles", "Soins Minceur & Anti-Cellulite", "Accessoires de Bain"]
@@ -62,16 +62,69 @@ const menuCategories = [
   }
 ];
 
+const mobileDrawerCategories = [
+  { title: "DERMO-CORNER", items: ["La Roche-Posay", "Vichy", "CeraVe", "Bioderma", "SVR", "Eucerin"] },
+  { title: "PROMOTIONS !", items: ["Offres du moment", "Bons plans", "Dernieres promotions"] },
+  { title: "K-BEAUTY", items: ["Nettoyants", "Serums", "Creme hydratante", "Masques", "SPF"] },
+  {
+    title: "VISAGE",
+    items: [
+      "Solaire: Protection solaire",
+      "Solaire: Auto-bronzant",
+      "Solaire: Soin apres-soleil",
+      "Type: Nettoyant visage",
+      "Type: Serum",
+      "Type: Creme de jour",
+      "Type: Creme de nuit",
+      "Type: Contour des yeux",
+      "Type: Eau micellaire",
+      "Type: Masque visage",
+      "Besoins: Anti-imperfections",
+      "Besoins: Anti-age",
+      "Besoins: Hydratant & nourrissant",
+      "Besoins: Anti-taches",
+      "Besoins: Anti-rougeurs",
+      "Besoins: Eclat & anti-fatigue",
+      "Besoins: Peaux sensibles",
+    ]
+  },
+  { title: "CHEVEUX", items: ["Shampoing", "Apres-shampoing", "Masque cheveux", "Soins reparateurs", "Huiles & serums"] },
+  { title: "MAQUILLAGE", items: ["Teint", "Yeux", "Levres", "Demaquillant", "Accessoires maquillage"] },
+  { title: "CORPS", items: ["Corps & bain", "Hydratation", "Gommage", "Rasage & epilation", "Minceur"] },
+  { title: "MAMAN & BEBE", items: ["Bebe", "Maman", "Solaire bebe", "Change & toilette", "Accessoires"] },
+  { title: "HOMMES", items: ["Soins visage homme", "Soins corps homme", "Deodorants", "Rasage", "Barbe"] },
+  { title: "HYGIÈNE DENTAIRE", items: ["Dentifrices", "Brosses a dents", "Bains de bouche", "Blanchiment"] },
+  { title: "HYGIÈNE", items: ["Gel hydroalcoolique", "Deodorants", "Soin intime", "Protections"] },
+  { title: "HYGIÈNE & INTIMITÉ", items: ["Toilette Intime", "Serviettes Hygieniques", "Tampons", "Lubrifiants"] },
+  { title: "ACCESSOIRES", items: ["Accessoires visage", "Accessoires cheveux", "Trousses", "Brosses", "Eponges"] },
+  { title: "MINCEUR", items: ["Brule-graisses", "Draineurs", "Collagene", "Sport & recuperation"] },
+  { title: "SPORT", items: ["Proteines", "Energie", "Hydratation", "Recuperation"] },
+  { title: "SANTÉ", items: ["Auto-Surveillance", "Premiers Secours", "Orthopedie & soutien", "Bien-etre"] },
+  { title: "COMPLEMENTS ALIMENTAIRES", items: ["Vitamines & Mineraux", "Collagene", "Omega 3", "Detox & Drainage"] },
+  { title: "PREMIUM HAIR CARE", items: ["Shampoing premium", "Masque premium", "Huiles & serums", "Anti-chute"] },
+  { title: "PREOCCUPATIONS", items: ["Acne & Imperfections", "Cernes", "Taches", "Rosacee & Rougeurs", "Peau seche", "Anti-age", "Chute de cheveux", "Immunite"] },
+];
+
 const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }> }> = [
+  { label: 'DERMO-CORNER', Icon: ShieldCheck },
+  { label: 'PROMOTIONS !', Icon: Tag },
+  { label: 'K-BEAUTY', Icon: Sparkles },
   { label: 'CORPS', Icon: Droplet },
   { label: 'VISAGE', Icon: Sparkles },
   { label: 'CHEVEUX', Icon: Scissors },
   { label: 'HYGIÈNE DENTAIRE', Icon: Smile },
   { label: 'MAQUILLAGE', Icon: Brush },
   { label: 'HYGIÈNE & INTIMITÉ', Icon: Leaf },
+  { label: 'HYGIÈNE', Icon: Leaf },
+  { label: 'ACCESSOIRES', Icon: MoreHorizontal },
+  { label: 'MINCEUR', Icon: HeartPulse },
+  { label: 'SPORT', Icon: HeartPulse },
+  { label: 'MAMAN & BEBE', Icon: Heart },
+  { label: 'HOMMES', Icon: Heart },
   { label: 'SANTÉ', Icon: HeartPulse },
   { label: 'PREOCCUPATIONS', Icon: Flame },
-  { label: 'COMPLEMENTS ALIMENTAIRES', Icon: Sprout }
+  { label: 'COMPLEMENTS ALIMENTAIRES', Icon: Sprout },
+  { label: 'PREMIUM HAIR CARE', Icon: Scissors }
 ];
 
 const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; openKey?: string }> = [
@@ -150,14 +203,8 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
   };
 
   const mobileMenuCategories = mobileMenuItems.map(({ label, Icon }) => {
-    const fromDesktop = menuCategories.find((c) => c.title === label);
-    const items =
-      fromDesktop?.items ??
-      (label === 'PREOCCUPATIONS'
-        ? ['Acne & Imperfections', 'Cernes', 'Taches', 'Rosacee & Rougeurs', 'Peau seche', 'Anti-age', 'Chute de cheveux', 'Immunite']
-        : label === 'COMPLEMENTS ALIMENTAIRES'
-          ? ['Vitamines & Mineraux', 'Collagene', 'Omega 3', 'Detox & Drainage']
-          : []);
+    const fromDrawer = mobileDrawerCategories.find((c) => c.title === label);
+    const items = fromDrawer?.items ?? [];
 
     return { label, Icon, items };
   });
@@ -391,7 +438,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
       <nav className="nav-bar">
         <div className="container">
           <ul className="flex items-center gap-xs main-nav-list">
-            {menuCategories.map((category, index) => (
+            {desktopMenuCategories.map((category, index) => (
               <li key={index} className="nav-item">
                 <a href="#" className="nav-link flex items-center gap-xs">
                   {category.title} <ChevronDown size={14} className="dropdown-icon" />
