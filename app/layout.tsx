@@ -11,12 +11,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
   type CssVars = {
     '--site-bg-image': string;
-    '--hero-mobile-bg': string;
   };
 
   const style: CSSProperties & CssVars = {
     '--site-bg-image': `url("${basePath}/arrier%20plan.png")`,
-    '--hero-mobile-bg': `url("${basePath}/image1%202.png")`,
   };
 
   return (
