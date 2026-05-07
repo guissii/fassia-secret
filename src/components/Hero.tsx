@@ -1,11 +1,13 @@
 import { ArrowRight, FlaskConical, Heart, Leaf } from 'lucide-react';
 
 export function Hero() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
   return (
     <section className="hero-section">
       <div
         className="hero-background"
-        style={{ backgroundImage: 'url("ChatGPT%20Image%20May%205,%202026,%2003_31_21%20PM.png")' }}
+        style={{ backgroundImage: `url("${basePath}/hero%20new.png")` }}
       >
         <div className="hero-gradient-overlay"></div>
         <div className="container hero-content">
@@ -20,7 +22,7 @@ export function Hero() {
               <span className="hero-title-script">naturellement</span>
             </h1>
             <p className="text-lg text-muted mb-lg hero-subtext">
-              Découvrez notre nouvelle gamme de soins bio pour une routine beauté saine et éclatante.
+              Decouvrez nos soins premium et complements alimentaires pour une routine beaute saine et eclatante.
             </p>
             <div className="flex gap-md hero-buttons">
               <button className="btn btn-primary hero-cta">

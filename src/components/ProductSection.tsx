@@ -43,8 +43,8 @@ const mockProducts: Product[] = [
   },
   {
     id: 3,
-    name: "Détox Bio",
-    description: "Complément alimentaire détox à base d’artichaut & pissenlit.",
+    name: "Detox & Drainage",
+    description: "Complement alimentaire detox a base d’artichaut & pissenlit.",
     price: 129.00,
     oldPrice: 159.00,
     image: "5aa79a5c-fd9e-42f0-bf17-d64dbb490eb8.png",
@@ -65,8 +65,8 @@ const mockProducts: Product[] = [
     name: "Routine Huiles & Plantes",
     description: "Sélection d’actifs botaniques pour une peau éclatante.",
     price: 169.00,
-    image: "4e552387-f2e2-4769-907c-e62bdbe50616.png",
-    category: "Bio",
+    image: "image%202%202.png",
+    category: "Bien-etre",
     badge: "Nouveau",
     badgeColor: "var(--color-primary)"
   }

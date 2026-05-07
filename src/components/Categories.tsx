@@ -1,6 +1,8 @@
 import { ArrowRight, Leaf } from 'lucide-react';
 
 export function Categories() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
   const categories = [
     {
       id: 1,
@@ -20,10 +22,10 @@ export function Categories() {
     },
     {
       id: 3,
-      title: "Produits Bio & Naturels",
+      title: "Complements Alimentaires",
       productsCount: "200 PRODUITS",
-      image: "4e552387-f2e2-4769-907c-e62bdbe50616.png",
-      className: "category-small",
+      image: "hero%20new.png",
+      className: "category-small category-supplements",
       btnClass: "btn-primary-rounded"
     }
   ];
@@ -50,7 +52,9 @@ export function Categories() {
             <div key={cat.id} className={`bento-card ${cat.className}`}>
               <div 
                 className="bento-bg"
-                style={{ backgroundImage: `url('${cat.image}')` }}
+                style={{
+                  backgroundImage: `url('${basePath}/${cat.image}')`,
+                }}
               ></div>
               <div className="bento-gradient"></div>
               

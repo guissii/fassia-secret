@@ -3,6 +3,7 @@ import {
   Brush,
   ChevronDown,
   Droplet,
+  Flame,
   MoreHorizontal,
   Headphones,
   Heart,
@@ -54,6 +55,10 @@ const menuCategories = [
   {
     title: "HOMMES",
     items: ["Déodorants", "Soins Hommes", "Lubrifiants", "Préservatifs"]
+  },
+  {
+    title: "PREOCCUPATIONS",
+    items: ["Acne & Imperfections", "Cernes", "Taches", "Rosacee & Rougeurs", "Peau seche", "Anti-age", "Chute de cheveux", "Immunite"]
   }
 ];
 
@@ -65,7 +70,8 @@ const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: numbe
   { label: 'MAQUILLAGE', Icon: Brush },
   { label: 'HYGIÈNE & INTIMITÉ', Icon: Leaf },
   { label: 'SANTÉ', Icon: HeartPulse },
-  { label: 'PRODUITS BIO & NATURELS', Icon: Sprout }
+  { label: 'PREOCCUPATIONS', Icon: Flame },
+  { label: 'COMPLEMENTS ALIMENTAIRES', Icon: Sprout }
 ];
 
 const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; openKey?: string }> = [
@@ -74,7 +80,8 @@ const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?:
   { label: 'CHEVEUX', Icon: Scissors, openKey: 'CHEVEUX' },
   { label: 'HYGIÈNE\nDENTAIRE', Icon: Smile, openKey: 'HYGIÈNE DENTAIRE' },
   { label: 'MAQUILLAGE', Icon: Brush, openKey: 'MAQUILLAGE' },
-  { label: 'PLUS', Icon: MoreHorizontal }
+  { label: 'PLUS', Icon: MoreHorizontal },
+  { label: 'PREOCCUPA\nTIONS', Icon: Flame, openKey: 'PREOCCUPATIONS' }
 ];
 
 interface HeaderProps {
@@ -146,9 +153,11 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
     const fromDesktop = menuCategories.find((c) => c.title === label);
     const items =
       fromDesktop?.items ??
-      (label === 'PRODUITS BIO & NATURELS'
-        ? ['Cosmétique Bio', 'Huiles essentielles', 'Compléments naturels', 'Tisanes & infusions']
-        : []);
+      (label === 'PREOCCUPATIONS'
+        ? ['Acne & Imperfections', 'Cernes', 'Taches', 'Rosacee & Rougeurs', 'Peau seche', 'Anti-age', 'Chute de cheveux', 'Immunite']
+        : label === 'COMPLEMENTS ALIMENTAIRES'
+          ? ['Vitamines & Mineraux', 'Collagene', 'Omega 3', 'Detox & Drainage']
+          : []);
 
     return { label, Icon, items };
   });
