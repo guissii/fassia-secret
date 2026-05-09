@@ -1,4 +1,5 @@
-import { Heart, ShoppingCart, ArrowLeftRight, Leaf, ArrowRight } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Heart, ShoppingCart, ArrowLeftRight, Leaf, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Product {
   id: number;
@@ -78,8 +79,61 @@ export function ProductSection({
   products = mockProducts,
   showFooter = false
 }: ProductSectionProps) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    el.classList.add('reveal-ready');
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      requestAnimationFrame(() => {
+        el.classList.add('is-visible');
+      });
+      return;
+    }
+
+    const safetyTimer = window.setTimeout(() => {
+      el.classList.add('is-visible');
+    }, 1200);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          el.classList.add('is-visible');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -10% 0px' }
+    );
+
+    observer.observe(el);
+    return () => {
+      window.clearTimeout(safetyTimer);
+      observer.disconnect();
+    };
+  }, []);
+
+  const scrollPage = (direction: -1 | 1) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const pageWidth = el.clientWidth;
+    if (pageWidth <= 0) return;
+    const currentPage = Math.round(el.scrollLeft / pageWidth);
+    const target = (currentPage + direction) * pageWidth;
+    el.scrollTo({ left: target, behavior: 'smooth' });
+  };
+
   return (
-    <section className="product-section py-3xl">
+    <section ref={sectionRef} className="product-section py-3xl">
       <div className="container">
         
         {/* Section Header */}
@@ -96,9 +150,27 @@ export function ProductSection({
         </div>
 
         {/* Carousel Container */}
-        <div className="product-carousel">
-          {products.map((product) => (
-            <div key={product.id} className="product-card">
+        <div className="product-carousel-wrap">
+          <button
+            type="button"
+            className="product-carousel-nav prev"
+            onClick={() => scrollPage(-1)}
+            aria-label="Précédent"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            className="product-carousel-nav next"
+            onClick={() => scrollPage(1)}
+            aria-label="Suivant"
+          >
+            <ChevronRight size={18} />
+          </button>
+
+          <div className="product-carousel" ref={carouselRef}>
+            {products.map((product) => (
+              <div key={product.id} className="product-card">
               
               {/* Image & Badges */}
               <div className="product-image-container">
@@ -142,8 +214,9 @@ export function ProductSection({
                 </button>
               </div>
 
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Footer actions */}

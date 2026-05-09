@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "clean": "node -e \"const fs=require('fs'); fs.rmSync('.next',{recursive:true,force:true});\"",
+    "dev:clean": "npm run clean && next dev",
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint .",

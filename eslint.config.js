@@ -17,4 +17,10 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: ['next-env.d.ts'],
+    rules: {
+      '@typescript-eslint/triple-slash-reference': 'off',
+    },
+  },
 ])

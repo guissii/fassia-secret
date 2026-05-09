@@ -1,7 +1,12 @@
+"use client";
+
 import { useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { BrandFlow } from './components/BrandFlow';
+import { NewArrivalsBanner } from './components/NewArrivalsBanner';
 import { ProductSection } from './components/ProductSection';
+import { IngredientsSection } from './components/IngredientsSection';
 import { Categories } from './components/Categories';
 import { Brands } from './components/Brands';
 import { Footer } from './components/Footer';
@@ -49,8 +54,14 @@ function App() {
       <Header onCartOpen={() => setIsCartOpen(true)} cartCount={totalCartCount} />
       <main>
         <Hero />
-        
-        <ProductSection title="Nouveautés" />
+
+        <BrandFlow brandName="CENTELLA" visualImage="ca  quon va utiiser.png" />
+
+        {/* Bannière cliquable → redirige vers la page Nouveautés */}
+        <NewArrivalsBanner image="neww section.png" href="/nouveautes" alt="Nouveautés" />
+
+        <IngredientsSection />
+
         <ProductSection title="Meilleures Ventes" />
         
         <Categories />

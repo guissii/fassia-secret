@@ -1,0 +1,36 @@
+.new-arrivals-banner-section {
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+.new-arrivals-banner-link {
+  display: block;
+}
+
+.new-arrivals-banner-media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.new-arrivals-banner-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 768px) {
+  .new-arrivals-banner-media {
+    border-radius: 18px;
+  }
+}
+
