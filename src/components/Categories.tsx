@@ -34,7 +34,7 @@ export function Categories() {
     <section className="categories-section py-3xl">
       <div className="container">
         
-        {/* Editorial Title */}
+        {/* Section Title */}
         <div className="categories-header text-center mb-2xl">
           <h2 className="categories-title">
             Catégories Populaires
