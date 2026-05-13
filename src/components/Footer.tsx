@@ -1,4 +1,6 @@
 import { MapPin, Phone, Mail, Globe, Share2, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 export function Footer() {
   return (
@@ -6,35 +8,39 @@ export function Footer() {
       <div className="footer-top">
         <div className="container grid footer-grid">
           <div className="footer-col">
-            <a className="footer-brand" href="#" aria-label="Fassia Secret">
-              <img className="footer-logo" src="logo.png" alt="Fassia Secret" />
-            </a>
+            <Link className="footer-brand" href="/" aria-label="Fassia Secret">
+              <img className="footer-logo" src={publicAssetUrl('logo.png')} alt="Fassia Secret" />
+            </Link>
             <p className="text-muted text-sm mb-lg">
               Votre parapharmacie en ligne de confiance. Produits santé & beauté livrés partout au Maroc.
             </p>
             <div className="social-links flex gap-md">
-              <a href="#" className="social-icon"><Globe size={20} /></a>
-              <a href="#" className="social-icon"><Share2 size={20} /></a>
+              <a href="#" className="social-icon" onClick={(e) => e.preventDefault()}>
+                <Globe size={20} />
+              </a>
+              <a href="#" className="social-icon" onClick={(e) => e.preventDefault()}>
+                <Share2 size={20} />
+              </a>
             </div>
           </div>
 
           <div className="footer-col">
             <h4 className="text-lg font-bold mb-md">Liens Rapides</h4>
             <ul className="footer-links">
-              <li><a href="#">Conditions de livraison</a></li>
-              <li><a href="#">Mentions légales</a></li>
-              <li><a href="#">Conditions générales</a></li>
-              <li><a href="#">Suivi de commande</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Conditions de livraison</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Mentions légales</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Conditions générales</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Suivi de commande</a></li>
             </ul>
           </div>
 
           <div className="footer-col">
             <h4 className="text-lg font-bold mb-md">Mon Compte</h4>
             <ul className="footer-links">
-              <li><a href="#">Informations personnelles</a></li>
-              <li><a href="#">Historique des commandes</a></li>
-              <li><a href="#">Mes adresses</a></li>
-              <li><a href="#">Liste de souhaits</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Informations personnelles</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Historique des commandes</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Mes adresses</a></li>
+              <li><a href="#" onClick={(e) => e.preventDefault()}>Liste de souhaits</a></li>
             </ul>
           </div>
 

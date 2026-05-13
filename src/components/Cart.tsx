@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 export interface CartItem {
   id: number;
@@ -23,6 +24,9 @@ const SHIPPING_THRESHOLD = 500;
 const SHIPPING_COST = 39;
 
 export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const isFreeShipping = subtotal >= SHIPPING_THRESHOLD;
   const shipping = isFreeShipping ? 0 : SHIPPING_COST;
@@ -38,6 +42,20 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    if (isOpen) {
+      restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      requestAnimationFrame(() => closeButtonRef.current?.focus());
+      return;
+    }
+
+    const toRestore = restoreFocusRef.current;
+    restoreFocusRef.current = null;
+    if (toRestore) requestAnimationFrame(() => toRestore.focus());
   }, [isOpen]);
 
   // Close on Escape
@@ -68,7 +86,13 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
               <span className="cart-header-count">{totalItems}</span>
             )}
           </div>
-          <button className="cart-close-btn" onClick={onClose} aria-label="Fermer le panier">
+          <button
+            className="cart-close-btn"
+            onClick={onClose}
+            aria-label="Fermer le panier"
+            type="button"
+            ref={closeButtonRef}
+          >
             <X size={22} strokeWidth={1.5} />
           </button>
         </div>
@@ -137,11 +161,11 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
               </div>
             </div>
 
-            <button className="cart-checkout-btn">
+            <button className="cart-checkout-btn" type="button">
               PASSER LA COMMANDE <ArrowRight size={16} />
             </button>
 
-            <button className="cart-continue-btn" onClick={onClose}>
+            <button className="cart-continue-btn" onClick={onClose} type="button">
               Continuer mes achats
             </button>
 
@@ -172,7 +196,7 @@ function CartItemRow({
   return (
     <div className="cart-item">
       <div className="cart-item-image-wrap">
-        <img src={item.image} alt={item.name} className="cart-item-image" />
+        <img src={publicAssetUrl(item.image)} alt={item.name} className="cart-item-image" />
       </div>
 
       <div className="cart-item-details">
@@ -186,6 +210,7 @@ function CartItemRow({
               className="cart-qty-btn"
               onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
               aria-label="Diminuer la quantité"
+              type="button"
             >
               <Minus size={12} />
             </button>
@@ -194,6 +219,7 @@ function CartItemRow({
               className="cart-qty-btn"
               onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
               aria-label="Augmenter la quantité"
+              type="button"
             >
               <Plus size={12} />
             </button>
@@ -212,6 +238,7 @@ function CartItemRow({
             className="cart-remove-btn"
             onClick={() => onRemove(item.id)}
             aria-label="Supprimer l'article"
+            type="button"
           >
             <Trash2 size={14} />
           </button>

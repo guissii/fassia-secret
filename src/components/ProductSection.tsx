@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Heart, ShoppingCart, ArrowLeftRight, Leaf, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 interface Product {
   id: number;
@@ -174,7 +175,7 @@ export function ProductSection({
               
               {/* Image & Badges */}
               <div className="product-image-container">
-                <img src={product.image} alt={product.name} className="product-image" />
+                <img src={publicAssetUrl(product.image)} alt={product.name} className="product-image" />
                 
                 {product.badge && (
                   <span className="product-badge" style={{ backgroundColor: product.badgeColor || 'var(--color-primary)' }}>
@@ -203,13 +204,13 @@ export function ProductSection({
 
               {/* Actions (3 Circular Buttons) */}
               <div className="product-actions-circular">
-                <button className="action-circle outline-btn">
+                <button className="action-circle outline-btn" type="button">
                   <Heart size={16} />
                 </button>
-                <button className="action-circle primary-btn">
+                <button className="action-circle primary-btn" type="button">
                   <ShoppingCart size={16} />
                 </button>
-                <button className="action-circle outline-btn">
+                <button className="action-circle outline-btn" type="button">
                   <ArrowLeftRight size={16} />
                 </button>
               </div>
@@ -227,7 +228,7 @@ export function ProductSection({
               <Leaf size={28} className="ornament-icon-large text-primary" strokeWidth={1.5} style={{ fill: 'var(--color-primary)' }} />
               <span className="ornament-line-long"></span>
             </div>
-            <button className="btn-primary-rounded mt-lg mx-auto" style={{ display: 'inline-flex' }}>
+            <button className="btn-primary-rounded mt-lg mx-auto" style={{ display: 'inline-flex' }} type="button">
               VOIR TOUTES LES NOUVEAUTÉS <ArrowRight size={16} />
             </button>
           </div>

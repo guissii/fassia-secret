@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { ArrowLeftRight, Heart, Leaf, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 type BrandFlowProduct = {
   id: number;
@@ -23,7 +24,6 @@ export function BrandFlow({
   visualImage = 'ca  quon va utiiser.png',
   products,
 }: BrandFlowProps) {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
   const scrollPage = (direction: -1 | 1) => {
@@ -34,10 +34,6 @@ export function BrandFlow({
     const currentPage = Math.round(el.scrollLeft / pageWidth);
     const target = (currentPage + direction) * pageWidth;
     el.scrollTo({ left: target, behavior: 'smooth' });
-  };
-
-  const toPublicUrl = (filename: string) => {
-    return encodeURI(`${basePath}/${filename}`);
   };
 
   const items = useMemo<BrandFlowProduct[]>(() => {
@@ -108,7 +104,7 @@ export function BrandFlow({
           >
           <div className="brand-flow-slide brand-flow-visual-tile" aria-label={`Visuel ${brandName}`}>
             <img
-              src={toPublicUrl(visualImage)}
+              src={publicAssetUrl(visualImage)}
               alt={`${brandName} visuel`}
               className="brand-flow-visual-img"
               loading="lazy"
@@ -119,7 +115,7 @@ export function BrandFlow({
             <div key={p.id} className="product-card brand-flow-slide">
               <div className="product-image-container">
                 <img
-                  src={toPublicUrl(p.image)}
+                  src={publicAssetUrl(p.image)}
                   alt={p.name}
                   className="product-image"
                   loading="lazy"

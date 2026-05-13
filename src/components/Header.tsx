@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
+import Link from 'next/link';
 import {
   Brush,
   ChevronDown,
@@ -22,6 +23,7 @@ import {
   Truck,
   X
 } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 const desktopMenuCategories = [
   {
@@ -147,6 +149,9 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const mobileMenuCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const restoreMenuFocusRef = useRef<HTMLElement | null>(null);
+  const restoreSearchFocusRef = useRef<HTMLElement | null>(null);
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -158,6 +163,9 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
   };
 
   const toggleMobileMenu = () => {
+    if (typeof document !== 'undefined' && !isMobileMenuOpen) {
+      restoreMenuFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     setIsMobileMenuOpen((v) => {
       const next = !v;
       if (next) setOpenMobileCategory(null);
@@ -167,6 +175,9 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
   };
 
   const openDrawerWithCategory = (category: string | null) => {
+    if (typeof document !== 'undefined') {
+      restoreMenuFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     setIsMobileMenuOpen(true);
     setOpenMobileCategory(category);
     setIsMobileSearchOpen(false);
@@ -197,10 +208,35 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
   }, [isMobileSearchOpen]);
 
   const openMobileSearch = () => {
+    if (typeof document !== 'undefined') {
+      restoreSearchFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     setIsMobileMenuOpen(false);
     setOpenMobileCategory(null);
     setIsMobileSearchOpen(true);
   };
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      requestAnimationFrame(() => mobileMenuCloseButtonRef.current?.focus());
+      return;
+    }
+
+    if (isMobileSearchOpen) return;
+
+    const toRestore = restoreMenuFocusRef.current;
+    restoreMenuFocusRef.current = null;
+    if (toRestore) requestAnimationFrame(() => toRestore.focus());
+  }, [isMobileMenuOpen, isMobileSearchOpen]);
+
+  useEffect(() => {
+    if (isMobileSearchOpen) return;
+    if (isMobileMenuOpen) return;
+
+    const toRestore = restoreSearchFocusRef.current;
+    restoreSearchFocusRef.current = null;
+    if (toRestore) requestAnimationFrame(() => toRestore.focus());
+  }, [isMobileSearchOpen, isMobileMenuOpen]);
 
   const mobileMenuCategories = mobileMenuItems.map(({ label, Icon }) => {
     const fromDrawer = mobileDrawerCategories.find((c) => c.title === label);
@@ -286,19 +322,25 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
         aria-label="Menu"
       >
         <div className="mobile-menu-header">
-          <button className="mobile-menu-icon-btn" onClick={closeMobileMenu} aria-label="Fermer le menu">
+          <button
+            className="mobile-menu-icon-btn"
+            onClick={closeMobileMenu}
+            aria-label="Fermer le menu"
+            ref={mobileMenuCloseButtonRef}
+            type="button"
+          >
             <X size={24} />
           </button>
 
           <div className="mobile-menu-brand" aria-label="Fassia Secret">
-            <img className="mobile-menu-logo" src="logo.png" alt="Fassia Secret" />
+            <img className="mobile-menu-logo" src={publicAssetUrl('logo.png')} alt="Fassia Secret" />
             <div className="mobile-menu-brand-text">
               <div className="mobile-menu-brand-title">Fassia Secret</div>
               <div className="mobile-menu-brand-subtitle">PARAPHARMACIE</div>
             </div>
           </div>
 
-          <button className="mobile-menu-icon-btn" onClick={onCartOpen} aria-label="Ouvrir le panier">
+          <button className="mobile-menu-icon-btn" onClick={onCartOpen} aria-label="Ouvrir le panier" type="button">
             <div className="mobile-menu-cart">
               <ShoppingCart size={22} />
               <span className="mobile-menu-cart-badge">{cartCount}</span>
@@ -324,7 +366,15 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
 
               <div className={`mobile-submenu ${openMobileCategory === label ? 'open' : ''}`}>
                 {items.map((item) => (
-                  <a key={item} href="#" className="mobile-submenu-item" onClick={closeMobileMenu}>
+                  <a
+                    key={item}
+                    href="#"
+                    className="mobile-submenu-item"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeMobileMenu();
+                    }}
+                  >
                     {item}
                   </a>
                 ))}
@@ -375,13 +425,14 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
             aria-label="Ouvrir le menu"
+            type="button"
           >
             <Menu size={28} />
           </button>
 
-          <a className="logo" href="#" aria-label="Fassia Secret">
-            <img className="site-logo" src="logo.png" alt="Fassia Secret" />
-          </a>
+          <Link className="logo" href="/" aria-label="Fassia Secret">
+            <img className="site-logo" src={publicAssetUrl('logo.png')} alt="Fassia Secret" />
+          </Link>
           
           <div className="header-search-slot">
             <div className="search-bar flex header-search hidden-mobile">
@@ -397,11 +448,16 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
           </div>
 
           <div className="actions flex items-center gap-lg">
-            <button className="action-btn flex-col items-center hidden-mobile" aria-label="Favoris">
+            <button className="action-btn flex-col items-center hidden-mobile" aria-label="Favoris" type="button">
               <Heart size={24} />
               <span className="action-label text-xs">Favoris</span>
             </button>
-            <button className="action-btn flex-col items-center cart-btn mobile-cart-btn" onClick={onCartOpen} aria-label="Panier">
+            <button
+              className="action-btn flex-col items-center cart-btn mobile-cart-btn"
+              onClick={onCartOpen}
+              aria-label="Panier"
+              type="button"
+            >
               <div className="cart-icon-wrapper">
                 <ShoppingCart size={24} />
                 <span className="cart-badge">{cartCount}</span>
@@ -440,14 +496,20 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
           <ul className="flex items-center gap-xs main-nav-list">
             {desktopMenuCategories.map((category, index) => (
               <li key={index} className="nav-item">
-                <a href="#" className="nav-link flex items-center gap-xs">
+                <a
+                  href="#"
+                  className="nav-link flex items-center gap-xs"
+                  onClick={(e) => e.preventDefault()}
+                >
                   {category.title} <ChevronDown size={14} className="dropdown-icon" />
                 </a>
                 <div className="dropdown-menu">
                   <ul>
                     {category.items.map((item, idx) => (
                       <li key={idx}>
-                        <a href="#" className="dropdown-item">{item}</a>
+                        <a href="#" className="dropdown-item" onClick={(e) => e.preventDefault()}>
+                          {item}
+                        </a>
                       </li>
                     ))}
                   </ul>
@@ -455,7 +517,11 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
               </li>
             ))}
             <li>
-              <a href="#" className="nav-link nav-link-promos flex items-center gap-xs">
+              <a
+                href="#"
+                className="nav-link nav-link-promos flex items-center gap-xs"
+                onClick={(e) => e.preventDefault()}
+              >
                 <Tag size={14} className="promos-icon" /> PROMOS
               </a>
             </li>

@@ -1,8 +1,7 @@
 import { ArrowRight, Leaf } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 export function Categories() {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-
   const categories = [
     {
       id: 1,
@@ -53,7 +52,7 @@ export function Categories() {
               <div 
                 className="bento-bg"
                 style={{
-                  backgroundImage: `url('${basePath}/${cat.image}')`,
+                  backgroundImage: `url('${publicAssetUrl(cat.image)}')`,
                 }}
               ></div>
               <div className="bento-gradient"></div>
@@ -61,7 +60,7 @@ export function Categories() {
               <div className="bento-content text-center">
                 <h3 className="bento-title">{cat.title}</h3>
                 <p className="bento-count">{cat.productsCount}</p>
-                <button className={`bento-btn ${cat.btnClass}`}>
+                <button className={`bento-btn ${cat.btnClass}`} type="button">
                   DÉCOUVRIR <ArrowRight size={16} />
                 </button>
               </div>

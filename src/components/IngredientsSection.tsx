@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ArrowRight, Droplet, FlaskConical, Sparkles, Sun, Leaf } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 type Ingredient = {
   id: number;
@@ -55,7 +56,6 @@ const INGREDIENTS: Ingredient[] = [
 
 export function IngredientsSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -116,7 +116,7 @@ export function IngredientsSection() {
               <div key={item.id} className="ingredients-card">
                 <div
                   className="ingredients-card-bg"
-                  style={{ backgroundImage: `url('${basePath}/${item.image}')` }}
+                  style={{ backgroundImage: `url('${publicAssetUrl(item.image)}')` }}
                 ></div>
                 <div className="ingredients-card-overlay"></div>
 

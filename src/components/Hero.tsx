@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, FlaskConical, Heart, Leaf } from 'lucide-react';
+import { publicAssetUrl } from '../lib/publicUrl';
 
 export function Hero() {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(max-width: 768px)').matches;
@@ -20,10 +20,6 @@ export function Hero() {
   }, []);
 
   const slideCount = slides.length;
-
-  const toPublicUrl = (filename: string) => {
-    return encodeURI(`${basePath}/${filename}`);
-  };
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 768px)');
@@ -86,7 +82,7 @@ export function Hero() {
             <div
               key={s.image}
               className={`hero-slide ${i === renderedIndex ? 'active' : ''}`}
-              style={{ backgroundImage: `url("${toPublicUrl(s.image)}")` }}
+              style={{ backgroundImage: `url("${publicAssetUrl(s.image)}")` }}
             />
           ))}
         </div>
