@@ -129,14 +129,11 @@ const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: numbe
   { label: 'PREMIUM HAIR CARE', Icon: Scissors }
 ];
 
-const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; openKey?: string }> = [
-  { label: 'CORPS', Icon: Droplet, openKey: 'CORPS' },
-  { label: 'VISAGE', Icon: Sparkles, openKey: 'VISAGE' },
-  { label: 'CHEVEUX', Icon: Scissors, openKey: 'CHEVEUX' },
-  { label: 'HYGIÈNE\nDENTAIRE', Icon: Smile, openKey: 'HYGIÈNE DENTAIRE' },
-  { label: 'MAQUILLAGE', Icon: Brush, openKey: 'MAQUILLAGE' },
-  { label: 'PLUS', Icon: MoreHorizontal },
-  { label: 'PREOCCUPA\nTIONS', Icon: Flame, openKey: 'PREOCCUPATIONS' }
+const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; href?: string; openKey?: string }> = [
+  { label: 'PROMOTIONS', Icon: Tag, openKey: 'PROMOTIONS !' },
+  { label: 'COMPLÉMENTS\nALIMENTAIRES', Icon: Sprout, openKey: 'COMPLEMENTS ALIMENTAIRES' },
+  { label: 'KOREAN\nBEAUTY', Icon: Sparkles, openKey: 'K-BEAUTY' },
+  { label: 'PARFUMS\n& MAQUILLAGE', Icon: Brush, href: '/maquillage-parfums' },
 ];
 
 interface HeaderProps {
@@ -471,20 +468,31 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
       <div className="mobile-categories-bar">
         <div className="container">
           <div className="mobile-categories-grid" role="navigation" aria-label="Catégories">
-            {mobileQuickCategories.map(({ label, Icon, openKey }) => (
-              <button
-                key={label}
-                type="button"
-                className="mobile-category"
-                onClick={() => {
-                  openDrawerWithCategory(openKey ?? null);
-                }}
-                aria-label={label.replace('\n', ' ')}
-              >
-                <Icon size={22} className="mobile-category-icon" />
-                <span className="mobile-category-label">{label}</span>
-                <ChevronDown size={14} className="mobile-category-chevron" />
-              </button>
+            {mobileQuickCategories.map(({ label, Icon, openKey, href }) => (
+              href ? (
+                <Link
+                  key={label}
+                  href={href}
+                  className="mobile-category"
+                  aria-label={label.replace(/\s*\n\s*/g, ' ')}
+                >
+                  <Icon size={22} className="mobile-category-icon" />
+                  <span className="mobile-category-label">{label}</span>
+                </Link>
+              ) : (
+                <button
+                  key={label}
+                  type="button"
+                  className="mobile-category"
+                  onClick={() => {
+                    if (openKey) openDrawerWithCategory(openKey);
+                  }}
+                  aria-label={label.replace(/\s*\n\s*/g, ' ')}
+                >
+                  <Icon size={22} className="mobile-category-icon" />
+                  <span className="mobile-category-label">{label}</span>
+                </button>
+              )
             ))}
           </div>
         </div>

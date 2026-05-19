@@ -15,49 +15,49 @@ export function Footer() {
               Votre parapharmacie en ligne de confiance. Produits santé & beauté livrés partout au Maroc.
             </p>
             <div className="social-links flex gap-md">
-              <a href="#" className="social-icon" onClick={(e) => e.preventDefault()}>
-                <Globe size={20} />
+              <a href="#" className="social-icon" aria-label="Website">
+                <Globe size={18} />
               </a>
-              <a href="#" className="social-icon" onClick={(e) => e.preventDefault()}>
-                <Share2 size={20} />
+              <a href="#" className="social-icon" aria-label="Share">
+                <Share2 size={18} />
               </a>
             </div>
           </div>
 
           <div className="footer-col">
-            <h4 className="text-lg font-bold mb-md">Liens Rapides</h4>
+            <h4 className="mb-md">Liens Rapides</h4>
             <ul className="footer-links">
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Conditions de livraison</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Mentions légales</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Conditions générales</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Suivi de commande</a></li>
+              <li><a href="#">Conditions de livraison</a></li>
+              <li><a href="#">Mentions légales</a></li>
+              <li><a href="#">Conditions générales</a></li>
+              <li><a href="#">Suivi de commande</a></li>
             </ul>
           </div>
 
           <div className="footer-col">
-            <h4 className="text-lg font-bold mb-md">Mon Compte</h4>
+            <h4 className="mb-md">Mon Compte</h4>
             <ul className="footer-links">
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Informations personnelles</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Historique des commandes</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Mes adresses</a></li>
-              <li><a href="#" onClick={(e) => e.preventDefault()}>Liste de souhaits</a></li>
+              <li><a href="#">Informations personnelles</a></li>
+              <li><a href="#">Historique des commandes</a></li>
+              <li><a href="#">Mes adresses</a></li>
+              <li><a href="#">Liste de souhaits</a></li>
             </ul>
           </div>
 
           <div className="footer-col">
-            <h4 className="text-lg font-bold mb-md">Contactez-nous</h4>
+            <h4 className="mb-md">Contactez-nous</h4>
             <ul className="contact-list text-sm text-muted">
               <li className="flex gap-sm items-center">
-                <MapPin size={16} className="text-primary" />
-                <span>Adresse masquee</span>
+                <MapPin size={14} className="text-primary" />
+                <span>Casablanca, Maroc</span>
               </li>
               <li className="flex gap-sm items-center">
-                <Phone size={16} className="text-primary" />
-                <span>Telephone masque</span>
+                <Phone size={14} className="text-primary" />
+                <span>+212 600 000 000</span>
               </li>
               <li className="flex gap-sm items-center">
-                <Mail size={16} className="text-primary" />
-                <span>Email masque</span>
+                <Mail size={14} className="text-primary" />
+                <span>contact@fassiasecret.com</span>
               </li>
             </ul>
           </div>

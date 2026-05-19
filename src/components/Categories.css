@@ -2,40 +2,7 @@
   background-color: rgba(255, 255, 255, 0.55);
 }
 
-/* Editorial Title with Leaf Ornament */
-.categories-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.categories-title {
-  font-family: serif;
-  font-size: clamp(1.4rem, 5.5vw, 2.5rem);
-  font-weight: 400;
-  color: var(--color-primary);
-  margin: 0;
-  letter-spacing: 0.4px;
-  white-space: nowrap;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.categories-ornament {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  color: var(--color-primary);
-}
-
-.ornament-line {
-  width: 40px;
-  height: 1px;
-  background-color: var(--color-primary);
-  opacity: 0.5;
-}
+/* Old Editorial Title styles removed - now using .section-header-premium from index.css */
 
 /* Bento Grid System */
 .categories-bento-grid {
@@ -133,7 +100,7 @@
 .bento-card {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -208,7 +175,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: 12px 32px;
-  border-radius: 30px;
+  border-radius: 0;
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 1px;

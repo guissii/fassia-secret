@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { BrandFlow } from './components/BrandFlow';
-import { NewArrivalsBanner } from './components/NewArrivalsBanner';
 import { ProductSection } from './components/ProductSection';
-import { IngredientsSection } from './components/IngredientsSection';
 import { Categories } from './components/Categories';
 import { Brands } from './components/Brands';
 import { Footer } from './components/Footer';
 import { Cart, type CartItem } from './components/Cart';
+import { EssentialsSection } from './components/EssentialsSection';
+import { IngredientsSection } from './components/IngredientsSection';
 
 // Demo cart items matching the product style
 const DEMO_CART_ITEMS: CartItem[] = [
@@ -55,10 +54,7 @@ function App() {
       <main>
         <Hero />
 
-        <BrandFlow brandName="CENTELLA" visualImage="ca  quon va utiiser.png" />
-
-        {/* Bannière cliquable → redirige vers la page Nouveautés */}
-        <NewArrivalsBanner image="neww section.png" href="/nouveautes" alt="Nouveautés" />
+        <EssentialsSection />
 
         <IngredientsSection />
 

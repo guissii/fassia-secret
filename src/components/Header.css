@@ -129,7 +129,7 @@
   display: none;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid rgba(225, 0, 116, 0.25);
   background: #ffffff;
   color: #e10074;
@@ -156,7 +156,7 @@
   width: 100%;
   max-width: 620px;
   border: 1px solid rgba(225, 0, 116, 0.25);
-  border-radius: 10px;
+  border-radius: 0;
   position: relative;
   background: #ffffff;
   height: 52px;
@@ -219,7 +219,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 0;
 }
 
 .nav-bar {
@@ -313,7 +313,7 @@
   transform: translateY(-50%);
   width: 4px;
   height: 4px;
-  border-radius: 50%;
+  border-radius: 0;
   background-color: #e10074;
   opacity: 0;
   transition: all 0.3s;
@@ -458,11 +458,10 @@
   }
 
   .mobile-categories-grid {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 10px;
     padding: 0 4px;
   }
 
@@ -474,8 +473,8 @@
     gap: 6px;
     padding: 8px 4px 6px;
     color: var(--color-text);
-    min-width: 76px;
-    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
   }
 
   .mobile-category-icon {
@@ -491,11 +490,6 @@
     line-height: 1.05;
     white-space: pre-line;
     max-width: 78px;
-  }
-
-  .mobile-category-chevron {
-    color: rgba(26, 26, 26, 0.45);
-    margin-top: -2px;
   }
 
   .mobile-categories-grid::-webkit-scrollbar {
@@ -613,7 +607,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 0;
   }
 
   .mobile-menu-search {
@@ -624,7 +618,7 @@
     position: relative;
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 14px;
+    border-radius: 0;
     padding: 12px 40px 12px 14px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
   }
@@ -726,7 +720,7 @@
     gap: 12px;
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 16px;
+    border-radius: 0;
     margin: 12px 14px 14px;
   }
 

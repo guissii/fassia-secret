@@ -1,4 +1,4 @@
-import { ArrowRight, Leaf } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
 
 export function Categories() {
@@ -33,16 +33,12 @@ export function Categories() {
     <section className="categories-section py-3xl">
       <div className="container">
         
-        {/* Section Title */}
-        <div className="categories-header text-center mb-2xl">
-          <h2 className="categories-title">
+        {/* Section Header */}
+        <div className="section-header-premium mb-2xl">
+          <h2 className="section-title-premium">
             Catégories Populaires
           </h2>
-          <div className="categories-ornament">
-            <span className="ornament-line"></span>
-            <Leaf size={20} className="ornament-icon" strokeWidth={1.5} />
-            <span className="ornament-line"></span>
-          </div>
+          <div className="section-ornament-premium" aria-hidden="true" />
         </div>
 
         {/* Bento Grid */}
@@ -59,7 +55,6 @@ export function Categories() {
               
               <div className="bento-content text-center">
                 <h3 className="bento-title">{cat.title}</h3>
-                <p className="bento-count">{cat.productsCount}</p>
                 <button className={`bento-btn ${cat.btnClass}`} type="button">
                   DÉCOUVRIR <ArrowRight size={16} />
                 </button>

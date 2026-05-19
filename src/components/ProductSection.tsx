@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Heart, ShoppingCart, ArrowLeftRight, Leaf, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Leaf, ArrowRight, ChevronLeft, ChevronRight, ArrowUpRight, Heart, ShoppingBag } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
+import Link from 'next/link';
 
 interface Product {
   id: number;
@@ -19,6 +20,7 @@ interface ProductSectionProps {
   subtitle?: string;
   products?: Product[];
   showFooter?: boolean;
+  seeMoreHref?: string;
 }
 
 const mockProducts: Product[] = [
@@ -30,7 +32,7 @@ const mockProducts: Product[] = [
     image: "19bd7403-d2ac-49a4-a584-be5895add421.png",
     category: "Visage",
     badge: "Nouveau",
-    badgeColor: "var(--color-primary)"
+    badgeColor: "var(--color-primary)",
   },
   {
     id: 2,
@@ -40,19 +42,17 @@ const mockProducts: Product[] = [
     oldPrice: 249.00,
     image: "d6f902fd-0b09-48d0-8055-d03094820431.png",
     category: "Visage",
-    badge: "Promo !",
-    badgeColor: "var(--color-primary)"
+    badgeColor: "var(--color-primary)",
   },
   {
     id: 3,
     name: "Detox & Drainage",
-    description: "Complement alimentaire detox a base d’artichaut & pissenlit.",
+    description: "Complément détox à base d’actifs botaniques.",
     price: 129.00,
     oldPrice: 159.00,
     image: "5aa79a5c-fd9e-42f0-bf17-d64dbb490eb8.png",
     category: "Compléments",
-    badge: "Promo !",
-    badgeColor: "var(--color-primary)"
+    badgeColor: "var(--color-primary)",
   },
   {
     id: 4,
@@ -60,7 +60,7 @@ const mockProducts: Product[] = [
     description: "Soutien immunitaire & santé osseuse au quotidien.",
     price: 149.00,
     image: "950aa654-e0a2-4875-8451-ca8805a6d44a.png",
-    category: "Santé"
+    category: "Santé",
   },
   {
     id: 5,
@@ -70,7 +70,7 @@ const mockProducts: Product[] = [
     image: "image%202%202.png",
     category: "Bien-etre",
     badge: "Nouveau",
-    badgeColor: "var(--color-primary)"
+    badgeColor: "var(--color-primary)",
   }
 ];
 
@@ -78,7 +78,8 @@ export function ProductSection({
   title = "NOUVEAUTÉS", 
   subtitle,
   products = mockProducts,
-  showFooter = false
+  showFooter = false,
+  seeMoreHref = "/boutique"
 }: ProductSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const carouselRef = useRef<HTMLDivElement | null>(null);
@@ -123,31 +124,38 @@ export function ProductSection({
     };
   }, []);
 
-  const scrollPage = (direction: -1 | 1) => {
+  const scrollByCards = (direction: -1 | 1) => {
     const el = carouselRef.current;
     if (!el) return;
-    const pageWidth = el.clientWidth;
-    if (pageWidth <= 0) return;
-    const currentPage = Math.round(el.scrollLeft / pageWidth);
-    const target = (currentPage + direction) * pageWidth;
-    el.scrollTo({ left: target, behavior: 'smooth' });
+    const firstCard = el.querySelector<HTMLElement>('.product-card');
+    const cardWidth = firstCard?.offsetWidth ?? 0;
+    const styles = window.getComputedStyle(el);
+    const gap = Number.parseFloat(styles.columnGap || styles.gap || '0') || 0;
+    const delta = (cardWidth + gap) * 2 * direction;
+    el.scrollBy({ left: delta, behavior: 'smooth' });
+  };
+
+  const formatPrice = (value: number) => `${value.toFixed(2)} MAD`;
+
+  const promoLabelFor = (p: Product) => {
+    if (typeof p.oldPrice === 'number' && p.oldPrice > p.price) {
+      const pct = Math.round((1 - p.price / p.oldPrice) * 100);
+      if (pct > 0) return `-${pct}%`;
+    }
+    return p.badge ?? '';
   };
 
   return (
-    <section ref={sectionRef} className="product-section py-3xl">
+    <section ref={sectionRef} className="product-section py-xl">
       <div className="container">
         
         {/* Section Header */}
-        <div className="section-header text-center mb-2xl">
-          <h2 className="product-section-title">
+        <div className="section-header-premium mb-xl">
+          <h2 className="section-title-premium">
             {title}
           </h2>
-          <div className="section-ornament">
-            <span className="ornament-line"></span>
-            <Leaf size={20} className="ornament-icon" strokeWidth={1.5} />
-            <span className="ornament-line"></span>
-          </div>
-          {subtitle && <p className="section-subtitle">{subtitle}</p>}
+          <div className="section-ornament-premium" aria-hidden="true" />
+          {subtitle && <p className="section-subtitle-premium">{subtitle}</p>}
         </div>
 
         {/* Carousel Container */}
@@ -155,7 +163,7 @@ export function ProductSection({
           <button
             type="button"
             className="product-carousel-nav prev"
-            onClick={() => scrollPage(-1)}
+            onClick={() => scrollByCards(-1)}
             aria-label="Précédent"
           >
             <ChevronLeft size={18} />
@@ -163,7 +171,7 @@ export function ProductSection({
           <button
             type="button"
             className="product-carousel-nav next"
-            onClick={() => scrollPage(1)}
+            onClick={() => scrollByCards(1)}
             aria-label="Suivant"
           >
             <ChevronRight size={18} />
@@ -171,52 +179,66 @@ export function ProductSection({
 
           <div className="product-carousel" ref={carouselRef}>
             {products.map((product) => (
-              <div key={product.id} className="product-card">
+              <article key={product.id} className="product-card" aria-label={product.name}>
               
               {/* Image & Badges */}
-              <div className="product-image-container">
-                <img src={publicAssetUrl(product.image)} alt={product.name} className="product-image" />
+              <div className="product-image-area">
+                <div className="product-image-frame">
+                  <img
+                    src={publicAssetUrl(product.image)}
+                    alt={product.name}
+                    className="product-image"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
                 
-                {product.badge && (
-                  <span className="product-badge" style={{ backgroundColor: product.badgeColor || 'var(--color-primary)' }}>
-                    <Leaf size={12} className="badge-icon" />
-                    {product.badge}
+                {promoLabelFor(product) && (
+                  <span
+                    className="product-badge"
+                    style={{ backgroundColor: product.badgeColor || 'var(--color-primary)' }}
+                  >
+                    {promoLabelFor(product)}
                   </span>
                 )}
-              </div>
 
-              {/* Info */}
-              <div className="product-info">
-                <h3 className="product-name">{product.name}</h3>
-                {product.description && (
-                  <p className="product-description">{product.description}</p>
-                )}
-                
-                <div className="product-divider"></div>
-
-                <div className="product-prices">
-                  <span className="price-current">{product.price.toFixed(2)} MAD</span>
-                  {product.oldPrice && (
-                    <span className="price-old">{product.oldPrice.toFixed(2)} MAD</span>
-                  )}
+                <div className="product-heart-btn" aria-label="Ajouter aux favoris">
+                  <Heart size={18} strokeWidth={2} />
                 </div>
               </div>
 
-              {/* Actions (3 Circular Buttons) */}
-              <div className="product-actions-circular">
-                <button className="action-circle outline-btn" type="button">
-                  <Heart size={16} />
-                </button>
-                <button className="action-circle primary-btn" type="button">
-                  <ShoppingCart size={16} />
-                </button>
-                <button className="action-circle outline-btn" type="button">
-                  <ArrowLeftRight size={16} />
-                </button>
+              {/* Info */}
+              <div className="product-content">
+                <span className="product-category-label">{product.category}</span>
+                <h3 className="product-name">{product.name}</h3>
+                {product.description && <p className="product-description">{product.description}</p>}
+
+                <div className="product-footer-row">
+                  <div className="product-price-row" aria-label="Prix">
+                    <span className="price-current">{formatPrice(product.price)}</span>
+                    {typeof product.oldPrice === 'number' && product.oldPrice > product.price && (
+                      <span className="price-old">{formatPrice(product.oldPrice)}</span>
+                    )}
+                  </div>
+                  <button className="product-cta-circle" type="button" aria-label={`Ajouter ${product.name} au panier`}>
+                    <ShoppingBag size={18} strokeWidth={2} />
+                  </button>
+                </div>
               </div>
 
-              </div>
+              </article>
             ))}
+
+            {/* See More Card at the end of Carousel */}
+            <Link href={seeMoreHref} className="product-card see-more-card">
+              <div className="see-more-content">
+                <div className="see-more-icon-wrap">
+                  <ArrowUpRight size={32} strokeWidth={1.5} />
+                </div>
+                <span className="see-more-text">Voir Plus</span>
+                <p className="see-more-subtext">Découvrir toute la collection</p>
+              </div>
+            </Link>
           </div>
         </div>
 

@@ -1,6 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, FlaskConical, Heart, Leaf } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { publicAssetUrl } from '../lib/publicUrl';
+
+type HeroSlide = {
+  id: string;
+  imageMobile: string;
+  imageDesktop: string;
+};
 
 export function Hero() {
   const [isMobile, setIsMobile] = useState(() => {
@@ -11,11 +16,18 @@ export function Hero() {
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
 
-  const slides = useMemo(() => {
+  const slides = useMemo<HeroSlide[]>(() => {
     return [
-      { image: 'hero new.png' },
-      { image: 'image 2 2.png' },
-      { image: 'ChatGPT Image May 5, 2026, 03_31_21 PM.png' },
+      {
+        id: 'promo-1',
+        imageMobile: 'eee.webp',
+        imageDesktop: 'eee.webp',
+      },
+      {
+        id: 'promo-2',
+        imageMobile: 'B.BENEFPRODUIT2.webp',
+        imageDesktop: 'B.BENEFPRODUIT2.webp',
+      },
     ];
   }, []);
 
@@ -44,17 +56,26 @@ export function Hero() {
     return () => window.clearInterval(id);
   }, [isMobile, slideCount]);
 
-  const renderedIndex = isMobile ? activeIndex : 0;
-
   const goTo = (idx: number) => {
     const next = ((idx % slideCount) + slideCount) % slideCount;
     setActiveIndex(next);
   };
 
+  const goPrev = () => goTo(activeIndex - 1);
+  const goNext = () => goTo(activeIndex + 1);
+
   return (
-    <section className="hero-section">
+    <section className="hero-section" aria-label="Bannière principale">
       <div
-        className="hero-background"
+        className="hero-carousel"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Offres et nouveautés"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') goPrev();
+          if (e.key === 'ArrowRight') goNext();
+        }}
         onTouchStart={(e) => {
           if (!isMobile || slideCount < 2) return;
           touchStartX.current = e.touches[0]?.clientX ?? null;
@@ -77,67 +98,53 @@ export function Hero() {
           else goTo(activeIndex - 1);
         }}
       >
-        <div className="hero-slides" aria-hidden="true">
-          {slides.map((s, i) => (
-            <div
-              key={s.image}
-              className={`hero-slide ${i === renderedIndex ? 'active' : ''}`}
-              style={{ backgroundImage: `url("${publicAssetUrl(s.image)}")` }}
-            />
-          ))}
-        </div>
-        <div className="hero-gradient-overlay"></div>
-        <div className="container hero-content">
-          <div className="hero-text-clean">
-            <div className="hero-badge">
-              <Leaf size={16} className="hero-badge-icon" />
-              <span className="hero-badge-text">NOUVELLE COLLECTION</span>
-            </div>
-            <h1 className="hero-title mt-md mb-lg">
-              <span className="hero-title-main">Prenez soin</span>
-              <span className="hero-title-main">de votre peau</span>
-              <span className="hero-title-script">naturellement</span>
-            </h1>
-            <p className="text-lg text-muted mb-lg hero-subtext">
-              Decouvrez nos soins premium et complements alimentaires pour une routine beaute saine et eclatante.
-            </p>
-            <div className="flex gap-md hero-buttons">
-              <button className="btn btn-primary hero-cta">
-                DÉCOUVRIR LA GAMME <ArrowRight size={18} />
-              </button>
-            </div>
-
-            <div className="hero-mini-features" aria-label="Points forts">
-              <div className="hero-mini-feature">
-                <Leaf size={18} className="hero-mini-icon" />
-                <span>Ingrédients naturels</span>
-              </div>
-              <div className="hero-mini-feature">
-                <FlaskConical size={18} className="hero-mini-icon" />
-                <span>Formules efficaces</span>
-              </div>
-              <div className="hero-mini-feature">
-                <Heart size={18} className="hero-mini-icon" />
-                <span>Cruelty free</span>
-              </div>
-            </div>
-
-            {isMobile && slideCount > 1 && (
-              <div className="hero-dots" role="tablist" aria-label="Carousel">
-                {slides.map((s, i) => (
-                  <button
-                    key={s.image}
-                    type="button"
-                    className={`hero-dot ${i === activeIndex ? 'active' : ''}`}
-                    onClick={() => goTo(i)}
-                    aria-label={`Slide ${i + 1}`}
-                    aria-pressed={i === activeIndex}
+        <div className="hero-viewport">
+          <div className="hero-track" style={{ transform: `translate3d(${-activeIndex * 100}%, 0, 0)` }}>
+            {slides.map((s, i) => (
+              <article
+                key={s.id}
+                className="hero-slide"
+                style={
+                  {
+                    ['--hero-bg']: `url('${publicAssetUrl(isMobile ? s.imageMobile : s.imageDesktop)}')`,
+                  } as unknown as CSSProperties
+                }
+                aria-roledescription="slide"
+                aria-label={`${i + 1} / ${slideCount}`}
+                aria-hidden={i !== activeIndex}
+              >
+                <picture className="hero-media">
+                  <source media="(min-width: 992px)" srcSet={publicAssetUrl(s.imageDesktop)} />
+                  <img
+                    className="hero-media-img"
+                    src={publicAssetUrl(s.imageMobile)}
+                    alt=""
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={i === 0 ? 'high' : 'auto'}
+                    decoding="async"
                   />
-                ))}
-              </div>
-            )}
+                </picture>
+              </article>
+            ))}
           </div>
         </div>
+
+        {slideCount > 1 && (
+          <>
+            <div className="hero-dots" role="tablist" aria-label="Pagination">
+              {slides.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`hero-dot ${i === activeIndex ? 'active' : ''}`}
+                  onClick={() => goTo(i)}
+                  aria-label={`Aller au slide ${i + 1}`}
+                  aria-pressed={i === activeIndex}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
