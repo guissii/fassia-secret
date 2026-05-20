@@ -20,6 +20,21 @@
   padding-bottom: var(--spacing-xl);
 }
 
+.product-section-title-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.product-section-title-link .section-title-premium {
+  cursor: pointer;
+}
+
+.product-section-title-link:hover .section-title-premium {
+  text-decoration: underline;
+  text-underline-offset: 10px;
+  text-decoration-thickness: 2px;
+}
+
 /* ─── Reveal Animations ─── */
 .product-section .section-header-premium,
 .product-section .product-carousel-wrap,

@@ -11,6 +11,7 @@ import { Cart, type CartItem } from './components/Cart';
 import { EssentialsSection } from './components/EssentialsSection';
 import { IngredientsSection } from './components/IngredientsSection';
 import { MakeupParfumsSection } from './components/MakeupParfumsSection';
+import { KoreanRoutineSection } from './components/KoreanRoutineSection';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -66,7 +67,7 @@ function App() {
 
         <Categories />
 
-        <ProductSection title="Beauté Coréenne" showFooter seeMoreHref="/boutique?category=K-Beauty" />
+        <KoreanRoutineSection />
 
         <Brands />
 

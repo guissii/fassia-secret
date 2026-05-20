@@ -237,7 +237,7 @@ const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: numbe
 const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; href?: string; openKey?: string }> = [
   { label: 'PROMOTIONS', Icon: Tag, openKey: 'PROMOTIONS !' },
   { label: 'COMPLÉMENTS\nALIMENTAIRES', Icon: Sprout, openKey: 'COMPLEMENTS ALIMENTAIRES' },
-  { label: 'KOREAN\nBEAUTY', Icon: Sparkles, openKey: 'K-BEAUTY' },
+  { label: 'KOREAN\nBEAUTY', Icon: Sparkles, href: '/korean-beauty/' },
   { label: 'PARFUMS\n& MAQUILLAGE', Icon: Brush, href: '/maquillage-parfums' },
 ];
 

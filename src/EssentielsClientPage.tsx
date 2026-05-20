@@ -50,16 +50,57 @@ export default function EssentielsClientPage() {
     <div className="app-container">
       <Header onCartOpen={() => setIsCartOpen(true)} cartCount={totalCartCount} />
       <main>
-        <section className="essentials-page py-3xl">
+        <section className="essentials-page essentials-page-carousel py-3xl">
           <div className="container">
             <div className="section-header-premium mb-2xl">
               <h1 className="section-title-premium">Nos Essentiels</h1>
               <div className="section-ornament-premium" aria-hidden="true" />
             </div>
 
-            <div className="essentials-grid">
-              {ESSENTIALS_PRODUCTS.map((p) => (
-                <article key={p.id} className="essential-card">
+            <div className="essentials-carousel">
+              <div className="essentials-hero-pair">
+                <div className="essentials-visual-tile">
+                  <img
+                    src={publicAssetUrl('ca  quon va utiiser.png')}
+                    alt="Centella Visuel"
+                    className="essentials-visual-img"
+                    loading="lazy"
+                  />
+                  <div className="essentials-visual-overlay">
+                    <span className="essentials-visual-tag">ESSENTIELS</span>
+                    <h3 className="essentials-visual-title">Centella</h3>
+                  </div>
+                </div>
+
+                {ESSENTIALS_PRODUCTS.slice(0, 1).map((p) => (
+                  <article key={p.id} className="essential-card">
+                    <div className="essential-image-area">
+                      {p.badge && <span className="essential-badge-left">{p.badge}</span>}
+                      <div className="essential-badge-right" aria-label="Ajouter aux favoris">
+                        <Heart size={18} strokeWidth={2} />
+                      </div>
+                      <img src={publicAssetUrl(p.image)} alt={p.name} className="essential-image" loading="lazy" />
+                    </div>
+                    <div className="essential-content">
+                      <span className="essential-brand">{p.brand}</span>
+                      <h3 className="essential-title">{p.name}</h3>
+                      <p className="essential-desc">{p.description}</p>
+                      <div className="essential-footer">
+                        <div className="essential-price-group">
+                          <span className="essential-price">{formatPrice(p.price)}</span>
+                          {p.oldPrice && <span className="essential-price-old">{formatPrice(p.oldPrice)}</span>}
+                        </div>
+                        <button className="essential-cta" aria-label="Ajouter au panier">
+                          <ShoppingBag size={18} strokeWidth={2} />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {ESSENTIALS_PRODUCTS.slice(1).map((p) => (
+                <article key={p.id} className="essential-card essentials-standalone-card">
                   <div className="essential-image-area">
                     {p.badge && <span className="essential-badge-left">{p.badge}</span>}
                     <div className="essential-badge-right" aria-label="Ajouter aux favoris">
@@ -99,4 +140,3 @@ export default function EssentielsClientPage() {
     </div>
   );
 }
-

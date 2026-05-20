@@ -21,6 +21,7 @@ interface ProductSectionProps {
   products?: Product[];
   showFooter?: boolean;
   seeMoreHref?: string;
+  headerHref?: string;
 }
 
 const mockProducts: Product[] = [
@@ -79,7 +80,8 @@ export function ProductSection({
   subtitle,
   products = mockProducts,
   showFooter = false,
-  seeMoreHref = "/boutique"
+  seeMoreHref = "/boutique",
+  headerHref
 }: ProductSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const carouselRef = useRef<HTMLDivElement | null>(null);
@@ -146,14 +148,18 @@ export function ProductSection({
   };
 
   return (
-    <section ref={sectionRef} className="product-section py-xl">
+    <section ref={sectionRef} className="product-section">
       <div className="container">
         
         {/* Section Header */}
-        <div className="section-header-premium mb-xl">
-          <h2 className="section-title-premium">
-            {title}
-          </h2>
+        <div className="section-header-premium">
+          {headerHref ? (
+            <Link className="product-section-title-link" href={headerHref}>
+              <h2 className="section-title-premium">{title}</h2>
+            </Link>
+          ) : (
+            <h2 className="section-title-premium">{title}</h2>
+          )}
           <div className="section-ornament-premium" aria-hidden="true" />
           {subtitle && <p className="section-subtitle-premium">{subtitle}</p>}
         </div>
