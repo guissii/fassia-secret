@@ -10,6 +10,9 @@ import { Footer } from './components/Footer';
 import { Cart, type CartItem } from './components/Cart';
 import { EssentialsSection } from './components/EssentialsSection';
 import { IngredientsSection } from './components/IngredientsSection';
+import { MakeupParfumsSection } from './components/MakeupParfumsSection';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 // Demo cart items matching the product style
 const DEMO_CART_ITEMS: CartItem[] = [
@@ -55,16 +58,23 @@ function App() {
         <Hero />
 
         <EssentialsSection />
+        <MakeupParfumsSection />
 
         <IngredientsSection />
 
-        <ProductSection title="Meilleures Ventes" />
-        
+        <ProductSection title="Meilleures Ventes" showFooter seeMoreHref="/boutique" />
+
         <Categories />
-        
-        <ProductSection title="Beauté Coréenne" />
-        
+
+        <ProductSection title="Beauté Coréenne" showFooter seeMoreHref="/boutique?category=K-Beauty" />
+
         <Brands />
+
+        <div className="section-footer text-center mt-2xl">
+          <Link href="/boutique" className="see-more-products-cta mt-lg mx-auto" style={{ display: 'inline-flex' }}>
+            <span>VOIR PLUS DE PRODUITS</span> <ArrowRight size={16} />
+          </Link>
+        </div>
       </main>
       <Footer />
 

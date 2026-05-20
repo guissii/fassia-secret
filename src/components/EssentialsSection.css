@@ -3,7 +3,7 @@
    ══════════════════════════════════════════════ */
 
 .essentials-section {
-  background-color: var(--color-background);
+  background-color: transparent;
   overflow: hidden;
   padding-top: var(--spacing-xl);
   padding-bottom: var(--spacing-2xl);
@@ -11,7 +11,7 @@
 }
 
 .essentials-page {
-  background-color: var(--color-background);
+  background-color: transparent;
 }
 
 .essentials-grid {
@@ -97,6 +97,12 @@
   padding-left: var(--container-padding);
   padding-right: var(--container-padding);
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
 .essentials-carousel::-webkit-scrollbar {

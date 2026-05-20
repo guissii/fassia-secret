@@ -1,7 +1,7 @@
 .brands-section {
   border-top: 1px solid var(--color-border);
   overflow: hidden;
-  background-color: var(--color-background);
+  background-color: transparent;
 }
 
 /* Old Brands Header styles removed - now using .section-header-premium from index.css */

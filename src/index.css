@@ -230,6 +230,7 @@ ul {
 .text-2xl { font-size: 1.75rem; font-weight: 300; }
 .text-3xl { font-size: 2.5rem; font-weight: 400; letter-spacing: -0.5px; }
 .text-4xl { font-size: 3.5rem; font-weight: 300; letter-spacing: -1px; line-height: 1.1; }
+.text-center { text-align: center; }
 .text-muted { color: var(--color-text-muted); }
 
 /* Animation */
@@ -248,6 +249,15 @@ ul {
 .py-xl { padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
 .py-2xl { padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-2xl); }
 .py-3xl { padding-top: var(--spacing-3xl); padding-bottom: var(--spacing-3xl); }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.section-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
 .mt-sm { margin-top: var(--spacing-sm); }
 .mt-md { margin-top: var(--spacing-md); }

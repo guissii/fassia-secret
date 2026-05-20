@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
+import Link from 'next/link';
 
 type Ingredient = {
   id: number;
@@ -11,6 +12,7 @@ type Ingredient = {
   image: string;
   icon: 'droplet' | 'flask' | 'sparkles' | 'sun' | 'leaf';
   accent: string;
+  searchQuery: string;
 };
 
 const imageUrl = (prompt: string) => {
@@ -27,6 +29,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de produit cosmétique minimaliste: flacon compte-gouttes et gouttes transparentes, thème niacinamide vitamine B3, laboratoire, fond clair doux, style premium e-commerce, haute définition'),
     icon: 'sparkles',
     accent: '#e10074',
+    searchQuery: 'Niacinamide',
   },
   {
     id: 2,
@@ -37,6 +40,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie macro de gouttes d eau et sérum hydratant, thème acide hyaluronique, reflets bleus, laboratoire, fond propre, style premium e-commerce, haute définition'),
     icon: 'droplet',
     accent: '#0ea5e9',
+    searchQuery: 'Acide Hyaluronique',
   },
   {
     id: 3,
@@ -47,6 +51,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de flacon sérum et texture gel, thème acide salicylique BHA, ambiance clinique, accents verts, fond clair, style premium e-commerce, haute définition'),
     icon: 'flask',
     accent: '#10b981',
+    searchQuery: 'Acide Salicylique',
   },
   {
     id: 4,
@@ -57,6 +62,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de crème riche et texture onctueuse, thème céramides barrière cutanée, tons neutres, fond clair, style premium e-commerce, haute définition'),
     icon: 'leaf',
     accent: '#84cc16',
+    searchQuery: 'Céramides',
   },
   {
     id: 5,
@@ -67,6 +73,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de crème solaire avec rayons de soleil doux et reflets dorés, thème SPF 50+, fond clair, style premium e-commerce, haute définition'),
     icon: 'sun',
     accent: '#f59e0b',
+    searchQuery: 'SPF',
   },
   {
     id: 6,
@@ -77,6 +84,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de sérum ambré en flacon, thème rétinol vitamine A, ambiance laboratoire, fond clair, style premium e-commerce, haute définition'),
     icon: 'sparkles',
     accent: '#a855f7',
+    searchQuery: 'Rétinol',
   },
   {
     id: 7,
@@ -87,6 +95,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de sérum vitaminé avec agrumes subtils, thème vitamine C, tons orange lumineux, fond clair, style premium e-commerce, haute définition'),
     icon: 'sun',
     accent: '#f97316',
+    searchQuery: 'Vitamine C',
   },
   {
     id: 8,
@@ -97,6 +106,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de texture exfoliante et laboratoire, thème AHA BHA peeling doux, accents rose, fond clair, style premium e-commerce, haute définition'),
     icon: 'flask',
     accent: '#ec4899',
+    searchQuery: 'AHA BHA',
   },
   {
     id: 9,
@@ -107,6 +117,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie de crème apaisante et texture douce, thème panthénol provitamine B5, ambiance clinique, fond clair, style premium e-commerce, haute définition'),
     icon: 'droplet',
     accent: '#06b6d4',
+    searchQuery: 'Panthénol',
   },
   {
     id: 10,
@@ -117,6 +128,7 @@ const INGREDIENTS: Ingredient[] = [
     image: imageUrl('Photographie premium de feuilles de centella asiatica et sérum, tons verts doux, fond clair, style e-commerce, haute définition'),
     icon: 'leaf',
     accent: '#22c55e',
+    searchQuery: 'Centella',
   },
 ];
 
@@ -231,14 +243,13 @@ export function IngredientsSection() {
                     <div className="ing-card-tag">{item.tag}</div>
                     <h3 className="ing-card-title">{item.title}</h3>
                     <span className="ing-card-subtitle">{item.subtitle}</span>
-                    <p className="ing-card-text">{item.description}</p>
-                    <button
-                      type="button"
+                    <Link
+                      href={`/boutique?q=${encodeURIComponent(item.searchQuery)}`}
                       className="ing-card-btn"
                       style={{ '--btn-accent': item.accent } as React.CSSProperties}
                     >
                       Découvrir <ArrowRight size={14} />
-                    </button>
+                    </Link>
                   </div>
                 </article>
               );

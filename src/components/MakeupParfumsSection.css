@@ -1,0 +1,142 @@
+.makeup-parfums-section {
+  background: transparent;
+  overflow: hidden;
+  padding: var(--spacing-xl) 0;
+}
+
+.makeup-parfums-panel {
+  position: relative;
+  border-radius: 44px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(244, 240, 230, 0.74) 100%
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  padding: 44px 34px;
+  overflow: hidden;
+}
+
+.makeup-parfums-carousel {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding: 6px 0 14px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  scroll-padding-left: 34px;
+  scroll-padding-right: 34px;
+}
+
+.makeup-parfums-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.makeup-parfums-tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(240px, 28vw, 320px);
+  height: clamp(320px, 36vw, 420px);
+  border-radius: 34px;
+  overflow: hidden;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  box-shadow: var(--shadow-md);
+  transform: translateY(0);
+  transition: transform 420ms cubic-bezier(0.25, 1, 0.5, 1), box-shadow 220ms ease, opacity 220ms ease;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  opacity: 0.92;
+  z-index: 1;
+}
+
+.makeup-parfums-tile:not(:last-child) {
+  margin-right: -36px;
+}
+
+.makeup-parfums-tile.is-active {
+  transform: translateY(-2px) scale(1.02);
+  opacity: 1;
+  box-shadow: var(--shadow-lg);
+  z-index: 3;
+}
+
+.makeup-parfums-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.makeup-parfums-media {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.03);
+  transition: transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.makeup-parfums-tile:hover .makeup-parfums-media {
+  transform: scale(1.06);
+}
+
+.makeup-parfums-chip {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: #111;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+  .makeup-parfums-section {
+    padding: var(--spacing-lg) 0;
+  }
+
+  .makeup-parfums-panel {
+    border-radius: 36px;
+    padding: 34px 0 26px;
+  }
+
+  .makeup-parfums-carousel {
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+    scroll-padding-left: var(--container-padding);
+    scroll-padding-right: var(--container-padding);
+  }
+
+  .makeup-parfums-tile {
+    width: 72vw;
+    height: 330px;
+  }
+
+  .makeup-parfums-tile:not(:last-child) {
+    margin-right: -22px;
+  }
+
+  .makeup-parfums-tile:hover {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+  }
+}

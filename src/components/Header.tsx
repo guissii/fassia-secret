@@ -64,47 +64,152 @@ const desktopMenuCategories = [
   }
 ];
 
-const mobileDrawerCategories = [
-  { title: "DERMO-CORNER", items: ["La Roche-Posay", "Vichy", "CeraVe", "Bioderma", "SVR", "Eucerin"] },
-  { title: "PROMOTIONS !", items: ["Offres du moment", "Bons plans", "Dernieres promotions"] },
-  { title: "K-BEAUTY", items: ["Nettoyants", "Serums", "Creme hydratante", "Masques", "SPF"] },
+type DrawerItem = { label: string; href: string };
+type DrawerCategory = { title: string; items: DrawerItem[] };
+
+const mobileDrawerCategories: DrawerCategory[] = [
+  { title: "DERMO-CORNER", items: [
+    { label: "La Roche-Posay", href: "/boutique?q=La+Roche-Posay" },
+    { label: "Vichy", href: "/boutique?q=Vichy" },
+    { label: "CeraVe", href: "/boutique?q=CeraVe" },
+    { label: "Bioderma", href: "/boutique?q=Bioderma" },
+    { label: "SVR", href: "/boutique?q=SVR" },
+    { label: "Eucerin", href: "/boutique?q=Eucerin" },
+  ] },
+  { title: "PROMOTIONS !", items: [
+    { label: "Offres du moment", href: "/boutique?promo=1" },
+    { label: "Bons plans", href: "/boutique?promo=1" },
+    { label: "Dernieres promotions", href: "/boutique?promo=1" },
+  ] },
+  { title: "K-BEAUTY", items: [
+    { label: "Nettoyants", href: "/boutique?category=K-Beauty" },
+    { label: "Serums", href: "/boutique?category=K-Beauty" },
+    { label: "Creme hydratante", href: "/boutique?category=K-Beauty" },
+    { label: "Masques", href: "/boutique?category=K-Beauty" },
+    { label: "SPF", href: "/boutique?category=K-Beauty" },
+  ] },
   {
     title: "VISAGE",
     items: [
-      "Solaire: Protection solaire",
-      "Solaire: Auto-bronzant",
-      "Solaire: Soin apres-soleil",
-      "Type: Nettoyant visage",
-      "Type: Serum",
-      "Type: Creme de jour",
-      "Type: Creme de nuit",
-      "Type: Contour des yeux",
-      "Type: Eau micellaire",
-      "Type: Masque visage",
-      "Besoins: Anti-imperfections",
-      "Besoins: Anti-age",
-      "Besoins: Hydratant & nourrissant",
-      "Besoins: Anti-taches",
-      "Besoins: Anti-rougeurs",
-      "Besoins: Eclat & anti-fatigue",
-      "Besoins: Peaux sensibles",
+      { label: "Solaire: Protection solaire", href: "/boutique?category=Visage" },
+      { label: "Solaire: Auto-bronzant", href: "/boutique?category=Visage" },
+      { label: "Solaire: Soin apres-soleil", href: "/boutique?category=Visage" },
+      { label: "Type: Nettoyant visage", href: "/boutique?category=Visage" },
+      { label: "Type: Serum", href: "/boutique?category=Visage" },
+      { label: "Type: Creme de jour", href: "/boutique?category=Visage" },
+      { label: "Type: Creme de nuit", href: "/boutique?category=Visage" },
+      { label: "Type: Contour des yeux", href: "/boutique?category=Visage" },
+      { label: "Type: Eau micellaire", href: "/boutique?category=Visage" },
+      { label: "Type: Masque visage", href: "/boutique?category=Visage" },
+      { label: "Besoins: Anti-imperfections", href: "/boutique?category=Visage&q=anti-imperfections" },
+      { label: "Besoins: Anti-age", href: "/boutique?category=Visage&q=anti-age" },
+      { label: "Besoins: Hydratant & nourrissant", href: "/boutique?category=Visage&q=hydratant" },
+      { label: "Besoins: Anti-taches", href: "/boutique?category=Visage&q=anti-taches" },
+      { label: "Besoins: Anti-rougeurs", href: "/boutique?category=Visage&q=anti-rougeurs" },
+      { label: "Besoins: Eclat & anti-fatigue", href: "/boutique?category=Visage&q=eclat" },
+      { label: "Besoins: Peaux sensibles", href: "/boutique?category=Visage&q=sensible" },
     ]
   },
-  { title: "CHEVEUX", items: ["Shampoing", "Apres-shampoing", "Masque cheveux", "Soins reparateurs", "Huiles & serums"] },
-  { title: "MAQUILLAGE", items: ["Teint", "Yeux", "Levres", "Demaquillant", "Accessoires maquillage"] },
-  { title: "CORPS", items: ["Corps & bain", "Hydratation", "Gommage", "Rasage & epilation", "Minceur"] },
-  { title: "MAMAN & BEBE", items: ["Bebe", "Maman", "Solaire bebe", "Change & toilette", "Accessoires"] },
-  { title: "HOMMES", items: ["Soins visage homme", "Soins corps homme", "Deodorants", "Rasage", "Barbe"] },
-  { title: "HYGIÈNE DENTAIRE", items: ["Dentifrices", "Brosses a dents", "Bains de bouche", "Blanchiment"] },
-  { title: "HYGIÈNE", items: ["Gel hydroalcoolique", "Deodorants", "Soin intime", "Protections"] },
-  { title: "HYGIÈNE & INTIMITÉ", items: ["Toilette Intime", "Serviettes Hygieniques", "Tampons", "Lubrifiants"] },
-  { title: "ACCESSOIRES", items: ["Accessoires visage", "Accessoires cheveux", "Trousses", "Brosses", "Eponges"] },
-  { title: "MINCEUR", items: ["Brule-graisses", "Draineurs", "Collagene", "Sport & recuperation"] },
-  { title: "SPORT", items: ["Proteines", "Energie", "Hydratation", "Recuperation"] },
-  { title: "SANTÉ", items: ["Auto-Surveillance", "Premiers Secours", "Orthopedie & soutien", "Bien-etre"] },
-  { title: "COMPLEMENTS ALIMENTAIRES", items: ["Vitamines & Mineraux", "Collagene", "Omega 3", "Detox & Drainage"] },
-  { title: "PREMIUM HAIR CARE", items: ["Shampoing premium", "Masque premium", "Huiles & serums", "Anti-chute"] },
-  { title: "PREOCCUPATIONS", items: ["Acne & Imperfections", "Cernes", "Taches", "Rosacee & Rougeurs", "Peau seche", "Anti-age", "Chute de cheveux", "Immunite"] },
+  { title: "CHEVEUX", items: [
+    { label: "Shampoing", href: "/boutique?category=Cheveux" },
+    { label: "Apres-shampoing", href: "/boutique?category=Cheveux" },
+    { label: "Masque cheveux", href: "/boutique?category=Cheveux" },
+    { label: "Soins reparateurs", href: "/boutique?category=Cheveux" },
+    { label: "Huiles & serums", href: "/boutique?category=Cheveux" },
+  ] },
+  { title: "MAQUILLAGE", items: [
+    { label: "Teint", href: "/maquillage-parfums" },
+    { label: "Yeux", href: "/maquillage-parfums" },
+    { label: "Levres", href: "/maquillage-parfums" },
+    { label: "Demaquillant", href: "/boutique?category=Maquillage" },
+    { label: "Accessoires maquillage", href: "/boutique?category=Maquillage" },
+  ] },
+  { title: "CORPS", items: [
+    { label: "Corps & bain", href: "/boutique?category=Corps" },
+    { label: "Hydratation", href: "/boutique?category=Corps" },
+    { label: "Gommage", href: "/boutique?category=Corps" },
+    { label: "Rasage & epilation", href: "/boutique?category=Corps" },
+    { label: "Minceur", href: "/boutique?category=Corps" },
+  ] },
+  { title: "MAMAN & BEBE", items: [
+    { label: "Bebe", href: "/boutique?category=Maman+%26+B%C3%A9b%C3%A9" },
+    { label: "Maman", href: "/boutique?category=Maman+%26+B%C3%A9b%C3%A9" },
+    { label: "Solaire bebe", href: "/boutique?category=Maman+%26+B%C3%A9b%C3%A9" },
+    { label: "Change & toilette", href: "/boutique?category=Maman+%26+B%C3%A9b%C3%A9" },
+    { label: "Accessoires", href: "/boutique?category=Maman+%26+B%C3%A9b%C3%A9" },
+  ] },
+  { title: "HOMMES", items: [
+    { label: "Soins visage homme", href: "/boutique?category=Hommes" },
+    { label: "Soins corps homme", href: "/boutique?category=Hommes" },
+    { label: "Deodorants", href: "/boutique?category=Hommes" },
+    { label: "Rasage", href: "/boutique?category=Hommes" },
+    { label: "Barbe", href: "/boutique?category=Hommes" },
+  ] },
+  { title: "HYGIÈNE DENTAIRE", items: [
+    { label: "Dentifrices", href: "/boutique?category=Hygi%C3%A8ne+Dentaire" },
+    { label: "Brosses a dents", href: "/boutique?category=Hygi%C3%A8ne+Dentaire" },
+    { label: "Bains de bouche", href: "/boutique?category=Hygi%C3%A8ne+Dentaire" },
+    { label: "Blanchiment", href: "/boutique?category=Hygi%C3%A8ne+Dentaire" },
+  ] },
+  { title: "HYGIÈNE", items: [
+    { label: "Gel hydroalcoolique", href: "/boutique?category=Hygi%C3%A8ne" },
+    { label: "Deodorants", href: "/boutique?category=Hygi%C3%A8ne" },
+    { label: "Soin intime", href: "/boutique?category=Hygi%C3%A8ne" },
+    { label: "Protections", href: "/boutique?category=Hygi%C3%A8ne" },
+  ] },
+  { title: "HYGIÈNE & INTIMITÉ", items: [
+    { label: "Toilette Intime", href: "/boutique?category=Hygi%C3%A8ne" },
+    { label: "Serviettes Hygieniques", href: "/boutique?category=Hygi%C3%A8ne" },
+    { label: "Tampons", href: "/boutique?category=Hygi%C3%A8ne" },
+    { label: "Lubrifiants", href: "/boutique?category=Hygi%C3%A8ne" },
+  ] },
+  { title: "ACCESSOIRES", items: [
+    { label: "Accessoires visage", href: "/boutique?category=Accessoires" },
+    { label: "Accessoires cheveux", href: "/boutique?category=Accessoires" },
+    { label: "Trousses", href: "/boutique?category=Accessoires" },
+    { label: "Brosses", href: "/boutique?category=Accessoires" },
+    { label: "Eponges", href: "/boutique?category=Accessoires" },
+  ] },
+  { title: "MINCEUR", items: [
+    { label: "Brule-graisses", href: "/boutique?category=Minceur" },
+    { label: "Draineurs", href: "/boutique?category=Minceur" },
+    { label: "Collagene", href: "/boutique?category=Minceur" },
+    { label: "Sport & recuperation", href: "/boutique?category=Minceur" },
+  ] },
+  { title: "SPORT", items: [
+    { label: "Proteines", href: "/boutique?category=Sport" },
+    { label: "Energie", href: "/boutique?category=Sport" },
+    { label: "Hydratation", href: "/boutique?category=Sport" },
+    { label: "Recuperation", href: "/boutique?category=Sport" },
+  ] },
+  { title: "SANTÉ", items: [
+    { label: "Auto-Surveillance", href: "/boutique?category=Sant%C3%A9" },
+    { label: "Premiers Secours", href: "/boutique?category=Sant%C3%A9" },
+    { label: "Orthopedie & soutien", href: "/boutique?category=Sant%C3%A9" },
+    { label: "Bien-etre", href: "/boutique?category=Bien-%C3%AAtre" },
+  ] },
+  { title: "COMPLEMENTS ALIMENTAIRES", items: [
+    { label: "Vitamines & Mineraux", href: "/boutique?category=Compl%C3%A9ments" },
+    { label: "Collagene", href: "/boutique?category=Compl%C3%A9ments" },
+    { label: "Omega 3", href: "/boutique?category=Compl%C3%A9ments" },
+    { label: "Detox & Drainage", href: "/boutique?category=Compl%C3%A9ments" },
+  ] },
+  { title: "PREMIUM HAIR CARE", items: [
+    { label: "Shampoing premium", href: "/boutique?category=Cheveux" },
+    { label: "Masque premium", href: "/boutique?category=Cheveux" },
+    { label: "Huiles & serums", href: "/boutique?category=Cheveux" },
+    { label: "Anti-chute", href: "/boutique?category=Cheveux" },
+  ] },
+  { title: "PREOCCUPATIONS", items: [
+    { label: "Acne & Imperfections", href: "/boutique?q=acne+imperfections" },
+    { label: "Cernes", href: "/boutique?q=cernes" },
+    { label: "Taches", href: "/boutique?q=taches" },
+    { label: "Rosacee & Rougeurs", href: "/boutique?q=rougeurs" },
+    { label: "Peau seche", href: "/boutique?q=peau+seche" },
+    { label: "Anti-age", href: "/boutique?q=anti-age" },
+    { label: "Chute de cheveux", href: "/boutique?q=chute+cheveux" },
+    { label: "Immunite", href: "/boutique?q=immunite" },
+  ] },
 ];
 
 const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }> }> = [
@@ -237,7 +342,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
 
   const mobileMenuCategories = mobileMenuItems.map(({ label, Icon }) => {
     const fromDrawer = mobileDrawerCategories.find((c) => c.title === label);
-    const items = fromDrawer?.items ?? [];
+    const items: DrawerItem[] = fromDrawer?.items ?? [];
 
     return { label, Icon, items };
   });
@@ -363,17 +468,14 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
 
               <div className={`mobile-submenu ${openMobileCategory === label ? 'open' : ''}`}>
                 {items.map((item) => (
-                  <a
-                    key={item}
-                    href="#"
+                  <Link
+                    key={item.label}
+                    href={item.href}
                     className="mobile-submenu-item"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      closeMobileMenu();
-                    }}
+                    onClick={() => closeMobileMenu()}
                   >
-                    {item}
-                  </a>
+                    {item.label}
+                  </Link>
                 ))}
               </div>
             </li>
@@ -502,36 +604,61 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
       <nav className="nav-bar">
         <div className="container">
           <ul className="flex items-center gap-xs main-nav-list">
-            {desktopMenuCategories.map((category, index) => (
+            {desktopMenuCategories.map((category, index) => {
+              // Map each desktop category title to a proper boutique filter
+              const desktopCatHrefMap: Record<string, string> = {
+                'CORPS': '/boutique?category=Corps',
+                'VISAGE': '/boutique?category=Visage',
+                'CHEVEUX': '/boutique?category=Cheveux',
+                'HYGIÈNE DENTAIRE': '/boutique?category=Hygi%C3%A8ne+Dentaire',
+                'MAQUILLAGE': '/maquillage-parfums',
+                'HYGIÈNE & INTIMITÉ': '/boutique?category=Hygi%C3%A8ne',
+                'SANTÉ': '/boutique?category=Sant%C3%A9',
+                'HOMMES': '/boutique?category=Hommes',
+                'PREOCCUPATIONS': '/boutique',
+              };
+              const parentHref = desktopCatHrefMap[category.title] || '/boutique';
+              return (
               <li key={index} className="nav-item">
-                <a
-                  href="#"
+                <Link
+                  href={parentHref}
                   className="nav-link flex items-center gap-xs"
-                  onClick={(e) => e.preventDefault()}
                 >
                   {category.title} <ChevronDown size={14} className="dropdown-icon" />
-                </a>
+                </Link>
                 <div className="dropdown-menu">
                   <ul>
-                    {category.items.map((item, idx) => (
+                    {category.items.map((item, idx) => {
+                      let itemHref = parentHref;
+                      if (category.title === 'PREOCCUPATIONS') {
+                        itemHref = `/boutique?q=${encodeURIComponent(item)}`;
+                      } else if (category.title === 'MAQUILLAGE') {
+                        if (['Teint', 'Yeux', 'Lèvres'].includes(item)) {
+                          itemHref = '/maquillage-parfums';
+                        } else {
+                          itemHref = `/boutique?category=Maquillage`;
+                        }
+                      }
+                      return (
                       <li key={idx}>
-                        <a href="#" className="dropdown-item" onClick={(e) => e.preventDefault()}>
+                        <Link href={itemHref} className="dropdown-item">
                           {item}
-                        </a>
+                        </Link>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </div>
               </li>
-            ))}
+              );
+            })}
             <li>
-              <a
-                href="#"
+              <Link
+                href="/boutique?promo=1"
                 className="nav-link nav-link-promos flex items-center gap-xs"
-                onClick={(e) => e.preventDefault()}
               >
                 <Tag size={14} className="promos-icon" /> PROMOS
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

@@ -235,8 +235,8 @@ export function ProductSection({
                 <div className="see-more-icon-wrap">
                   <ArrowUpRight size={32} strokeWidth={1.5} />
                 </div>
-                <span className="see-more-text">Voir Plus</span>
-                <p className="see-more-subtext">Découvrir toute la collection</p>
+                <span className="see-more-text">Voir plus</span>
+                <p className="see-more-subtext">De produits</p>
               </div>
             </Link>
           </div>
@@ -250,9 +250,9 @@ export function ProductSection({
               <Leaf size={28} className="ornament-icon-large text-primary" strokeWidth={1.5} style={{ fill: 'var(--color-primary)' }} />
               <span className="ornament-line-long"></span>
             </div>
-            <button className="btn-primary-rounded mt-lg mx-auto" style={{ display: 'inline-flex' }} type="button">
-              VOIR TOUTES LES NOUVEAUTÉS <ArrowRight size={16} />
-            </button>
+            <Link href={seeMoreHref} className="see-more-products-cta mt-lg mx-auto" style={{ display: 'inline-flex' }}>
+              <span>VOIR PLUS DE PRODUITS</span> <ArrowRight size={16} />
+            </Link>
           </div>
         )}
 

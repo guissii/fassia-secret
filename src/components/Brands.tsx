@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { publicAssetUrl } from '../lib/publicUrl';
+import Link from 'next/link';
 
 type Brand = { name: string; logo?: string };
 
@@ -7,7 +8,7 @@ function BrandItem({ brand }: { brand: Brand }) {
   const [state, setState] = useState<'loading' | 'loaded' | 'error'>(brand.logo ? 'loading' : 'error');
 
   return (
-    <div className="brand-logo-card" aria-label={brand.name}>
+    <Link href={`/boutique?q=${encodeURIComponent(brand.name)}`} className="brand-logo-card" aria-label={brand.name}>
       {brand.logo && (
         <img
           src={publicAssetUrl(brand.logo)}
@@ -20,7 +21,7 @@ function BrandItem({ brand }: { brand: Brand }) {
         />
       )}
       {(state === 'error' || state === 'loading') && <span className="brand-name">{brand.name}</span>}
-    </div>
+    </Link>
   );
 }
 

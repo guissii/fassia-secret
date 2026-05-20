@@ -1,5 +1,5 @@
 .footer {
-  background-color: rgba(255, 255, 255, 0.72);
+  background-color: transparent;
   border-top: 1px solid var(--color-border);
   margin-top: var(--spacing-lg); /* Reduced from 2xl */
 }
