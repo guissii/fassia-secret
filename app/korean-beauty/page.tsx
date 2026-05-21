@@ -143,7 +143,6 @@ export default function KoreanBeautyPage() {
       {/* Hero */}
       <section className="kb-hero">
         <div className="container">
-          <span className="kb-hero-tag"><Sparkles size={14} /> The K-Beauty Ritual</span>
           <h1 className="kb-hero-title">10-Step <span>Glow</span> Routine</h1>
           <p className="kb-hero-desc">
             Parcourez chaque étape. Shoppez les meilleurs produits coréens.
@@ -235,6 +234,18 @@ export default function KoreanBeautyPage() {
                   </article>
                 ))}
 
+                <Link
+                  href={`/boutique?${step.filterQuery}`}
+                  className="essential-card kb-see-more-card"
+                  aria-label={`Voir plus ${step.title}`}
+                >
+                  <div className="kb-see-more-inner">
+                    <span className="kb-see-more-label">Voir plus</span>
+                    <span className="kb-see-more-title">{step.title}</span>
+                    <ArrowRight size={18} />
+                  </div>
+                </Link>
+
               </div>
 
             </div>
@@ -245,11 +256,21 @@ export default function KoreanBeautyPage() {
       {/* Global CTA */}
       <section className="kb-global-cta">
         <div className="container" style={{ textAlign: 'center' }}>
-          <Link href="/boutique?category=K-Beauty" className="btn btn-primary" style={{ borderRadius: 'var(--radius-full)', gap: '12px' }}>
-            Explorer tout le catalogue K-Beauty <ArrowRight size={18} />
+          <Link href="/boutique?category=K-Beauty" className="kb-global-cta-link">
+            <span className="kb-global-cta-text">
+              <span className="kb-global-cta-kicker">Explorer tout le</span>
+              <span className="kb-global-cta-title">Catalogue K-Beauty</span>
+            </span>
+            <span className="kb-global-cta-icon" aria-hidden="true">
+              <ArrowRight size={28} />
+            </span>
           </Link>
         </div>
       </section>
+
+      <Link href="/" className="kb-nav-bubble" aria-label="Retour à l'accueil">
+        N°
+      </Link>
     </main>
   );
 }

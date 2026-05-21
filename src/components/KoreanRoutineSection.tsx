@@ -1,11 +1,8 @@
-import { useState } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 import './KoreanRoutineSection.css';
-import { RoutinePopup } from './RoutinePopup';
 
 export function KoreanRoutineSection() {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
   return (
     <>
       <section className="korean-routine-section section-padding">
@@ -21,13 +18,10 @@ export function KoreanRoutineSection() {
             <p className="korean-routine-desc">
               Découvrez la méthode ancestrale en 10 étapes pour une peau lumineuse, hydratée et sans imperfections. Une véritable expérience de luxe pour votre peau.
             </p>
-            <button 
-              className="korean-routine-trigger-btn"
-              onClick={() => setIsPopupOpen(true)}
-            >
+            <Link className="korean-routine-trigger-btn" href="/korean-beauty">
               Discover the 10-step glow ritual
               <ArrowRight size={20} />
-            </button>
+            </Link>
           </div>
           <div className="korean-routine-visual">
             <div className="korean-routine-image-wrapper">
@@ -41,11 +35,6 @@ export function KoreanRoutineSection() {
           </div>
         </div>
       </section>
-
-      <RoutinePopup 
-        isOpen={isPopupOpen} 
-        onClose={() => setIsPopupOpen(false)} 
-      />
     </>
   );
 }

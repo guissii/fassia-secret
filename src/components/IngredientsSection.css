@@ -5,9 +5,22 @@
 
 .ing-section {
   background: transparent;
-  padding: 80px 0 72px;
+  padding: 64px 0 56px;
   overflow: hidden;
   position: relative;
+}
+
+.ing-section::before {
+  content: '';
+  position: absolute;
+  inset: -120px -80px;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(var(--color-primary-rgb, 220, 80, 140), 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 35%, rgba(120, 80, 220, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 90%, rgba(var(--color-primary-rgb, 220, 80, 140), 0.06) 0%, transparent 62%);
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 
@@ -20,7 +33,7 @@
   align-items: center;
   text-align: center;
   gap: 12px;
-  margin-bottom: 48px;
+  margin-bottom: 28px;
   position: relative;
   z-index: 2;
 }
@@ -102,7 +115,7 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  padding: 8px 0 16px;
+  padding: 6px 0 10px;
   scrollbar-width: none;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
@@ -348,11 +361,11 @@
    ══════════════════════════════════════════════ */
 @media (min-width: 1024px) {
   .ing-section {
-    padding: 100px 0 88px;
+    padding: 76px 0 64px;
   }
 
   .ing-header {
-    margin-bottom: 56px;
+    margin-bottom: 32px;
   }
 
   .ing-carousel {
@@ -392,7 +405,7 @@
    ══════════════════════════════════════════════ */
 @media (min-width: 769px) and (max-width: 1023px) {
   .ing-section {
-    padding: 72px 0 60px;
+    padding: 60px 0 52px;
   }
 
   .ing-carousel {
@@ -421,11 +434,11 @@
    ══════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .ing-section {
-    padding: 56px 0 48px;
+    padding: 50px 0 44px;
   }
 
   .ing-header {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     gap: 10px;
   }
 

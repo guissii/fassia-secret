@@ -256,7 +256,7 @@ export function ProductSection({
               <Leaf size={28} className="ornament-icon-large text-primary" strokeWidth={1.5} style={{ fill: 'var(--color-primary)' }} />
               <span className="ornament-line-long"></span>
             </div>
-            <Link href={seeMoreHref} className="see-more-products-cta mt-lg mx-auto" style={{ display: 'inline-flex' }}>
+            <Link href={seeMoreHref} className="see-more-products-cta mt-lg mx-auto">
               <span>VOIR PLUS DE PRODUITS</span> <ArrowRight size={16} />
             </Link>
           </div>
