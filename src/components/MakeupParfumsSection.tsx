@@ -91,6 +91,11 @@ export function MakeupParfumsSection() {
   return (
     <section className="makeup-parfums-section" aria-label="Maquillage & Parfums">
       <div className="container">
+        <div className="section-header makeup-parfums-header">
+          <h2 className="section-title makeup-parfums-title">
+            Maquillage <span className="makeup-parfums-amp">&</span> Parfums
+          </h2>
+        </div>
         <div className="makeup-parfums-panel">
           <div className="makeup-parfums-carousel" role="list" ref={carouselRef}>
             {TILES.map((tile, idx) => (

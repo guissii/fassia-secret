@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Heart, ShoppingBag, ArrowUpRight } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';

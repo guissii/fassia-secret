@@ -43,18 +43,6 @@ main {
 
 /* ─── CONTAINER ─────────────────────────────── */
 
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 16px;
-  }
-}
-
 /* ─── SECTION HEADERS ───────────────────────── */
 
 .section-header {

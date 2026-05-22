@@ -185,7 +185,7 @@
 .ing-card-bg {
   position: absolute;
   inset: 0;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   transform: none;
@@ -242,15 +242,20 @@
   z-index: 1;
   width: 100%;
   margin-top: auto;
-  padding: 20px;
+  padding: 18px 20px 18px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.84);
+  gap: 8px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.92) 72%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: none;
 }
 
 .ing-card-tag {
@@ -386,8 +391,8 @@
   }
 
   .ing-card-body {
-    padding: 24px;
-    gap: 10px;
+    padding: 20px 24px 20px;
+    gap: 8px;
   }
 
   .ing-carousel-wrap::before,
@@ -467,7 +472,7 @@
   }
 
   .ing-card-body {
-    padding: 16px;
+    padding: 14px 16px 14px;
     gap: 6px;
   }
 

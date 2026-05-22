@@ -240,7 +240,6 @@ export function IngredientsSection() {
 
                   {/* Content */}
                   <div className="ing-card-body">
-                    <div className="ing-card-tag">{item.tag}</div>
                     <h3 className="ing-card-title">{item.title}</h3>
                     <span className="ing-card-subtitle">{item.subtitle}</span>
                     <Link

@@ -207,6 +207,25 @@
   position: relative;
 }
 
+.cart-icon-wrapper.bump {
+  animation: cartBump 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cartBump {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.12);
+  }
+  55% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .cart-badge {
   position: absolute;
   top: -6px;

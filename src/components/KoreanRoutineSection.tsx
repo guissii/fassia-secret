@@ -3,15 +3,19 @@ import Link from 'next/link';
 import './KoreanRoutineSection.css';
 
 export function KoreanRoutineSection() {
+  const imageUrl = (prompt: string) => {
+    return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=portrait_4_3`;
+  };
+
   return (
     <>
       <section className="korean-routine-section section-padding">
         <div className="korean-routine-container">
           <div className="korean-routine-content">
-            <div className="korean-routine-tag">
+            <Link href="/korean-beauty" className="korean-routine-tag" aria-label="Aller à Korean Beauty">
               <Sparkles size={16} />
               <span>Korean Beauty</span>
-            </div>
+            </Link>
             <h2 className="korean-routine-title">
               Le Secret du <span>Glow Parfait</span>
             </h2>
@@ -24,14 +28,14 @@ export function KoreanRoutineSection() {
             </Link>
           </div>
           <div className="korean-routine-visual">
-            <div className="korean-routine-image-wrapper">
+            <Link href="/korean-beauty" className="korean-routine-image-wrapper" aria-label="Découvrir le rituel Korean Beauty">
               <img 
-                src="https://images.unsplash.com/photo-1615397323214-7299a9a38f3c?auto=format&fit=crop&q=80&w=800" 
+                src={imageUrl('Photographie premium skincare coréen, flacons sérum et textures glossy, ambiance rose nude minimal luxe, lumière studio douce, haute définition')} 
                 alt="Korean skincare ritual" 
                 className="korean-routine-image"
               />
               <div className="korean-routine-glow"></div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

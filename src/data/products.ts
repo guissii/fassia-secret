@@ -46,6 +46,163 @@ export const ALL_PRODUCTS: CatalogProduct[] = [
     category: 'Compléments',
   },
   {
+    id: 17,
+    brand: 'FASSIA NUTRI',
+    name: 'Melatonine 1 mg',
+    description: 'Sommeil & rythme: endormissement plus serein.',
+    price: 119.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments alimentaires, flacon melatonine minimaliste, gélules blanches, fond beige rosé, lumière studio douce, haute définition'
+    ),
+    category: 'Compléments',
+    badge: 'Nouveau',
+  },
+  {
+    id: 18,
+    brand: 'FASSIA NUTRI',
+    name: 'Magnesium Glycinate',
+    description: 'Relaxation & récupération, formule douce.',
+    price: 179.0,
+    oldPrice: 219.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon magnésium glycinate, ambiance clinique chic, fond clair, haute définition'
+    ),
+    category: 'Compléments',
+    badge: '-18%',
+  },
+  {
+    id: 19,
+    brand: 'FASSIA NUTRI',
+    name: 'Ashwagandha KSM-66',
+    description: 'Adaptogène: équilibre stress & énergie.',
+    price: 229.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon ashwagandha, poudres fines, fond beige clair, style laboratoire, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 20,
+    brand: 'FASSIA NUTRI',
+    name: 'L-Theanine Calm',
+    description: 'Sérénité & focus doux sans somnolence.',
+    price: 159.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon L-théanine, ambiance minimal luxe, fond blanc chaud, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 21,
+    brand: 'FASSIA NUTRI',
+    name: 'Probiotiques 20B',
+    description: 'Microbiote & confort digestif au quotidien.',
+    price: 249.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon probiotiques, gélules, fond blanc clinique, accents menthe, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 22,
+    brand: 'FASSIA NUTRI',
+    name: 'Enzymes Digestives',
+    description: 'Soutien pendant les repas, digestion légère.',
+    price: 169.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon enzymes digestives, fond beige rosé clair, style minimal, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 23,
+    brand: 'FASSIA NUTRI',
+    name: 'Berberine 500 mg',
+    description: 'Métabolisme & gestion du sucre.',
+    price: 269.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon berbérine, capsules, fond clair, lumière studio, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 24,
+    brand: 'FASSIA NUTRI',
+    name: 'NAC 600 mg',
+    description: 'Soutien hépatique & antioxydant.',
+    price: 199.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon NAC 600, ambiance clinique, fond blanc chaud, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 25,
+    brand: 'FASSIA NUTRI',
+    name: 'Propolis Extract',
+    description: 'Ruche & immunité: propolis concentrée.',
+    price: 149.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon propolis, ambiance miel doré, fond beige clair, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 26,
+    brand: 'FASSIA NUTRI',
+    name: 'Trans-Resveratrol',
+    description: 'Antioxydant: longévité & éclat.',
+    price: 289.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon resveratrol, ambiance luxe minimal, fond clair, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 27,
+    brand: 'FASSIA NUTRI',
+    name: 'Curcuma Curcumine',
+    description: 'Confort articulaire & inflammation.',
+    price: 189.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments, flacon curcumine, poudre curcuma, fond beige crème, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 28,
+    brand: 'FASSIA NUTRI',
+    name: 'Collagene Peptides',
+    description: 'Peau, cheveux, ongles: beauté de l’intérieur.',
+    price: 239.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments beauté, collagène peptides, flacon blanc, fond rose nude, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 29,
+    brand: 'FASSIA NUTRI',
+    name: 'Multivitamines Daily',
+    description: 'Vitamines & minéraux essentiels chaque matin.',
+    price: 219.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments multivitamines, flacon, gélules colorées douces, fond clair, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
+    id: 30,
+    brand: 'FASSIA NUTRI',
+    name: 'Omega-3 Ultra',
+    description: 'Cœur, cerveau & performance: oméga-3 concentrés.',
+    price: 259.0,
+    image: imageUrl(
+      'Photographie premium e-commerce compléments oméga 3, capsules dorées, flacon, fond clair, style clinique chic, haute définition'
+    ),
+    category: 'Compléments',
+  },
+  {
     id: 4,
     brand: 'VICHY',
     name: 'Vitamin D3 2000 IU',

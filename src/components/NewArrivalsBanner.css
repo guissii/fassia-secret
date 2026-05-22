@@ -28,9 +28,18 @@
   object-position: center;
 }
 
+@media (min-width: 992px) {
+  .new-arrivals-banner-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .new-arrivals-banner-img {
+    object-fit: cover;
+  }
+}
+
 @media (max-width: 768px) {
   .new-arrivals-banner-media {
     border-radius: 0;
   }
 }
-

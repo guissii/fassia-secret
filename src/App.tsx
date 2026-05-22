@@ -12,6 +12,7 @@ import { EssentialsSection } from './components/EssentialsSection';
 import { IngredientsSection } from './components/IngredientsSection';
 import { MakeupParfumsSection } from './components/MakeupParfumsSection';
 import { KoreanRoutineSection } from './components/KoreanRoutineSection';
+import { SupplementsSection } from './components/SupplementsSection';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -62,6 +63,8 @@ function App() {
         <MakeupParfumsSection />
 
         <IngredientsSection />
+
+        <SupplementsSection />
 
         <ProductSection title="Meilleures Ventes" showFooter seeMoreHref="/boutique" />
 

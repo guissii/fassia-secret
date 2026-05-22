@@ -4,6 +4,36 @@
   padding: var(--spacing-xl) 0;
 }
 
+.makeup-parfums-header {
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.makeup-parfums-title {
+  font-family: var(--font-display-serif, var(--font-serif));
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.6),
+    0 0 24px rgba(255, 79, 163, 0.18),
+    0 0 44px rgba(255, 79, 163, 0.08);
+}
+
+.makeup-parfums-title::after {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.makeup-parfums-amp {
+  font-family: var(--font-display-script, cursive);
+  font-style: italic;
+  font-weight: 700;
+  color: #FF4FA3;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.65),
+    0 0 24px rgba(255, 79, 163, 0.34),
+    0 0 52px rgba(255, 79, 163, 0.18);
+}
+
 .makeup-parfums-panel {
   position: relative;
   border-radius: 44px;
@@ -21,7 +51,7 @@
 
 .makeup-parfums-carousel {
   display: flex;
-  gap: 0;
+  gap: clamp(12px, 2.4vw, 18px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -45,11 +75,12 @@
 .makeup-parfums-tile {
   position: relative;
   flex: 0 0 auto;
-  width: clamp(240px, 28vw, 320px);
-  height: clamp(320px, 36vw, 420px);
-  border-radius: 34px;
+  width: clamp(220px, 66vw, 320px);
+  height: auto;
+  aspect-ratio: 3 / 4;
+  border-radius: 28px;
   overflow: hidden;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   scroll-snap-stop: always;
   box-shadow: var(--shadow-md);
   transform: translateY(0);
@@ -61,7 +92,7 @@
 }
 
 .makeup-parfums-tile:not(:last-child) {
-  margin-right: -36px;
+  margin-right: 0;
 }
 
 .makeup-parfums-tile.is-active {
@@ -107,14 +138,46 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+@media (min-width: 992px) {
+  .makeup-parfums-panel {
+    padding: clamp(32px, 3vw, 54px);
+  }
+
+  .makeup-parfums-carousel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: clamp(16px, 2vw, 26px);
+    overflow-x: visible;
+    scroll-snap-type: none;
+    padding: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scroll-padding-left: 0;
+    scroll-padding-right: 0;
+  }
+
+  .makeup-parfums-tile {
+    width: auto;
+    height: clamp(260px, 18vw, 380px);
+  }
+
+  .makeup-parfums-tile:not(:last-child) {
+    margin-right: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .makeup-parfums-section {
     padding: var(--spacing-lg) 0;
   }
 
+  .makeup-parfums-header {
+    margin-bottom: 14px;
+  }
+
   .makeup-parfums-panel {
     border-radius: 36px;
-    padding: 34px 0 26px;
+    padding: 26px 0 18px;
   }
 
   .makeup-parfums-carousel {
@@ -127,12 +190,14 @@
   }
 
   .makeup-parfums-tile {
-    width: 72vw;
-    height: 330px;
+    width: 78vw;
+    max-width: 320px;
+    aspect-ratio: 3 / 4;
+    height: auto;
   }
 
   .makeup-parfums-tile:not(:last-child) {
-    margin-right: -22px;
+    margin-right: 0;
   }
 
   .makeup-parfums-tile:hover {

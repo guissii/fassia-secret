@@ -49,6 +49,7 @@ export default function BoutiqueClientPage() {
       .filter(Boolean);
   }, [searchParams]);
   const onlyPromos = useMemo(() => searchParams.get('promo') === '1', [searchParams]);
+  const onlyNew = useMemo(() => searchParams.get('new') === '1', [searchParams]);
   const sort = useMemo(() => {
     const raw = searchParams.get('sort');
     if (raw === 'price-asc' || raw === 'price-desc' || raw === 'reco') return raw;
@@ -89,6 +90,7 @@ export default function BoutiqueClientPage() {
     let list = ALL_PRODUCTS.filter((p) => {
       if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
       if (onlyPromos && !(typeof p.oldPrice === 'number' && p.oldPrice > p.price)) return false;
+      if (onlyNew && p.badge !== 'Nouveau') return false;
       if (!normalized) return true;
       return (
         p.name.toLowerCase().includes(normalized) ||
@@ -186,6 +188,23 @@ export default function BoutiqueClientPage() {
         </label>
       </div>
 
+      <div className="shop-filters-group">
+        <label className="shop-filter-option">
+          <input
+            type="checkbox"
+            checked={onlyNew}
+            onChange={(e) => {
+              updateSearchParams((sp) => {
+                if (e.target.checked) sp.set('new', '1');
+                else sp.delete('new');
+                sp.set('page', '1');
+              });
+            }}
+          />
+          <span>Nouveautés</span>
+        </label>
+      </div>
+
       <button
         type="button"
         className="shop-filters-reset"
@@ -194,6 +213,7 @@ export default function BoutiqueClientPage() {
             sp.delete('q');
             sp.delete('category');
             sp.delete('promo');
+            sp.delete('new');
             sp.delete('sort');
             sp.delete('page');
           });

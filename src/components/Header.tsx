@@ -235,8 +235,8 @@ const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: numbe
 ];
 
 const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; href?: string; openKey?: string }> = [
-  { label: 'PROMOTIONS', Icon: Tag, openKey: 'PROMOTIONS !' },
-  { label: 'COMPLÉMENTS\nALIMENTAIRES', Icon: Sprout, openKey: 'COMPLEMENTS ALIMENTAIRES' },
+  { label: 'PROMOTIONS', Icon: Tag, href: '/promotions' },
+  { label: 'COMPLÉMENTS\nALIMENTAIRES', Icon: Sprout, href: '/boutique?category=Compl%C3%A9ments' },
   { label: 'KOREAN\nBEAUTY', Icon: Sparkles, href: '/korean-beauty/' },
   { label: 'PARFUMS\n& MAQUILLAGE', Icon: Brush, href: '/maquillage-parfums' },
 ];
@@ -244,16 +244,25 @@ const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?:
 interface HeaderProps {
   onCartOpen: () => void;
   cartCount?: number;
+  cartBumpKey?: number;
 }
 
-export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
+export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [cartBump, setCartBump] = useState(false);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const mobileMenuCloseButtonRef = useRef<HTMLButtonElement>(null);
   const restoreMenuFocusRef = useRef<HTMLElement | null>(null);
   const restoreSearchFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!cartBumpKey) return;
+    setCartBump(true);
+    const t = window.setTimeout(() => setCartBump(false), 420);
+    return () => window.clearTimeout(t);
+  }, [cartBumpKey]);
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -557,7 +566,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
               aria-label="Panier"
               type="button"
             >
-              <div className="cart-icon-wrapper">
+              <div className={`cart-icon-wrapper ${cartBump ? 'bump' : ''}`}>
                 <ShoppingCart size={24} />
                 <span className="cart-badge">{cartCount}</span>
               </div>
@@ -615,6 +624,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
                 'HYGIÈNE & INTIMITÉ': '/boutique?category=Hygi%C3%A8ne',
                 'SANTÉ': '/boutique?category=Sant%C3%A9',
                 'HOMMES': '/boutique?category=Hommes',
+                'COMPLEMENTS ALIMENTAIRES': '/boutique?category=Compl%C3%A9ments',
                 'PREOCCUPATIONS': '/boutique',
               };
               const parentHref = desktopCatHrefMap[category.title] || '/boutique';
@@ -654,7 +664,7 @@ export function Header({ onCartOpen, cartCount = 0 }: HeaderProps) {
             })}
             <li>
               <Link
-                href="/boutique?promo=1"
+                href="/promotions"
                 className="nav-link nav-link-promos flex items-center gap-xs"
               >
                 <Tag size={14} className="promos-icon" /> PROMOS

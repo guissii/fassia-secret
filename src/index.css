@@ -50,7 +50,7 @@ html {
   --spacing-3xl: 8rem;
 
   /* Container padding — used by carousel margin calculations */
-  --container-padding: var(--spacing-lg);
+  --container-padding: clamp(1.25rem, 3vw, 3.5rem);
 }
 
 /* ─── Global Premium Section Headers ─── */
@@ -149,7 +149,7 @@ ul {
 /* ─── Container ─── */
 .container {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 var(--container-padding);
   overflow: visible;       /* allow carousel to extend */

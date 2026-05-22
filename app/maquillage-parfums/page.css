@@ -171,7 +171,6 @@
   display: block;
 }
 
-/* Gradient overlay so text is always readable */
 .kb-visual-overlay {
   position: absolute;
   inset: 0;
@@ -226,7 +225,6 @@
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.09);
 }
 
-/* Override for kb-page: keep subtle style */
 .kb-page .essential-card {
   background: #fff;
   border-color: rgba(0, 0, 0, 0.07);
@@ -264,7 +262,6 @@
   padding: 10px;
 }
 
-/* Wishlist heart badge */
 .essential-badge-right {
   position: absolute;
   top: 10px;
@@ -634,7 +631,6 @@
     height: 38px;
   }
 
-  /* Carousel: scroll snapping, no extra padding */
   .kb-page .essentials-carousel {
     display: flex;
     overflow-x: auto;
@@ -649,14 +645,12 @@
     mask-image: none;
   }
 
-  /* ─── HERO PAIR CARD ── */
   .kb-page .essentials-hero-pair {
     flex: 0 0 88vw;
     width: 88vw;
     max-width: 360px;
     min-width: 0;
 
-    /* Side-by-side grid: image left, product right */
     display: grid;
     grid-template-columns: 42% 58%;
     gap: 10px;
@@ -669,7 +663,6 @@
     flex-shrink: 0;
   }
 
-  /* Visual tile fills the left column entirely */
   .kb-page .essentials-hero-pair .essentials-visual-tile {
     width: 100%;
     flex: none;
@@ -692,7 +685,6 @@
     font-size: 0.95rem;
   }
 
-  /* First product card: right column */
   .kb-page .essentials-hero-pair .essential-card {
     flex: none;
     width: 100%;
@@ -704,7 +696,6 @@
     background: #fff;
   }
 
-  /* Square image area for the product inside hero pair */
   .kb-page .essentials-hero-pair .essential-image-area {
     height: 180px;
     width: 100%;
@@ -739,7 +730,6 @@
     height: 32px;
   }
 
-  /* ─── STANDALONE PRODUCT CARDS ── */
   .kb-page .essential-card {
     flex: 0 0 44vw;
     width: 44vw;
@@ -785,7 +775,6 @@
     display: flex;
   }
 
-  /* ─── HERO TEXT ── */
   .kb-hero-title {
     font-size: 2.2rem;
   }
@@ -795,7 +784,6 @@
     max-width: 300px;
   }
 
-  /* ─── SECTION HEADER ── */
   .essentials-title {
     font-size: 1.2rem;
   }
@@ -847,7 +835,6 @@
   transform: scale(0.98);
 }
 
-/* ─── VERY SMALL SCREENS (< 380px) ─── */
 @media (max-width: 380px) {
 
   .kb-page .essentials-hero-pair {
