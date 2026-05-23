@@ -14,7 +14,7 @@
 
 .brands-logos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
   gap: 26px 34px;
   align-items: center;
   justify-items: center;
@@ -46,6 +46,18 @@
   font-weight: 800;
   letter-spacing: 0.8px;
   text-transform: uppercase;
+}
+
+@media (min-width: 769px) {
+  .brands-logos {
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .brands-logos {
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+  }
 }
 
 @media (max-width: 768px) {

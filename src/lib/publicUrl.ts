@@ -31,7 +31,7 @@ export function publicAssetUrl(inputPath: string) {
     return basePath || '/';
   }
 
-  if (/^(https?:)?\/\//.test(trimmed) || /^data:/.test(trimmed)) {
+  if (/^(https?:)?\/\//.test(trimmed) || /^data:/.test(trimmed) || /^blob:/.test(trimmed)) {
     return trimmed;
   }
 

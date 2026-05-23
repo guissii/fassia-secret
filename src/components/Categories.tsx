@@ -23,7 +23,7 @@ export function Categories() {
       title: 'Compléments Alimentaires',
       image: 'hero%20new.png',
       className: 'category-small category-supplements',
-      href: '/boutique?category=Compl%C3%A9ments',
+      href: '/complements-alimentaires',
     },
   ];
 

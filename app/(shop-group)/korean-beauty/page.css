@@ -1,0 +1,97 @@
+/* app/korean-beauty/page.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Dancing+Script:wght@600;700&display=swap');
+@import url('../../src/styles/CollectionLayout.css');
+
+.kb-page {
+  --kb-neon-pink: #FF4FA3;
+  --kb-deep-mauve: #2D1B2E;
+  --kb-mid-mauve: #4A2040;
+  --kb-soft-purple: #7B3F6E;
+  --kb-font-serif: 'Playfair Display', var(--font-serif);
+  --kb-font-script: 'Dancing Script', cursive;
+}
+
+/* ─── HERO CUSTOMIZATIONS ─────────────────────── */
+
+.kb-hero-title {
+  font-family: var(--kb-font-serif);
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.75),
+    0 0 46px rgba(255, 79, 163, 0.16);
+}
+
+.kb-hero-title span {
+  font-family: var(--kb-font-script);
+  color: var(--kb-neon-pink);
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.55),
+    0 0 26px rgba(255,79,163,0.55),
+    0 0 64px rgba(255,79,163,0.28);
+}
+
+/* ─── SECTION CUSTOMIZATIONS ───────────────────── */
+
+.essentials-title {
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.75),
+    0 0 46px rgba(255, 79, 163, 0.14);
+}
+
+.essentials-title .highlight {
+  color: var(--kb-neon-pink);
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.60),
+    0 0 24px rgba(255,79,163,0.42),
+    0 0 58px rgba(255,79,163,0.22);
+}
+
+/* ─── ANIMATIONS & SPARKLES (KB UNIQUE) ───────── */
+
+.kb-sparkle {
+  position: absolute;
+  animation: sparkle 3s ease-in-out infinite;
+  opacity: 0.55;
+  transform: translateZ(0);
+}
+
+.kb-sparkle::before {
+  content: '✦';
+  color: rgba(255, 255, 255, 0.60);
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.55),
+    0 0 28px rgba(255, 79, 163, 0.24);
+  font-size: 14px;
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(255,79,163,0.45); }
+  50% { box-shadow: 0 0 25px rgba(255,79,163,0.55); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.kb-nav-bubble {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-family: var(--kb-font-serif);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255,79,163,1), rgba(180,80,200,0.95));
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.25) inset,
+    0 0 22px rgba(255,79,163,0.35);
+  animation: glowPulse 2s ease-in-out infinite;
+  z-index: 50;
+}

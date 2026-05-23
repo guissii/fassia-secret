@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Globe, Share2, ShieldCheck } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, Share2, ShieldCheck, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { publicAssetUrl } from '../lib/publicUrl';
 
@@ -46,10 +46,26 @@ export function Footer() {
 
           <div className="footer-col">
             <h4 className="mb-md">Contactez-nous</h4>
+            <div className="footer-map" aria-label="Carte - localisation">
+              <iframe
+                title="Localisation Fassia Secret"
+                src="https://www.google.com/maps?q=2XJV%2B3W4%D8%8C%20Rue%20Matrane%20Khalil%20Matrane%2C%20Fes%2030050%2C%20Morocco&output=embed"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
             <ul className="contact-list text-sm text-muted">
               <li className="flex gap-sm items-center">
                 <MapPin size={14} className="text-primary" />
-                <span>Casablanca, Maroc</span>
+                <a
+                  className="contact-link"
+                  href="https://maps.app.goo.gl/R5STHD4uZzu36Lfn8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Voir la localisation sur Google Maps"
+                >
+                  Fès, Maroc <ExternalLink size={14} />
+                </a>
               </li>
               <li className="flex gap-sm items-center">
                 <Phone size={14} className="text-primary" />

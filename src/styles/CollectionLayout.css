@@ -1,0 +1,349 @@
+/* src/styles/CollectionLayout.css */
+
+/* ─── BASE PAGE LAYOUT ──────────────────────────── */
+
+.collection-page, .kb-page {
+  position: relative;
+  color: #111;
+  background: var(--color-bg, #faf8fc);
+  padding-bottom: 100px;
+  overflow: visible;
+}
+
+.collection-page > *, .kb-page > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── HERO SECTION ──────────────────────────────── */
+
+.collection-hero, .kb-hero {
+  padding: 56px 0 28px;
+  text-align: center;
+  background: transparent;
+}
+
+.collection-hero-tag, .kb-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 18px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #111;
+  border-radius: var(--radius-full);
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 20px;
+  border: 1px solid rgba(220, 80, 140, 0.38);
+  box-shadow: 0 10px 30px rgba(220, 80, 140, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.collection-hero-title, .kb-hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  color: #111;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.collection-hero-title span, .kb-hero-title span {
+  font-family: 'Dancing Script', cursive;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.14em;
+}
+
+.collection-hero-desc, .kb-hero-desc {
+  font-family: var(--font-main);
+  font-size: 1rem;
+  color: rgba(17, 17, 17, 0.58);
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* ─── SECTION HEADER ────────────────────────────── */
+
+.essentials-section {
+  padding: 22px 0;
+  margin: 0;
+}
+
+.essentials-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 2px;
+}
+
+.essentials-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.essentials-title .highlight {
+  color: var(--color-primary);
+  font-style: italic;
+  margin-right: 4px;
+}
+
+/* ─── CAROUSEL & HERO PAIR ──────────────────────── */
+
+.essentials-carousel {
+  display: flex;
+  gap: clamp(12px, 1.6vw, 18px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-bottom: 6px;
+  align-items: stretch;
+}
+
+.essentials-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Standalone cards in carousel (PC) */
+.essentials-carousel > .product-card {
+  flex: 0 0 clamp(260px, 22vw, 300px);
+  width: clamp(260px, 22vw, 300px);
+  scroll-snap-align: start;
+}
+
+.essentials-hero-pair {
+  flex: 0 0 clamp(520px, 44vw, 600px); /* Exactly 2x a standalone card */
+  width: clamp(520px, 44vw, 600px);
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 50/50 split */
+  gap: clamp(12px, 1.6vw, 18px);
+  align-items: stretch;
+}
+
+.essentials-visual-tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 5; /* Standardized to match products */
+  border-radius: 0;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.essentials-visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.kb-visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 6, 20, 0.72) 0%,
+    rgba(10, 6, 20, 0.18) 55%,
+    transparent 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 14px 12px;
+  color: #fff;
+  z-index: 10;
+}
+
+.kb-overlay-step {
+  font-family: var(--font-secondary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  opacity: 0.75;
+  margin-bottom: 3px;
+  display: block;
+  text-transform: uppercase;
+}
+
+.kb-overlay-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ─── SEE MORE CARD ─────────────────────────────── */
+
+.kb-see-more-card {
+  text-decoration: none;
+  color: inherit;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(220, 80, 140, 0.15);
+  background: linear-gradient(135deg, #fff 0%, #fff0f6 100%);
+  flex: 0 0 clamp(260px, 22vw, 300px); /* Match product cards */
+  width: clamp(260px, 22vw, 300px);
+  display: flex;
+  height: auto;
+  transition: all 0.3s ease;
+}
+
+.kb-see-more-card:hover {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffe0ec 100%);
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
+}
+
+.kb-see-more-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.kb-see-more-label {
+  font-family: var(--font-secondary);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.kb-see-more-title {
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(17, 17, 17, 0.6);
+  line-height: 1.4;
+  max-width: 200px;
+}
+
+.kb-see-more-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.kb-see-more-card:hover .kb-see-more-icon-circle {
+  transform: translateX(4px);
+  background: var(--color-primary);
+}
+
+/* ─── GLOBAL CTA ────────────────────────────────── */
+
+.kb-global-cta {
+  margin-top: 20px;
+  padding: 0 20px;
+}
+
+.kb-global-cta-link {
+  --cta-border: rgba(196, 160, 92, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  height: 58px;
+  width: min(720px, 92vw);
+  margin: 0 auto;
+  padding: 0 18px 0 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  color: rgba(120, 92, 52, 0.98);
+  border-radius: 12px;
+  border: 1px solid var(--cta-border);
+  box-shadow: 0 16px 40px rgba(17, 17, 17, 0.06);
+  backdrop-filter: blur(8px);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.kb-global-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: var(--color-primary);
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--cta-border) 70%, transparent);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ══════════════════════════════════════════════
+   📱 MOBILE LAYOUT (≤ 768px)
+   ══════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .collection-page {
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+  }
+
+  .essentials-section {
+    padding: 18px 0;
+  }
+
+  .essentials-carousel {
+    gap: 12px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .essentials-hero-pair {
+    flex: 0 0 90vw;
+    width: 90vw;
+    max-width: 400px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 50/50 for symmetry */
+    gap: 10px;
+    scroll-snap-align: start;
+  }
+
+  .essentials-visual-tile {
+    min-height: 200px;
+    height: 100%;
+  }
+
+  .kb-overlay-title {
+    font-size: 0.95rem;
+  }
+
+  .essentials-carousel > .product-card {
+    flex: 0 0 45vw; /* Exactly 1/2 of hero pair */
+    width: 45vw;
+    max-width: 200px; /* 1/2 of 400px */
+    scroll-snap-align: start;
+  }
+
+  .kb-see-more-card {
+    flex: 0 0 45vw;
+    max-width: 200px;
+  }
+}

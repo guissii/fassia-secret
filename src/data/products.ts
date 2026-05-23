@@ -32,7 +32,7 @@ export const ALL_PRODUCTS: CatalogProduct[] = [
     description: 'Gel-crème hydratant avec acide hyaluronique & thé vert.',
     price: 199.0,
     oldPrice: 249.0,
-    image: 'd6f902fd-0b09-48d0-8055-d03094820431.png',
+    image: 'Gemini_Generated_Image_souwz3souwz3souw.png',
     category: 'Visage',
   },
   {

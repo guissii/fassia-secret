@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum DeliveryStatus {
+  PENDING
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum PromoType {
+  FIXED
+  PERCENTAGE
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  brand       String
+  name        String
+  description String
+  price       Float
+  oldPrice    Float?
+  image       String
+  categories  Category[]
+  collections Collection[]
+  badge       String?
+  isVisible   Boolean     @default(true)
+  isArchived  Boolean     @default(false)
+  salesCount  Int         @default(0)
+  stock       Int         @default(0)
+  tags        String[]
+  concerns    String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  nameAr      String
+  slug        String    @unique
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  page        String    // e.g. "korean-beauty", "complements", "maquillage"
+  order       Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Order {
+  id             String         @id @default(cuid())
+  orderNumber    String         @unique
+  customerName   String
+  phone          String
+  city           String
+  address        String
+  items          OrderItem[]
+  total          Float
+  status         OrderStatus    @default(PENDING)
+  deliveryStatus DeliveryStatus @default(PENDING)
+  syncedToSheets Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  name      String
+  quantity  Int
+  price     Float
+  image     String
+}
+
+model Promo {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  type        PromoType
+  value       Float
+  expiresAt   DateTime
+  usageLimit  Int?
+  usageCount  Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SectionConfig {
+  id          String   @id @default(cuid())
+  sectionKey  String   @unique // e.g., 'essentials', 'best_sellers'
+  bannerImage String
+  updatedAt   DateTime @updatedAt
+}

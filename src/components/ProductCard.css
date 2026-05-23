@@ -1,0 +1,222 @@
+/* src/components/ProductCard.css */
+
+.product-card {
+  --pc-bg: transparent;
+  --pc-radius: 0;
+  --pc-shadow: none;
+  --pc-transition: all 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  background: var(--pc-bg);
+  border-radius: var(--pc-radius);
+  transition: var(--pc-transition);
+  cursor: pointer;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+/* ─── Image Area ─── */
+.product-image-area {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: #f3f4f6;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--pc-radius);
+}
+
+.product-image-frame {
+  width: 100%;
+  height: 100%;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.06);
+}
+
+/* ─── Badge ─── */
+.product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--color-primary, #dc508c);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── Circular CTA ─── */
+.product-cta-circle {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.product-cta-circle:hover {
+  background: var(--color-primary, #dc508c);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(var(--color-primary-rgb, 220, 80, 140), 0.35);
+}
+
+.product-cta-circle:active {
+  transform: scale(0.95);
+}
+
+/* ─── Content ─── */
+.product-content {
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 0 auto; /* Allow growth, prevent shrinking */
+  flex-grow: 1; /* Force filling vertical space */
+  justify-content: space-between;
+}
+
+.product-name-desc-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-category-label {
+  font-family: var(--font-secondary, sans-serif);
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-primary, #dc508c);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.9;
+}
+
+.product-name {
+  font-family: var(--font-main, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-description {
+  font-family: var(--font-main, sans-serif);
+  font-size: 12px;
+  color: rgba(17, 17, 17, 0.55);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+/* ─── Footer / Price ─── */
+.product-footer-row {
+  margin-top: auto;
+  padding-top: 12px;
+  min-height: 44px; /* Ensure price block always has the same space */
+  display: flex;
+  align-items: center;
+}
+
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.price-current {
+  font-family: var(--font-secondary, sans-serif);
+  font-size: 16px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.01em;
+}
+
+.price-old {
+  font-family: var(--font-secondary, sans-serif);
+  font-size: 12px;
+  color: #aaa;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.price-currency {
+  font-size: 0.72em;
+  font-weight: 800;
+  margin-left: 2px;
+  opacity: 0.8;
+}
+
+/* ══════════════════════════════════════════════
+   📱 MOBILE RESPONSIVENESS
+   ══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .product-content {
+    padding: 10px 0;
+  }
+
+  .product-name {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .product-description {
+    font-size: 11px;
+  }
+
+  .price-current {
+    font-size: 15px;
+  }
+
+  .product-cta-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    bottom: 10px;
+    right: 10px;
+  }
+}

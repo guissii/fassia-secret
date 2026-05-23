@@ -2,41 +2,25 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SlidersHorizontal, X } from 'lucide-react';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
-import { Cart, type CartItem } from './components/Cart';
-import { publicAssetUrl } from './lib/publicUrl';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
+import { productHref } from './lib/productSlug';
 import { ALL_PRODUCTS } from './data/products';
+import { ProductCard } from './components/ProductCard';
+import { useCart } from './components/CartContext';
 
-const DEMO_CART_ITEMS: CartItem[] = [
-  {
-    id: 1,
-    name: 'Derma Hydrating Serum',
-    price: 180.0,
-    image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
-    category: 'Visage',
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: 'Hydra Boost Gel Cream',
-    price: 199.0,
-    oldPrice: 249.0,
-    image: 'd6f902fd-0b09-48d0-8055-d03094820431.png',
-    category: 'Visage',
-    quantity: 2,
-  },
-];
+
 
 type SortKey = 'reco' | 'price-asc' | 'price-desc';
 
 export default function BoutiqueClientPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>(DEMO_CART_ITEMS);
+  const { addToCart } = useCart();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem('shopSidebarCollapsed') === '1';
+  });
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   const query = useMemo(() => searchParams.get('q') ?? '', [searchParams]);
@@ -68,41 +52,37 @@ export default function BoutiqueClientPage() {
     router.replace(qs ? `/boutique?${qs}` : '/boutique', { scroll: false });
   };
 
-  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  function handleUpdateQuantity(id: number, quantity: number) {
-    setCartItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)));
-  }
-
-  function handleRemoveItem(id: number) {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  }
 
   const categories = useMemo(() => {
-    const set = new Set<string>();
+    const predefined = [
+      'Visage', 'Corps', 'Cheveux', 'Hygiène Dentaire', 'Maquillage', 
+      'Hygiène', 'Accessoires', 'Minceur', 'Sport', 'Maman & Bébé', 
+      'Hommes', 'Santé', 'Compléments', 'K-Beauty', 'Parfums', 'Bien-être'
+    ];
+    const set = new Set<string>(predefined);
     for (const p of ALL_PRODUCTS) set.add(p.category);
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
   }, []);
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
+    const keywords = normalized.split(/\s+/).filter(Boolean);
 
     let list = ALL_PRODUCTS.filter((p) => {
       if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
       if (onlyPromos && !(typeof p.oldPrice === 'number' && p.oldPrice > p.price)) return false;
       if (onlyNew && p.badge !== 'Nouveau') return false;
-      if (!normalized) return true;
-      return (
-        p.name.toLowerCase().includes(normalized) ||
-        p.brand.toLowerCase().includes(normalized) ||
-        p.category.toLowerCase().includes(normalized)
-      );
+      if (keywords.length === 0) return true;
+      
+      const searchTarget = [p.name, p.brand, p.category, p.description].join(' ').toLowerCase();
+      return keywords.every(kw => searchTarget.includes(kw));
     });
 
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [query, onlyPromos, selectedCategories, sort]);
+  }, [query, onlyNew, onlyPromos, selectedCategories, sort]);
 
   const PAGE_SIZE = 20;
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
@@ -110,8 +90,6 @@ export default function BoutiqueClientPage() {
   const pageStart = (safePage - 1) * PAGE_SIZE;
   const pageEnd = Math.min(pageStart + PAGE_SIZE, filteredProducts.length);
   const visibleProducts = filteredProducts.slice(pageStart, pageEnd);
-
-  const formatPrice = (price: number) => price.toFixed(2) + ' MAD';
 
   const openFilters = () => {
     if (typeof document !== 'undefined') {
@@ -121,6 +99,11 @@ export default function BoutiqueClientPage() {
   };
 
   const closeFilters = () => setIsFilterOpen(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('shopSidebarCollapsed', isSidebarCollapsed ? '1' : '0');
+  }, [isSidebarCollapsed]);
 
   useEffect(() => {
     if (!isFilterOpen) return;
@@ -143,67 +126,72 @@ export default function BoutiqueClientPage() {
 
   const FiltersContent = (
     <div className="shop-filters">
-      <div className="shop-filters-group">
-        <div className="shop-filters-title">Catégories</div>
-        <div className="shop-filters-options">
-          {categories.map((cat) => {
-            const checked = selectedCategories.includes(cat);
-            return (
-              <label key={cat} className="shop-filter-option">
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={(e) => {
-                    const next = e.target.checked
-                      ? [...selectedCategories, cat]
-                      : selectedCategories.filter((c) => c !== cat);
-                    updateSearchParams((sp) => {
-                      if (next.length > 0) sp.set('category', next.join(','));
-                      else sp.delete('category');
-                      sp.set('page', '1');
-                    });
-                  }}
-                />
-                <span>{cat}</span>
-              </label>
-            );
-          })}
+      <details className="shop-filter-accordion" open>
+        <summary className="shop-filter-summary">Catégories</summary>
+        <div className="shop-filter-panel">
+          <div className="shop-filters-options">
+            {categories.map((cat) => {
+              const checked = selectedCategories.includes(cat);
+              return (
+                <label key={cat} className="shop-filter-option">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => {
+                      const next = e.target.checked
+                        ? [...selectedCategories, cat]
+                        : selectedCategories.filter((c) => c !== cat);
+                      updateSearchParams((sp) => {
+                        if (next.length > 0) sp.set('category', next.join(','));
+                        else sp.delete('category');
+                        sp.set('page', '1');
+                      });
+                    }}
+                  />
+                  <span>{cat}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </details>
 
-      <div className="shop-filters-group">
-        <label className="shop-filter-option">
-          <input
-            type="checkbox"
-            checked={onlyPromos}
-            onChange={(e) => {
-              updateSearchParams((sp) => {
-                if (e.target.checked) sp.set('promo', '1');
-                else sp.delete('promo');
-                sp.set('page', '1');
-              });
-            }}
-          />
-          <span>Promotions seulement</span>
-        </label>
-      </div>
+      <details className="shop-filter-accordion" open>
+        <summary className="shop-filter-summary">Options</summary>
+        <div className="shop-filter-panel">
+          <div className="shop-filters-options">
+            <label className="shop-filter-option">
+              <input
+                type="checkbox"
+                checked={onlyPromos}
+                onChange={(e) => {
+                  updateSearchParams((sp) => {
+                    if (e.target.checked) sp.set('promo', '1');
+                    else sp.delete('promo');
+                    sp.set('page', '1');
+                  });
+                }}
+              />
+              <span>Promotions seulement</span>
+            </label>
 
-      <div className="shop-filters-group">
-        <label className="shop-filter-option">
-          <input
-            type="checkbox"
-            checked={onlyNew}
-            onChange={(e) => {
-              updateSearchParams((sp) => {
-                if (e.target.checked) sp.set('new', '1');
-                else sp.delete('new');
-                sp.set('page', '1');
-              });
-            }}
-          />
-          <span>Nouveautés</span>
-        </label>
-      </div>
+            <label className="shop-filter-option">
+              <input
+                type="checkbox"
+                checked={onlyNew}
+                onChange={(e) => {
+                  updateSearchParams((sp) => {
+                    if (e.target.checked) sp.set('new', '1');
+                    else sp.delete('new');
+                    sp.set('page', '1');
+                  });
+                }}
+              />
+              <span>Nouveautés</span>
+            </label>
+          </div>
+        </div>
+      </details>
 
       <button
         type="button"
@@ -225,10 +213,8 @@ export default function BoutiqueClientPage() {
   );
 
   return (
-    <div className="app-container">
-      <Header onCartOpen={() => setIsCartOpen(true)} cartCount={totalCartCount} />
-      <main>
-        <section className="shop-page py-3xl">
+    <>
+      <section className="shop-page shop-page-minimal py-3xl">
           <div className="container">
             <div className="shop-header">
               <div className="shop-title">
@@ -276,9 +262,19 @@ export default function BoutiqueClientPage() {
               </div>
             </div>
 
-            <div className="shop-layout">
-              <aside className="shop-sidebar" aria-label="Filtres">
-                {FiltersContent}
+            <div className={`shop-layout ${isSidebarCollapsed ? 'is-sidebar-collapsed' : ''}`}>
+              <aside className={`shop-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`} aria-label="Filtres">
+                <button
+                  type="button"
+                  className="shop-sidebar-toggle"
+                  aria-label={isSidebarCollapsed ? 'Afficher les filtres' : 'Masquer les filtres'}
+                  aria-expanded={!isSidebarCollapsed}
+                  onClick={() => setIsSidebarCollapsed((v) => !v)}
+                >
+                  {isSidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                  <span className="shop-sidebar-toggle-label">Filtres</span>
+                </button>
+                {!isSidebarCollapsed ? FiltersContent : null}
               </aside>
 
               <div className="shop-results">
@@ -294,41 +290,13 @@ export default function BoutiqueClientPage() {
 
                 <div className="shop-grid" aria-label="Liste des produits">
                   {visibleProducts.map((p) => (
-                  <article key={p.id} className="product-card" aria-label={p.name}>
-                    <div className="product-image-area">
-                      <div className="product-image-frame">
-                        <img
-                          src={publicAssetUrl(p.image)}
-                          alt={p.name}
-                          className="product-image"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                      {(typeof p.oldPrice === 'number' && p.oldPrice > p.price) || p.badge ? (
-                        <span className="product-badge" style={{ backgroundColor: 'var(--color-primary)' }}>
-                          {p.badge ?? 'Promo'}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <div className="product-content">
-                      <span className="product-category-label">{p.brand}</span>
-                      <h3 className="product-name">{p.name}</h3>
-                      <p className="product-description">{p.description}</p>
-                      <div className="product-footer-row">
-                        <div className="product-price-row" aria-label="Prix">
-                          <span className="price-current">{formatPrice(p.price)}</span>
-                          {typeof p.oldPrice === 'number' && p.oldPrice > p.price && (
-                            <span className="price-old">{formatPrice(p.oldPrice)}</span>
-                          )}
-                        </div>
-                        <button className="product-cta-circle" type="button" aria-label={`Ajouter ${p.name} au panier`}>
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </article>
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      label={p.brand}
+                      onNavigate={() => router.push(productHref(p))}
+                      onAddToCart={() => addToCart(p)}
+                    />
                   ))}
                 </div>
 
@@ -371,16 +339,6 @@ export default function BoutiqueClientPage() {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-      />
 
       <div className={`shop-filter-backdrop ${isFilterOpen ? 'open' : ''}`} onClick={closeFilters} />
       <aside className={`shop-filter-drawer ${isFilterOpen ? 'open' : ''}`} aria-label="Filtres">
@@ -392,6 +350,6 @@ export default function BoutiqueClientPage() {
         </div>
         <div className="shop-filter-drawer-body">{FiltersContent}</div>
       </aside>
-    </div>
+    </>
   );
 }

@@ -11,16 +11,7 @@
 }
 
 .ing-section::before {
-  content: '';
-  position: absolute;
-  inset: -120px -80px;
-  background:
-    radial-gradient(ellipse at 20% 20%, rgba(var(--color-primary-rgb, 220, 80, 140), 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 35%, rgba(120, 80, 220, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 90%, rgba(var(--color-primary-rgb, 220, 80, 140), 0.06) 0%, transparent 62%);
-  filter: blur(14px);
-  pointer-events: none;
-  z-index: 0;
+  content: none;
 }
 
 
@@ -117,12 +108,6 @@
   overscroll-behavior-x: contain;
   padding: 6px 0 10px;
   scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
 }
 
 .ing-carousel::-webkit-scrollbar {
@@ -152,9 +137,9 @@
 .ing-card {
   position: relative;
   overflow: hidden;
-  border-radius: 24px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 0;
+  background: #f3f4f6;
+  border: none;
   flex: 0 0 auto;
   width: 280px;
   min-height: 380px;
@@ -165,20 +150,14 @@
   transition:
     transform 700ms cubic-bezier(0.2, 0.9, 0.2, 1),
     opacity 700ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    border-color 350ms ease,
-    box-shadow 350ms ease;
+    border-color 350ms ease;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.03);
+  box-shadow: none;
 }
 
 .ing-card:hover {
   border-color: rgba(225, 0, 116, 0.12);
-  box-shadow:
-    0 14px 42px rgba(0, 0, 0, 0.11),
-    0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 /* ─── Background Image ─── */
@@ -247,14 +226,9 @@
   flex-direction: column;
   justify-content: flex-end;
   gap: 8px;
-  background: linear-gradient(
-    to top,
-    rgba(255, 255, 255, 0.96) 0%,
-    rgba(255, 255, 255, 0.92) 72%,
-    rgba(255, 255, 255, 0.0) 100%
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-top: none;
 }
 
@@ -292,6 +266,7 @@
   margin: 4px 0 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -303,10 +278,10 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.92);
-  color: #111;
+  border-radius: 0;
+  border: none;
+  background: #111;
+  color: #fff;
   font-weight: 600;
   letter-spacing: 0.5px;
   font-size: 0.7rem;
@@ -314,15 +289,15 @@
   transition: all 300ms cubic-bezier(0.25, 1, 0.5, 1);
   cursor: pointer;
   margin-top: 2px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.10);
+  box-shadow: none;
 }
 
 .ing-card-btn:hover {
   background: var(--btn-accent, var(--color-primary));
   border-color: transparent;
   color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(225, 0, 116, 0.2);
+  transform: none;
+  box-shadow: none;
 }
 
 
