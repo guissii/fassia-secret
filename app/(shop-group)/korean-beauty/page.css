@@ -1,7 +1,7 @@
 /* app/korean-beauty/page.css */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Dancing+Script:wght@600;700&display=swap');
-@import url('../../src/styles/CollectionLayout.css');
+@import url('../../../src/styles/CollectionLayout.css');
 
 .kb-page {
   --kb-neon-pink: #FF4FA3;

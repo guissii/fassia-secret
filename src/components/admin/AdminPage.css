@@ -1089,27 +1089,51 @@ input:checked + .slider:before {
 
 /* Split Layout for Product Modal */
 .large-modal {
-  max-width: 1200px;
+  max-width: 1400px;
   width: 95vw;
+  height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.large-modal .modal-header {
+  margin-bottom: 1rem;
 }
 
 .product-form-container {
   display: flex;
   flex-direction: column;
-  height: calc(90vh - 100px);
-}
-
-.product-split-layout {
-  display: flex;
-  gap: 2rem;
   flex: 1;
   overflow: hidden;
 }
 
+.product-split-layout {
+  display: flex;
+  gap: 3rem;
+  flex: 1;
+  overflow: hidden;
+  padding-bottom: 1rem;
+}
+
 .product-form-side {
-  flex: 1.5;
+  flex: 1.6;
   overflow-y: auto;
-  padding-right: 1rem;
+  padding-right: 1.5rem;
+}
+
+/* Custom Scrollbar for Form Side */
+.product-form-side::-webkit-scrollbar {
+  width: 6px;
+}
+.product-form-side::-webkit-scrollbar-track {
+  background: transparent;
+}
+.product-form-side::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.product-form-side::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .product-preview-side {
@@ -1123,7 +1147,7 @@ input:checked + .slider:before {
 }
 
 .preview-header {
-  padding: 1rem;
+  padding: 1.25rem;
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   justify-content: space-between;
@@ -1136,13 +1160,13 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .lang-toggle {
   display: flex;
   background-color: var(--admin-surface);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--admin-border);
 }
@@ -1151,10 +1175,15 @@ input:checked + .slider:before {
   background: none;
   border: none;
   color: var(--admin-text-muted);
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lang-toggle button:hover {
+  background-color: rgba(255,255,255,0.05);
 }
 
 .lang-toggle button.active {
@@ -1168,16 +1197,26 @@ input:checked + .slider:before {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-color: #f3f4f6; /* Light gray background to mimic storefront body */
+  background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
   background-size: 20px 20px;
   overflow-y: auto;
 }
 
+.preview-canvas-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.preview-canvas-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
 .preview-canvas {
   width: 100%;
-  max-width: 300px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  border-radius: 12px;
+  max-width: 320px; /* Real mobile card width */
+  background-color: transparent; 
+  /* The ProductCard handles its own background, but we make sure the text isn't black on black */
+  color: #1a1a1a;
 }
 
 .preview-canvas .product-card {
