@@ -145,9 +145,6 @@ export default function PromotionsClientPage() {
     };
   }, []);
 
-  const scrollToOffers = () => {
-    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -183,66 +180,18 @@ export default function PromotionsClientPage() {
             <div className="promo-hero-bg" style={{ transform: `translateY(${heroParallaxY}px)` }} />
             <div className="container">
               <div className="promo-hero-inner">
-                <div className="promo-hero-kicker">
-                  Jusqu'à −40%
-                </div>
                 <h1 className="promo-hero-title">
                   L’Art du <em>Soin</em> à Prix Doux
                 </h1>
-                <p className="promo-hero-desc">
-                  Une sélection exclusive de pépites beauté et bien-être. 
-                  Renouvelez votre routine avec nos marques partenaires, à des conditions exceptionnelles.
-                </p>
 
                 <div className="promo-hero-cta-row">
-                  <button type="button" className="promo-hero-cta" onClick={scrollToOffers} aria-label="Explorer toutes les promotions">
+                  <Link href="/boutique?promo=1" className="promo-hero-cta" aria-label="Explorer toutes les promotions">
                     Explorer les offres
-                  </button>
+                  </Link>
                 </div>
               </div>
 
-              {bestDeal ? (
-                <div className="promo-deal-top">
-                  <div className="promo-deal-top-media">
-                    <img src={publicAssetUrl(bestDeal.image)} alt={bestDeal.name} loading="lazy" decoding="async" />
-                  </div>
-                  <div className="promo-deal-top-content">
-                    <div className="promo-deal-top-label">Offre du moment</div>
-                    <h2 className="promo-deal-top-title">{bestDeal.name}</h2>
-                    <p className="promo-deal-top-desc">
-                      Notre meilleure pépite actuellement. Une remise inédite, disponible pour une durée très limitée.
-                    </p>
-                    
-                    <div className="promo-countdown-minimal" aria-label="Compte à rebours">
-                      <div className="promo-count-min">
-                        <span className="promo-count-min-num">{pad2(countdown.days)}</span>
-                        <span className="promo-count-min-lab">Jours</span>
-                      </div>
-                      <span className="promo-count-min-sep">:</span>
-                      <div className="promo-count-min">
-                        <span className="promo-count-min-num">{pad2(countdown.hours)}</span>
-                        <span className="promo-count-min-lab">Heures</span>
-                      </div>
-                      <span className="promo-count-min-sep">:</span>
-                      <div className="promo-count-min">
-                        <span className="promo-count-min-num">{pad2(countdown.minutes)}</span>
-                        <span className="promo-count-min-lab">Min</span>
-                      </div>
-                      <span className="promo-count-min-sep">:</span>
-                      <div className="promo-count-min">
-                        <span className="promo-count-min-num">{pad2(countdown.seconds)}</span>
-                        <span className="promo-count-min-lab">Sec</span>
-                      </div>
-                    </div>
 
-                    <div className="promo-deal-top-actions">
-                      <button type="button" className="promo-deal-top-cta" onClick={() => handleAddToCart(bestDeal, { openCart: true })}>
-                        Ajouter au panier — {bestDeal.price} DH
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
             </div>
           </section>
 
@@ -320,45 +269,12 @@ export default function PromotionsClientPage() {
                         </motion.div>
                       ))}
 
-                {!isLoading && !isFilterLoading ? (
-                  <motion.div variants={itemVariants}>
-                    <Link
-                      href="/boutique?promo=1"
-                      className="product-card essentials-see-more promo-essential-more"
-                      aria-label="Voir plus de promotions"
-                    >
-                      <div className="essential-see-more-inner">
-                        <div className="essential-see-more-title">Voir plus</div>
-                        <div className="essential-see-more-subtitle">Toutes nos offres →</div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ) : null}
+
               </motion.div>
             </div>
           </section>
 
-          <section className="promo-why" aria-label="Nos engagements">
-            <div className="container">
-              <div className="promo-why-grid">
-                <div className="promo-why-item">
-                  <ShieldCheck size={22} className="promo-why-ic" />
-                  <div className="promo-why-title">Authenticité</div>
-                  <div className="promo-why-text">Sélection soignée et traçable.</div>
-                </div>
-                <div className="promo-why-item">
-                  <Sparkles size={22} className="promo-why-ic" />
-                  <div className="promo-why-title">Formulations premium</div>
-                  <div className="promo-why-text">Actifs et routines haut de gamme.</div>
-                </div>
-                <div className="promo-why-item">
-                  <Truck size={22} className="promo-why-ic" />
-                  <div className="promo-why-title">Livraison soignée</div>
-                  <div className="promo-why-text">Packaging protégé, expérience luxe.</div>
-                </div>
-              </div>
-            </div>
-          </section>
+
 
           <section className="promo-editorial" aria-label="Footer éditorial">
             <div className="container">

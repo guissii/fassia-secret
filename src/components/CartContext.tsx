@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import type { CartItem } from './Cart';
 
 type CartContextType = {
@@ -39,7 +39,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const addToCart = (p: any) => {
+  const addToCart = useCallback((p: any) => {
     setCartItems((prev) => {
       const existing = prev.find((it) => it.id === p.id);
       if (existing) {
@@ -59,28 +59,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
       ];
     });
     setIsCartOpen(true);
-  };
+  }, []);
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = useCallback((id: number, quantity: number) => {
     setCartItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)));
-  };
+  }, []);
 
-  const removeItem = (id: number) => {
+  const removeItem = useCallback((id: number) => {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    isCartOpen,
+    setIsCartOpen,
+    cartItems,
+    addToCart,
+    updateQuantity,
+    removeItem,
+    totalCartCount,
+  }), [isCartOpen, cartItems, addToCart, updateQuantity, removeItem, totalCartCount]);
 
   return (
-    <CartContext.Provider
-      value={{
-        isCartOpen,
-        setIsCartOpen,
-        cartItems,
-        addToCart,
-        updateQuantity,
-        removeItem,
-        totalCartCount,
-      }}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

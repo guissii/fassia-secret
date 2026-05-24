@@ -8,6 +8,7 @@ import { useCart } from './components/CartContext';
 import { productHref } from './lib/productSlug';
 import { ALL_PRODUCTS, type CatalogProduct } from './data/products';
 import { ProductCard } from './components/ProductCard';
+import './styles/CollectionLayout.css';
 import './ComplementsClientPage.css';
 
 type Focus = {
@@ -167,10 +168,13 @@ export default function ComplementsClientPage() {
                     />
                   ))}
 
-                  <Link href={href} className="product-card essentials-see-more" aria-label={`Voir plus ${f.title}`}>
-                    <div className="essential-see-more-inner">
-                      <div className="essential-see-more-title">Voir plus</div>
-                      <div className="essential-see-more-subtitle">Tous les produits →</div>
+                  <Link href={href} className="product-card kb-see-more-card" aria-label={`Voir plus ${f.title}`}>
+                    <div className="kb-see-more-inner">
+                      <div className="kb-see-more-label">Explorer</div>
+                      <div className="kb-see-more-title">Tous les produits pour {f.label}</div>
+                      <div className="kb-see-more-icon-circle">
+                        <ArrowRight size={20} />
+                      </div>
                     </div>
                   </Link>
                 </div>

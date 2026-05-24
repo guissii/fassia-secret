@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
 import {
   ChevronDown,
@@ -191,7 +191,9 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
         aria-label="Recherche"
       >
         <div className="mobile-search-inner" onClick={(e) => e.stopPropagation()}>
-          <SearchBar inputRef={mobileSearchInputRef} />
+          <Suspense fallback={<div className="search-placeholder">Chargement...</div>}>
+            <SearchBar inputRef={mobileSearchInputRef} />
+          </Suspense>
         </div>
       </div>
 
@@ -225,7 +227,9 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
           </Link>
           
           <div className="header-search-slot">
-            <SearchBar className="header-search hidden-mobile" />
+            <Suspense fallback={<div className="header-search hidden-mobile placeholder">Chargement...</div>}>
+              <SearchBar className="header-search hidden-mobile" />
+            </Suspense>
 
             <button className="mobile-search-btn" type="button" onClick={openMobileSearch} aria-label="Ouvrir la recherche">
               <Search size={22} />

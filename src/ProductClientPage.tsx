@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -59,17 +60,12 @@ export default function ProductClientPage({ product }: { product: Product }) {
   }, [product.brand, product.category, product.id]);
 
   const addProductToCart = (p: Product, quantity: number) => {
-    // Wrap product into an object that has 'quantity' so addToCart works properly 
-    // or wait, useCart's addToCart adds 1 by default, but we can add quantity here.
-    // Actually, the CartContext addToCart doesn't support a custom quantity parameter.
-    // Let's just call it `quantity` times. Wait, CartContext addToCart adds 1 or if it exists it adds 1.
-    // If I want to fix this, I should update CartContext addToCart.
-    // For now, let's update CartContext `addToCart` below or just use it.
-    // The previous code also added the product.
     for (let i = 0; i < quantity; i++) {
         addToCart(p);
     }
   };
+
+  const imageSrc = product.image.startsWith('http') ? product.image : publicAssetUrl(product.image);
 
   return (
     <>
@@ -85,9 +81,9 @@ export default function ProductClientPage({ product }: { product: Product }) {
 
           <div className="product-layout">
             <section className="product-media" aria-label="Visuel produit">
-              <div className="product-media-frame">
+              <div className="product-media-frame" style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
                 {isPromo ? <div className="product-media-badge">−{discount}%</div> : null}
-                <img src={publicAssetUrl(product.image)} alt={product.name} loading="eager" decoding="async" />
+                <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} priority />
               </div>
             </section>
 

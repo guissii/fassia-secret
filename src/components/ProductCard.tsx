@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { publicAssetUrl } from '../lib/publicUrl';
 import './ProductCard.css';
 
@@ -43,8 +44,8 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
       }}
     >
       <div className="product-image-area">
-        <div className="product-image-frame">
-          <img src={imageSrc} alt={product.name} className="product-image" loading="lazy" decoding="async" />
+        <div className="product-image-frame" style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
+          <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" loading="lazy" style={{ objectFit: 'cover' }} />
         </div>
         <button
           className="product-cta-circle"

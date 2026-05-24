@@ -192,12 +192,25 @@ export const mockAdminProducts: AdminProduct[] = ALL_PRODUCTS.map(p => {
 });
 
 export const mockCategories: Category[] = [
-  { id: 'cat_1', name: 'Visage', nameAr: 'الوجه', slug: 'visage', productCount: 45 },
-  { id: 'cat_2', name: 'Compléments', nameAr: 'مكملات غذائية', slug: 'complements', productCount: 32 },
-  { id: 'cat_3', name: 'Maquillage', nameAr: 'مكياج', slug: 'maquillage', productCount: 28 },
-  { id: 'cat_4', name: 'Parfums', nameAr: 'عطور', slug: 'parfums', productCount: 15 },
-  { id: 'cat_5', name: 'K-Beauty', nameAr: 'جمال كوري', slug: 'k-beauty', productCount: 12 },
-  { id: 'cat_6', name: 'Santé', nameAr: 'صحة', slug: 'sante', productCount: 8 },
+  { id: 'cat_dermo', name: 'Dermo-Corner', nameAr: 'ركن ديرمو', slug: 'dermo-corner', productCount: 0 },
+  { id: 'cat_promo', name: 'Promotions !', nameAr: 'تخفيضات !', slug: 'promotions', productCount: 0 },
+  { id: 'cat_kbeauty', name: 'K-Beauty', nameAr: 'جمال كوري', slug: 'k-beauty', productCount: 0 },
+  { id: 'cat_corps', name: 'Corps', nameAr: 'الجسم', slug: 'corps', productCount: 0 },
+  { id: 'cat_visage', name: 'Visage', nameAr: 'الوجه', slug: 'visage', productCount: 0 },
+  { id: 'cat_cheveux', name: 'Cheveux', nameAr: 'الشعر', slug: 'cheveux', productCount: 0 },
+  { id: 'cat_dentaire', name: 'Hygiène Dentaire', nameAr: 'صحة الفم', slug: 'hygiene-dentaire', productCount: 0 },
+  { id: 'cat_maquillage', name: 'Maquillage', nameAr: 'مكياج', slug: 'maquillage', productCount: 0 },
+  { id: 'cat_hygiene_int', name: 'Hygiène & Intimité', nameAr: 'نظافة وعناية شخصية', slug: 'hygiene-intimite', productCount: 0 },
+  { id: 'cat_hygiene', name: 'Hygiène', nameAr: 'نظافة', slug: 'hygiene', productCount: 0 },
+  { id: 'cat_accessoires', name: 'Accessoires', nameAr: 'إكسسوارات', slug: 'accessoires', productCount: 0 },
+  { id: 'cat_minceur', name: 'Minceur', nameAr: 'تنحيف', slug: 'minceur', productCount: 0 },
+  { id: 'cat_sport', name: 'Sport', nameAr: 'رياضة', slug: 'sport', productCount: 0 },
+  { id: 'cat_maman', name: 'Maman & Bébé', nameAr: 'الأم والطفل', slug: 'maman-bebe', productCount: 0 },
+  { id: 'cat_hommes', name: 'Hommes', nameAr: 'رجال', slug: 'hommes', productCount: 0 },
+  { id: 'cat_sante', name: 'Santé', nameAr: 'صحة', slug: 'sante', productCount: 0 },
+  { id: 'cat_preocc', name: 'Préoccupations', nameAr: 'اهتمامات', slug: 'preoccupations', productCount: 0 },
+  { id: 'cat_complements', name: 'Compléments Alimentaires', nameAr: 'مكملات غذائية', slug: 'complements-alimentaires', productCount: 0 },
+  { id: 'cat_premiumhair', name: 'Premium Hair Care', nameAr: 'عناية فائقة للشعر', slug: 'premium-hair-care', productCount: 0 },
 ];
 
 export const mockCollections = [

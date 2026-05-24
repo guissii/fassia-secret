@@ -1,18 +1,20 @@
 "use client";
 
-
+import dynamic from 'next/dynamic';
 import { Hero } from './components/Hero';
-import { CollectionCarousel } from './components/CollectionCarousel';
-import { Categories } from './components/Categories';
-import { Brands } from './components/Brands';
 import { EssentialsSection } from './components/EssentialsSection';
-import { IngredientsSection } from './components/IngredientsSection';
 import { MakeupParfumsSection } from './components/MakeupParfumsSection';
-import { KoreanRoutineSection } from './components/KoreanRoutineSection';
-import { SupplementsSection } from './components/SupplementsSection';
 import { ALL_PRODUCTS } from './data/products';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+
+// Lazy load components that are below the fold to improve initial page load performance
+const IngredientsSection = dynamic(() => import('./components/IngredientsSection').then(mod => mod.IngredientsSection));
+const SupplementsSection = dynamic(() => import('./components/SupplementsSection').then(mod => mod.SupplementsSection));
+const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel').then(mod => mod.CollectionCarousel));
+const Categories = dynamic(() => import('./components/Categories').then(mod => mod.Categories));
+const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
+const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSection').then(mod => mod.KoreanRoutineSection));
 
 function App() {
   const bestSellers = ALL_PRODUCTS.slice(0, 5);

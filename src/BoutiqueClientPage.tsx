@@ -56,9 +56,10 @@ export default function BoutiqueClientPage() {
 
   const categories = useMemo(() => {
     const predefined = [
-      'Visage', 'Corps', 'Cheveux', 'Hygiène Dentaire', 'Maquillage', 
-      'Hygiène', 'Accessoires', 'Minceur', 'Sport', 'Maman & Bébé', 
-      'Hommes', 'Santé', 'Compléments', 'K-Beauty', 'Parfums', 'Bien-être'
+      'Dermo-Corner', 'Promotions !', 'K-Beauty', 'Corps', 'Visage', 'Cheveux',
+      'Hygiène Dentaire', 'Maquillage', 'Hygiène & Intimité', 'Hygiène',
+      'Accessoires', 'Minceur', 'Sport', 'Maman & Bébé', 'Hommes', 'Santé',
+      'Préoccupations', 'Compléments Alimentaires', 'Premium Hair Care'
     ];
     const set = new Set<string>(predefined);
     for (const p of ALL_PRODUCTS) set.add(p.category);
@@ -223,20 +224,7 @@ export default function BoutiqueClientPage() {
               </div>
 
               <div className="shop-actions">
-                <input
-                  className="shop-search"
-                  type="search"
-                  value={query}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    updateSearchParams((sp) => {
-                      if (value.trim()) sp.set('q', value);
-                      else sp.delete('q');
-                      sp.set('page', '1');
-                    });
-                  }}
-                  placeholder="Rechercher (marque, produit, catégorie)"
-                />
+
 
                 <select
                   className="shop-sort"
@@ -338,6 +326,54 @@ export default function BoutiqueClientPage() {
               </div>
             </div>
           </div>
+
+          {(query || selectedCategories.length > 0 || onlyPromos || onlyNew) && (
+            <div className="container" style={{ marginTop: '60px', textAlign: 'center', borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '40px' }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '20px', color: '#111' }}>
+                Vous cherchez d'autres pépites ?
+              </h3>
+              <button 
+                type="button" 
+                onClick={() => {
+                  updateSearchParams((sp) => {
+                    sp.delete('q');
+                    sp.delete('category');
+                    sp.delete('promo');
+                    sp.delete('new');
+                    sp.delete('sort');
+                    sp.delete('page');
+                  });
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '16px 36px',
+                  background: 'var(--color-primary)',
+                  color: '#fff',
+                  borderRadius: '4px',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 30px rgba(225, 0, 116, 0.15)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.backgroundColor = 'var(--color-primary)';
+                }}
+              >
+                Explorer toute la boutique
+              </button>
+            </div>
+          )}
         </section>
 
       <div className={`shop-filter-backdrop ${isFilterOpen ? 'open' : ''}`} onClick={closeFilters} />

@@ -1,0 +1,87 @@
+import { Request, Response } from 'express';
+import prisma from '../config/prisma';
+import { Prisma, OrderStatus } from '@prisma/client';
+
+export const getOrders = async (req: Request, res: Response) => {
+  try {
+    const status = req.query.status as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20; // Default to 20 orders per page to save memory
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.OrderWhereInput = status ? { status: status.toUpperCase() as OrderStatus } : {};
+
+    const [orders, total] = await prisma.$transaction([
+      prisma.order.findMany({
+        where,
+        take: limit,
+        skip,
+        include: {
+          items: {
+            select: {
+              id: true,
+              name: true,
+              quantity: true,
+              price: true,
+              productId: true,
+              // Exclude the full nested product to reduce JSON payload size
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      prisma.order.count({ where })
+    ]);
+
+    res.json({ orders, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+};
+
+export const createOrder = async (req: Request, res: Response) => {
+  try {
+    const { customerName, phone, city, address, items, total } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ error: 'Order must contain at least one item' });
+    }
+
+    // Fix Race Condition by generating a unique short ID instead of sequential count
+    const uniqueSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const orderNumber = `CMD-${Date.now().toString().slice(-4)}-${uniqueSuffix}`;
+
+    const newOrder = await prisma.order.create({
+      data: {
+        orderNumber,
+        customerName,
+        phone,
+        city,
+        address,
+        total,
+        status: 'PENDING',
+        deliveryStatus: 'PENDING',
+        items: {
+          create: items.map((item: { productId: number; name: string; quantity: number; price: number; image: string }) => ({
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            image: item.image,
+          }))
+        }
+      },
+      include: {
+        items: true
+      }
+    });
+
+    res.status(201).json({ order: newOrder, success: true });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ error: 'Failed to create order' });
+  }
+};

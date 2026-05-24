@@ -64,7 +64,7 @@ const STEPS: Step[] = [
         ),
       },
     ],
-    filterQuery: 'category=Maquillage&q=foundation',
+    filterQuery: 'category=Maquillage&q=teint',
   },
   {
     id: 2,
@@ -101,7 +101,7 @@ const STEPS: Step[] = [
         ),
       },
     ],
-    filterQuery: 'category=Maquillage&q=mascara',
+    filterQuery: 'category=Maquillage&q=yeux',
   },
   {
     id: 3,
@@ -138,7 +138,7 @@ const STEPS: Step[] = [
         ),
       },
     ],
-    filterQuery: 'category=Maquillage&q=lipstick',
+    filterQuery: 'category=Maquillage&q=lèvres',
   },
   {
     id: 4,
@@ -175,7 +175,7 @@ const STEPS: Step[] = [
         ),
       },
     ],
-    filterQuery: 'category=K-Beauty,Visage',
+    filterQuery: 'category=K-Beauty&q=démaquillant',
   },
   {
     id: 5,
@@ -212,7 +212,7 @@ const STEPS: Step[] = [
         ),
       },
     ],
-    filterQuery: 'category=Parfums&q=rose',
+    filterQuery: 'category=Parfums&q=femme',
   },
   {
     id: 6,
@@ -249,7 +249,7 @@ const STEPS: Step[] = [
         ),
       },
     ],
-    filterQuery: 'category=Parfums&q=citrus',
+    filterQuery: 'category=Parfums&q=homme',
   },
 ];
 
