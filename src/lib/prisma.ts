@@ -1,13 +1,23 @@
 import { PrismaClient } from '@prisma/client';
 
+const createRecursiveProxy = (): any => {
+  return new Proxy(
+    () => Promise.resolve([]),
+    {
+      get: (target, prop) => {
+        if (prop === 'then') return undefined;
+        return createRecursiveProxy();
+      }
+    }
+  );
+};
+
 const prismaClientSingleton = () => {
   try {
     return new PrismaClient();
   } catch (error) {
     console.warn("Failed to initialize PrismaClient. Using dummy proxy for build.");
-    return new Proxy({}, {
-      get: () => () => Promise.resolve([])
-    }) as unknown as PrismaClient;
+    return createRecursiveProxy() as PrismaClient;
   }
 };
 
