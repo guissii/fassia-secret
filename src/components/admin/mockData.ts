@@ -117,8 +117,8 @@ export const mockOrders: Order[] = [
     city: 'Rabat',
     address: 'Appt 4, Immeuble 12, Agdal',
     items: [
-      { productId: 2, name: 'Hydra Boost Gel Cream', quantity: 1, price: 199, image: 'Gemini_Generated_Image_souwz3souwz3souw.png' },
-      { productId: 3, name: 'Detox & Drainage', quantity: 1, price: 129, image: '5aa79a5c-fd9e-42f0-bf17-d64dbb490eb8.png' },
+      { productId: 2, name: 'Hydra Boost Gel Cream', quantity: 1, price: 199, image: '19bd7403-d2ac-49a4-a584-be5895add421.png' },
+      { productId: 3, name: 'Detox & Drainage', quantity: 1, price: 129, image: '19bd7403-d2ac-49a4-a584-be5895add421.png' },
     ],
     total: 328,
     status: 'processing',

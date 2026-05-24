@@ -9,7 +9,7 @@ type NewArrivalsBannerProps = {
 };
 
 export function NewArrivalsBanner({
-  image = 'neww section.png',
+  image = '19bd7403-d2ac-49a4-a584-be5895add421.png',
   href = '/nouveautes',
   alt = 'Nouveautés',
 }: NewArrivalsBannerProps) {

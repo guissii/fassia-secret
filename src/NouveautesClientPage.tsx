@@ -9,7 +9,7 @@ export default function NouveautesClientPage() {
   return (
     <CollectionCarousel 
       title="NOUVEAUTÉS"
-      imageSrc="neww section.png"
+      imageSrc="19bd7403-d2ac-49a4-a584-be5895add421.png"
       products={nouveautes}
       linkHref="/nouveautes"
       linkTitle="Découvrir toutes les nouveautés"

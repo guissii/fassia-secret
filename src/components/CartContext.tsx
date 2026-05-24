@@ -31,7 +31,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       name: 'Hydra Boost Gel Cream',
       price: 199.0,
       oldPrice: 249.0,
-      image: 'd6f902fd-0b09-48d0-8055-d03094820431.png',
+      image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
       category: 'Visage',
       quantity: 2,
     },

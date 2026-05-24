@@ -32,7 +32,7 @@ export const ALL_PRODUCTS: CatalogProduct[] = [
     description: 'Gel-crème hydratant avec acide hyaluronique & thé vert.',
     price: 199.0,
     oldPrice: 249.0,
-    image: 'Gemini_Generated_Image_souwz3souwz3souw.png',
+    image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
     category: 'Visage',
   },
   {
@@ -42,7 +42,7 @@ export const ALL_PRODUCTS: CatalogProduct[] = [
     description: "Complément détox à base d’actifs botaniques.",
     price: 129.0,
     oldPrice: 159.0,
-    image: '5aa79a5c-fd9e-42f0-bf17-d64dbb490eb8.png',
+    image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
     category: 'Compléments',
   },
   {
@@ -208,7 +208,7 @@ export const ALL_PRODUCTS: CatalogProduct[] = [
     name: 'Vitamin D3 2000 IU',
     description: 'Soutien immunitaire & santé osseuse au quotidien.',
     price: 149.0,
-    image: '950aa654-e0a2-4875-8451-ca8805a6d44a.png',
+    image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
     category: 'Santé',
   },
   {
@@ -217,7 +217,7 @@ export const ALL_PRODUCTS: CatalogProduct[] = [
     name: 'Routine Huiles & Plantes',
     description: 'Sélection d’actifs botaniques pour une peau éclatante.',
     price: 169.0,
-    image: 'image%202%202.png',
+    image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
     category: 'Bien-être',
     badge: 'Nouveau',
   },

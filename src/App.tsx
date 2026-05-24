@@ -30,7 +30,7 @@ function App() {
 
       <CollectionCarousel 
         title="MEILLEURES VENTES"
-        imageSrc="image%202%202.png"
+        imageSrc="19bd7403-d2ac-49a4-a584-be5895add421.png"
         products={bestSellers}
         linkHref="/boutique"
         linkTitle="Découvrir les meilleures ventes"
