@@ -18,7 +18,7 @@ type Pillar = {
 };
 
 const imageUrl = (prompt: string) => {
-  return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=portrait_4_3`;
+  return '/logo.png';
 };
 
 const PILLARS: Pillar[] = [

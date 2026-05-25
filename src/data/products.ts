@@ -11,7 +11,7 @@ export type CatalogProduct = {
 };
 
 const imageUrl = (prompt: string) => {
-  return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=square_hd`;
+  return '/logo.png';
 };
 
 export const ALL_PRODUCTS: CatalogProduct[] = [

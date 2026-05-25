@@ -20,8 +20,8 @@ type Focus = {
   q: string;
 };
 
-const imageUrl = (prompt: string, imageSize: string) => {
-  return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=${imageSize}`;
+const imageUrl = (prompt: string, imageSize?: string) => {
+  return '/logo.png';
 };
 
 const HERO_IMAGE = imageUrl(

@@ -16,7 +16,7 @@ type Ingredient = {
 };
 
 const imageUrl = (prompt: string) => {
-  return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=landscape_4_3`;
+  return '/logo.png';
 };
 
 const INGREDIENTS: Ingredient[] = [

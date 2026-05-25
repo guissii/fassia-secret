@@ -18,7 +18,7 @@ export function KoreanRoutineSection() {
       .catch(console.error);
   }, []);
 
-  const defaultImageUrl = 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Photographie+premium+skincare+cor%C3%A9en%2C+flacons+s%C3%A9rum+et+textures+glossy%2C+ambiance+rose+nude+minimal+luxe%2C+lumi%C3%A8re+studio+douce%2C+haute+d%C3%A9finition&image_size=portrait_4_3';
+  const defaultImageUrl = '/logo.png';
 
   return (
     <>

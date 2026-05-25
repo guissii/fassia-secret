@@ -23,7 +23,7 @@ type Step = {
 };
 
 const kbImageUrl = (prompt: string, imageSize: string = 'portrait_4_3') => {
-  return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=${imageSize}`;
+  return '/logo.png';
 };
 
 const visualImg = (prompt: string) => kbImageUrl(prompt, 'portrait_4_3');
