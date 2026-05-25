@@ -3,6 +3,9 @@ import type { NextRequest } from 'next/server';
 import { verifyToken } from './lib/auth';
 
 export async function middleware(request: NextRequest) {
+  // BYPASS: Disable protection for development (Commented out for build fix)
+  // return NextResponse.next();
+
   const { pathname } = request.nextUrl;
 
   // Protected paths: Admin pages and Admin API (except login)
