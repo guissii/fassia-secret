@@ -16,6 +16,7 @@ type Product = {
 
 type Step = {
   id: number;
+  sectionKey: string;
   title: string;
   visualImage: string;
   products: Product[];
@@ -32,6 +33,7 @@ const productImg = (prompt: string) => kbImageUrl(prompt, 'square');
 const STEPS: Step[] = [
   {
     id: 1,
+    sectionKey: 'kb-oil-cleanser',
     title: 'Oil Cleanser',
     visualImage: visualImg('Photographie e-commerce skincare coréen, huile démaquillante (oil cleanser), ambiance rose beige minimal luxe, lumière studio douce, haute définition'),
     products: [
@@ -43,6 +45,7 @@ const STEPS: Step[] = [
   },
   {
     id: 2,
+    sectionKey: 'kb-foam-cleanser',
     title: 'Foam Cleanser',
     visualImage: visualImg('Photographie e-commerce skincare coréen, gel nettoyant moussant (foam cleanser), ambiance rose beige, minimal luxe, lumière studio douce, haute définition'),
     products: [
@@ -54,6 +57,7 @@ const STEPS: Step[] = [
   },
   {
     id: 3,
+    sectionKey: 'kb-exfoliator',
     title: 'Exfoliator',
     visualImage: visualImg('Photographie e-commerce skincare coréen, exfoliant chimique AHA BHA, ambiance rose beige, minimal luxe, lumière studio douce, haute définition'),
     products: [
@@ -65,6 +69,7 @@ const STEPS: Step[] = [
   },
   {
     id: 4,
+    sectionKey: 'kb-toner',
     title: 'Toner',
     visualImage: visualImg('Photographie e-commerce skincare coréen, toner hydratant, flacons translucides, ambiance rose beige, minimal luxe, haute définition'),
     products: [
@@ -76,6 +81,7 @@ const STEPS: Step[] = [
   },
   {
     id: 5,
+    sectionKey: 'kb-essence',
     title: 'Essence',
     visualImage: visualImg('Photographie e-commerce skincare coréen, essence hydratante, textures glossy, ambiance rose beige minimal luxe, haute définition'),
     products: [
@@ -87,6 +93,7 @@ const STEPS: Step[] = [
   },
   {
     id: 6,
+    sectionKey: 'kb-serum',
     title: 'Serum & Ampoule',
     visualImage: visualImg('Photographie e-commerce skincare coréen, sérums et ampoules en verre, reflets, ambiance rose beige, minimal luxe, haute définition'),
     products: [
@@ -98,6 +105,7 @@ const STEPS: Step[] = [
   },
   {
     id: 7,
+    sectionKey: 'kb-sheet-mask',
     title: 'Sheet Mask',
     visualImage: visualImg('Photographie e-commerce skincare coréen, masques tissu (sheet mask), ambiance rose beige, minimal luxe, haute définition'),
     products: [
@@ -109,6 +117,7 @@ const STEPS: Step[] = [
   },
   {
     id: 8,
+    sectionKey: 'kb-eye-cream',
     title: 'Eye Cream',
     visualImage: visualImg('Photographie e-commerce skincare coréen, contour des yeux (eye cream), ambiance rose beige, minimal luxe, haute définition'),
     products: [
@@ -120,6 +129,7 @@ const STEPS: Step[] = [
   },
   {
     id: 9,
+    sectionKey: 'kb-moisturizer',
     title: 'Moisturizer',
     visualImage: visualImg('Photographie e-commerce skincare coréen, crème hydratante (moisturizer), textures crème, ambiance rose beige, minimal luxe, haute définition'),
     products: [
@@ -131,6 +141,7 @@ const STEPS: Step[] = [
   },
   {
     id: 10,
+    sectionKey: 'kb-sunscreen',
     title: 'Sunscreen',
     visualImage: visualImg('Photographie e-commerce skincare coréen, crème solaire (sunscreen SPF), ambiance rose beige minimal luxe, haute définition'),
     products: [
@@ -142,7 +153,28 @@ const STEPS: Step[] = [
   },
 ];
 
+import { useEffect, useState } from 'react';
+
 export default function KoreanBeautyPage() {
+  const [banners, setBanners] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch('/api/admin/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const map = data.reduce((acc: any, b: any) => {
+            if (b.imageUrl) {
+              acc[b.section] = b.imageUrl;
+            }
+            return acc;
+          }, {});
+          setBanners(map);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <>
       <main className="kb-page">
@@ -158,6 +190,7 @@ export default function KoreanBeautyPage() {
 
       {/* 10 Steps — each is an exact copy of the Centella EssentialsSection layout */}
       {STEPS.map((step) => {
+        const visualImageUrl = banners[step.sectionKey] || step.visualImage;
         return (
           <section className="essentials-section" key={step.id}>
             <div className="container">
@@ -173,7 +206,7 @@ export default function KoreanBeautyPage() {
               <ProductCarousel
                 stepId={step.id.toString().padStart(2, '0')}
                 title={step.title}
-                visualImage={step.visualImage}
+                visualImage={visualImageUrl}
                 products={step.products}
                 productLabel="K-BEAUTY"
                 seeMoreHref={`/boutique?${step.filterQuery}`}

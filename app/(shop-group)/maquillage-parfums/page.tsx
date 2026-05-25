@@ -15,6 +15,7 @@ type Product = {
 
 type Step = {
   id: number;
+  sectionKey: string;
   title: string;
   visualImage: string;
   products: Product[];
@@ -31,6 +32,7 @@ const productImg = (prompt: string) => imageUrl(prompt, 'square');
 const STEPS: Step[] = [
   {
     id: 1,
+    sectionKey: 'mp-teint',
     title: 'Teint',
     visualImage: visualImg(
       "Photographie e-commerce maquillage premium, fond de teint et poudre sur vanity marbre, ambiance rose nude minimal luxe, lumière studio douce, haute définition"
@@ -68,6 +70,7 @@ const STEPS: Step[] = [
   },
   {
     id: 2,
+    sectionKey: 'mp-yeux',
     title: 'Yeux',
     visualImage: visualImg(
       "Photographie e-commerce maquillage yeux, mascara et palette fards à paupières sur fond rose nude, ambiance luxe minimal, lumière studio douce, haute définition"
@@ -105,6 +108,7 @@ const STEPS: Step[] = [
   },
   {
     id: 3,
+    sectionKey: 'mp-levres',
     title: 'Lèvres',
     visualImage: visualImg(
       "Photographie e-commerce maquillage lèvres, rouges à lèvres et gloss sur fond rose nude, texture velours, ambiance luxe minimal, haute définition"
@@ -142,6 +146,7 @@ const STEPS: Step[] = [
   },
   {
     id: 4,
+    sectionKey: 'mp-demaquillage',
     title: 'Démaquillage',
     visualImage: visualImg(
       "Photographie e-commerce démaquillage, huile et eau micellaire sur fond marbre clair, ambiance rose beige minimal luxe, lumière studio douce, haute définition"
@@ -179,6 +184,7 @@ const STEPS: Step[] = [
   },
   {
     id: 5,
+    sectionKey: 'mp-parfums-femme',
     title: 'Parfums Femme',
     visualImage: visualImg(
       "Photographie e-commerce parfum femme, flacons verre raffinés, reflets dorés, ambiance rose nude minimal luxe, haute définition"
@@ -216,6 +222,7 @@ const STEPS: Step[] = [
   },
   {
     id: 6,
+    sectionKey: 'mp-parfums-homme',
     title: 'Parfums Homme',
     visualImage: visualImg(
       "Photographie e-commerce parfum homme, flacons verre fumé, ambiance boisée, fond neutre premium, lumière studio douce, haute définition"
@@ -253,7 +260,28 @@ const STEPS: Step[] = [
   },
 ];
 
+import { useEffect, useState } from 'react';
+
 export default function MaquillageParfumsPage() {
+  const [banners, setBanners] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch('/api/admin/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const map = data.reduce((acc: any, b: any) => {
+            if (b.imageUrl) {
+              acc[b.section] = b.imageUrl;
+            }
+            return acc;
+          }, {});
+          setBanners(map);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <>
       <main className="kb-page">
@@ -269,6 +297,7 @@ export default function MaquillageParfumsPage() {
         </section>
 
         {STEPS.map((step) => {
+          const visualImageUrl = banners[step.sectionKey] || step.visualImage;
           return (
             <section className="essentials-section" key={step.id}>
               <div className="container">
@@ -283,7 +312,7 @@ export default function MaquillageParfumsPage() {
                 <ProductCarousel
                   stepId={step.id.toString().padStart(2, '0')}
                   title={step.title}
-                  visualImage={step.visualImage}
+                  visualImage={visualImageUrl}
                   products={step.products}
                   productLabel="BEAUTY"
                   seeMoreHref={`/boutique?${step.filterQuery}`}

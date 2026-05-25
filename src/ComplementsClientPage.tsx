@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
@@ -99,14 +99,29 @@ const matchesQuery = (p: CatalogProduct, q: string) => {
 export default function ComplementsClientPage() {
   const router = useRouter();
   const supplements = useMemo(() => ALL_PRODUCTS.filter((p) => p.category === 'Compléments'), []);
-
   const { addToCart } = useCart();
+  
+  const [heroImage, setHeroImage] = useState<string>(HERO_IMAGE);
+
+  useEffect(() => {
+    fetch('/api/admin/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const compBanner = data.find(b => b.section === 'complements-hero');
+          if (compBanner && compBanner.imageUrl) {
+            setHeroImage(compBanner.imageUrl);
+          }
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <>
       <main className="supp-page">
         <section className="supp-page-hero" aria-label="Compléments Alimentaires">
-          <div className="supp-page-hero-bg" style={{ backgroundImage: `url('${HERO_IMAGE}')` }} aria-hidden="true" />
+          <div className="supp-page-hero-bg" style={{ backgroundImage: `url('${heroImage}')` }} aria-hidden="true" />
           <div className="supp-page-hero-noise" aria-hidden="true" />
           <div className="container">
             <div className="supp-page-hero-inner">
