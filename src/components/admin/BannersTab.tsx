@@ -63,7 +63,7 @@ export function BannersTab() {
   const [activeGroup, setActiveGroup] = useState<number>(0);
 
   useEffect(() => {
-    fetch('/api/admin/banners')
+    fetch('/api/banners')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -79,7 +79,7 @@ export function BannersTab() {
   const handleUpdate = async (key: string, data: { imageUrl: string; linkUrl: string; title: string }) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/banners', {
+      const res = await fetch('/api/banners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section: key, imageUrl: data.imageUrl, linkUrl: data.linkUrl, title: data.title }),
@@ -105,7 +105,7 @@ export function BannersTab() {
     formData.append('file', file);
 
     try {
-      const res = await fetch('/api/admin/upload', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
