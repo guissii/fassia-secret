@@ -1,7 +1,7 @@
 import { getPageCollections } from '@/lib/collections';
 import HommeClientPage from '@/HommeClientPage';
 
-export const revalidate = 3600; // ISR: revalidate every hour
+export const dynamic = 'force-dynamic';
 
 export default async function HommePage() {
   const collections = await getPageCollections('homme');
