@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck, CheckCircle2, Loader2, Tag } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
+import { useCart } from './CartContext';
 
 export interface CartItem {
   id: number;
@@ -21,59 +22,106 @@ interface CartProps {
 }
 
 const SHIPPING_THRESHOLD = 500;
-const SHIPPING_COST = 39;
+const SHIPPING_COST = 35;
 
 export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  
+  const [checkoutMode, setCheckoutMode] = useState(false);
+  const [formData, setFormData] = useState({ customerName: '', phone: '', city: '', address: '' });
+  const [promoCode, setPromoCode] = useState('');
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const { clearCart } = useCart();
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const isFreeShipping = subtotal >= SHIPPING_THRESHOLD;
+  const discountAmount = (subtotal * promoDiscount) / 100;
+  const subtotalAfterDiscount = subtotal - discountAmount;
+  const isFreeShipping = subtotalAfterDiscount >= SHIPPING_THRESHOLD;
   const shipping = isFreeShipping ? 0 : SHIPPING_COST;
-  const total = subtotal + shipping;
+  const total = subtotalAfterDiscount + shipping;
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const progressPct = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
+  const progressPct = Math.min((subtotalAfterDiscount / SHIPPING_THRESHOLD) * 100, 100);
 
-  const handleCheckout = () => {
-    const number = "212774656745"; // Numéro WhatsApp
-    let message = "Bonjour, je souhaite passer la commande suivante sur Fassia Secret :\n\n";
-    items.forEach(item => {
-      message += `- ${item.quantity}x ${item.name} (${(item.price * item.quantity).toFixed(2)} MAD)\n`;
-    });
-    message += `\nSous-total : ${subtotal.toFixed(2)} MAD\n`;
-    message += `Livraison : ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
-    message += `*Total : ${total.toFixed(2)} MAD*\n\n`;
-    message += "Merci de me confirmer la disponibilité.";
-    
-    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  };
-
-  // Lock body scroll when open
+  // Reset states when cart opens/closes
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      if (orderSuccess) {
+        setOrderSuccess(false);
+        setCheckoutMode(false);
+      }
     } else {
       document.body.style.overflow = '';
+      setTimeout(() => {
+        if (!orderSuccess) setCheckoutMode(false);
+      }, 300);
     }
     return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
+  }, [isOpen, orderSuccess]);
+
+  const handleApplyPromo = () => {
+    // Simple mock promo for now
+    if (promoCode.toUpperCase() === 'FASSIA10') {
+      setPromoDiscount(10);
+    } else {
+      alert("Code promo invalide");
+      setPromoDiscount(0);
+    }
+  };
+
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      const payload = {
+        customerName: formData.customerName,
+        phone: formData.phone,
+        city: formData.city,
+        address: formData.address,
+        items: items.map(i => ({
+          productId: i.id,
+          name: i.name,
+          quantity: i.quantity,
+          price: i.price,
+          image: i.image
+        })),
+        total: total
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Order failed');
+      
+      setOrderSuccess(true);
+      clearCart();
+    } catch (err) {
+      alert("Une erreur est survenue lors de la commande. Veuillez réessayer ou nous contacter via WhatsApp.");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-
     if (isOpen) {
       restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       requestAnimationFrame(() => closeButtonRef.current?.focus());
       return;
     }
-
     const toRestore = restoreFocusRef.current;
     restoreFocusRef.current = null;
     if (toRestore) requestAnimationFrame(() => toRestore.focus());
   }, [isOpen]);
 
-  // Close on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handleKey);
@@ -82,113 +130,150 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className={`cart-backdrop ${isOpen ? 'cart-backdrop--visible' : ''}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Drawer */}
-      <aside className={`cart-drawer ${isOpen ? 'cart-drawer--open' : ''}`} role="dialog" aria-modal="true" aria-label="Votre panier">
-
-        {/* ── Header ── */}
+      <div className={`cart-backdrop ${isOpen ? 'cart-backdrop--visible' : ''}`} onClick={onClose} aria-hidden="true" />
+      <aside className={`cart-drawer ${isOpen ? 'cart-drawer--open' : ''}`} role="dialog" aria-modal="true">
         <div className="cart-header">
           <div className="cart-header-left">
             <ShoppingBag size={20} className="cart-header-icon" strokeWidth={1.5} />
-            <span className="cart-header-title">MON PANIER</span>
-            {totalItems > 0 && (
+            <span className="cart-header-title">{checkoutMode && !orderSuccess ? 'PAIEMENT' : 'MON PANIER'}</span>
+            {totalItems > 0 && !orderSuccess && (
               <span className="cart-header-count">{totalItems}</span>
             )}
           </div>
-          <button
-            className="cart-close-btn"
-            onClick={onClose}
-            aria-label="Fermer le panier"
-            type="button"
-            ref={closeButtonRef}
-          >
+          <button className="cart-close-btn" onClick={onClose} aria-label="Fermer le panier" type="button" ref={closeButtonRef}>
             <X size={22} strokeWidth={1.5} />
           </button>
         </div>
 
-        {/* ── Ornament ── */}
         <div className="cart-ornament">
           <span className="cart-ornament-line" />
           <Leaf size={14} strokeWidth={1.5} className="cart-ornament-icon" />
           <span className="cart-ornament-line" />
         </div>
 
-        {/* ── Free Shipping Banner ── */}
-        {items.length > 0 && (
-          <div className="cart-shipping-banner">
-            <div className="cart-shipping-text">
-              {isFreeShipping ? (
-                <span className="cart-shipping-achieved">
-                  <Truck size={14} /> Livraison offerte ! Félicitations 🎉
-                </span>
-              ) : (
-                <span>
-                  Plus que <strong>{(SHIPPING_THRESHOLD - subtotal).toFixed(2)} MAD</strong> pour la livraison gratuite
-                </span>
-              )}
-            </div>
-            <div className="cart-shipping-progress-track">
-              <div className="cart-shipping-progress-fill" style={{ width: `${progressPct}%` }} />
-            </div>
-          </div>
-        )}
-
-        {/* ── Items List ── */}
-        <div className="cart-items-list">
-          {items.length === 0 ? (
-            <EmptyCartState />
-          ) : (
-            items.map((item) => (
-              <CartItemRow
-                key={item.id}
-                item={item}
-                onUpdateQuantity={onUpdateQuantity}
-                onRemove={onRemoveItem}
-              />
-            ))
-          )}
-        </div>
-
-        {/* ── Footer ── */}
-        {items.length > 0 && (
-          <div className="cart-footer">
-            <div className="cart-summary">
-              <div className="cart-summary-row">
-                <span>Sous-total</span>
-                <span>{subtotal.toFixed(2)} MAD</span>
-              </div>
-              <div className="cart-summary-row">
-                <span>Livraison</span>
-                <span className={isFreeShipping ? 'cart-free-shipping-label' : ''}>
-                  {isFreeShipping ? 'GRATUITE' : `${SHIPPING_COST.toFixed(2)} MAD`}
-                </span>
-              </div>
-              <div className="cart-summary-divider" />
-              <div className="cart-summary-row cart-summary-total">
-                <span>Total</span>
-                <span>{total.toFixed(2)} MAD</span>
-              </div>
-            </div>
-
-            <button className="cart-checkout-btn" type="button" onClick={handleCheckout}>
-              PASSER LA COMMANDE <ArrowRight size={16} />
+        {orderSuccess ? (
+          <div className="cart-success-state" style={{ padding: '40px 20px', textAlign: 'center', flex: 1 }}>
+            <CheckCircle2 size={48} color="#10b981" style={{ margin: '0 auto 20px' }} />
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '10px' }}>Commande confirmée !</h3>
+            <p style={{ color: '#6b7280', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '30px' }}>
+              Merci pour votre confiance. Notre équipe vous contactera très vite pour confirmer la livraison.
+            </p>
+            <button className="cart-continue-btn" onClick={onClose} style={{ width: '100%', padding: '15px', background: '#f3f4f6', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+              Fermer
             </button>
-
-            <button className="cart-continue-btn" onClick={onClose} type="button">
-              Continuer mes achats
-            </button>
-
-            <div className="cart-trust-row">
-              <ShieldCheck size={14} strokeWidth={1.5} />
-              <span>Paiement 100% sécurisé — Livraison rapide</span>
-            </div>
           </div>
+        ) : checkoutMode ? (
+          <div className="cart-checkout-form-container" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+            <button type="button" onClick={() => setCheckoutMode(false)} style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              ← Retour au panier
+            </button>
+            <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Nom & Prénom *</label>
+                <input required type="text" value={formData.customerName} onChange={e => setFormData({...formData, customerName: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Téléphone *</label>
+                <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="06..." style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Ville *</label>
+                <input required type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Adresse complète *</label>
+                <textarea required value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={3} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', resize: 'vertical' }} />
+              </div>
+              
+              <div style={{ marginTop: '20px', padding: '15px', background: '#f9fafb', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <span>Total à payer</span>
+                  <span style={{ fontWeight: 600 }}>{total.toFixed(2)} MAD</span>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#6b7280', textAlign: 'center' }}>
+                  Paiement à la livraison (Cash on Delivery)
+                </div>
+              </div>
+              
+              <button type="submit" disabled={isSubmitting} className="cart-checkout-btn" style={{ marginTop: '10px' }}>
+                {isSubmitting ? <Loader2 size={16} className="animate-spin" style={{ margin: '0 auto' }} /> : 'CONFIRMER LA COMMANDE'}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <>
+            {items.length > 0 && (
+              <div className="cart-shipping-banner">
+                <div className="cart-shipping-text">
+                  {isFreeShipping ? (
+                    <span className="cart-shipping-achieved">
+                      <Truck size={14} /> Livraison offerte ! Félicitations 🎉
+                    </span>
+                  ) : (
+                    <span>
+                      Plus que <strong>{(SHIPPING_THRESHOLD - subtotalAfterDiscount).toFixed(2)} MAD</strong> pour la livraison gratuite
+                    </span>
+                  )}
+                </div>
+                <div className="cart-shipping-progress-track">
+                  <div className="cart-shipping-progress-fill" style={{ width: `${progressPct}%` }} />
+                </div>
+              </div>
+            )}
+
+            <div className="cart-items-list">
+              {items.length === 0 ? <EmptyCartState /> : items.map(item => (
+                <CartItemRow key={item.id} item={item} onUpdateQuantity={onUpdateQuantity} onRemove={onRemoveItem} />
+              ))}
+            </div>
+
+            {items.length > 0 && (
+              <div className="cart-footer">
+                
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
+                  <input type="text" placeholder="Code Promo" value={promoCode} onChange={e => setPromoCode(e.target.value)} style={{ flex: 1, padding: '10px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
+                  <button type="button" onClick={handleApplyPromo} style={{ padding: '0 15px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}>Appliquer</button>
+                </div>
+                
+                <div className="cart-summary">
+                  <div className="cart-summary-row">
+                    <span>Sous-total</span>
+                    <span>{subtotal.toFixed(2)} MAD</span>
+                  </div>
+                  {promoDiscount > 0 && (
+                    <div className="cart-summary-row" style={{ color: '#10b981' }}>
+                      <span>Remise Promo (-{promoDiscount}%)</span>
+                      <span>-{discountAmount.toFixed(2)} MAD</span>
+                    </div>
+                  )}
+                  <div className="cart-summary-row">
+                    <span>Livraison</span>
+                    <span className={isFreeShipping ? 'cart-free-shipping-label' : ''}>
+                      {isFreeShipping ? 'GRATUITE' : `${SHIPPING_COST.toFixed(2)} MAD`}
+                    </span>
+                  </div>
+                  <div className="cart-summary-divider" />
+                  <div className="cart-summary-row cart-summary-total">
+                    <span>Total</span>
+                    <span>{total.toFixed(2)} MAD</span>
+                  </div>
+                </div>
+
+                <button className="cart-checkout-btn" type="button" onClick={() => setCheckoutMode(true)}>
+                  VALIDER MON PANIER <ArrowRight size={16} />
+                </button>
+
+                <button className="cart-continue-btn" onClick={onClose} type="button">
+                  Continuer mes achats
+                </button>
+
+                <div className="cart-trust-row">
+                  <ShieldCheck size={14} strokeWidth={1.5} />
+                  <span>Paiement à la livraison — Expédition 24/48h</span>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </aside>
     </>
