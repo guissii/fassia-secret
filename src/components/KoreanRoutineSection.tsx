@@ -7,7 +7,7 @@ export function KoreanRoutineSection() {
   const [banner, setBanner] = useState<{ imageUrl: string; linkUrl: string; title: string } | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/banners')
+    fetch('/api/banners')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

@@ -7,7 +7,7 @@ export function EssentialsSection() {
   const essentials = ALL_PRODUCTS.filter((p) => p.category === 'K-Beauty').slice(0, 3);
 
   useEffect(() => {
-    fetch('/api/admin/banners')
+    fetch('/api/banners')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

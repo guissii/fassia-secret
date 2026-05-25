@@ -104,7 +104,7 @@ export default function ComplementsClientPage() {
   const [heroImage, setHeroImage] = useState<string>(HERO_IMAGE);
 
   useEffect(() => {
-    fetch('/api/admin/banners')
+    fetch('/api/banners')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

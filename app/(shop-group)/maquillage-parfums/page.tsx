@@ -266,7 +266,7 @@ export default function MaquillageParfumsPage() {
   const [banners, setBanners] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch('/api/admin/banners')
+    fetch('/api/banners')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

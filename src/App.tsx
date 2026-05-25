@@ -22,7 +22,7 @@ function App() {
   const [bestSellersBanner, setBestSellersBanner] = React.useState<string>("19bd7403-d2ac-49a4-a584-be5895add421.png");
 
   React.useEffect(() => {
-    fetch('/api/admin/banners')
+    fetch('/api/banners')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
