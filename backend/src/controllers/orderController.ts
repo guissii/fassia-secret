@@ -1,15 +1,14 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
-import { Prisma, OrderStatus } from '@prisma/client';
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20; // Default to 20 orders per page to save memory
+    const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.OrderWhereInput = status ? { status: status.toUpperCase() as OrderStatus } : {};
+    const where: Record<string, any> = status ? { status: status.toUpperCase() } : {};
 
     const [orders, total] = await prisma.$transaction([
       prisma.order.findMany({

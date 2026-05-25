@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import redis from '../config/redis';
-import { Prisma } from '@prisma/client';
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const categorySlug = req.query.category as string;
     const isVisible = req.query.isVisible as string;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50; // default 50
+    const limit = parseInt(req.query.limit as string) || 50;
     const skip = (page - 1) * limit;
 
     const cacheKey = `products:${categorySlug || 'all'}:${isVisible || 'all'}:${page}:${limit}`;
@@ -18,7 +17,7 @@ export const getProducts = async (req: Request, res: Response) => {
       return res.json(JSON.parse(cachedData));
     }
 
-    const where: Prisma.ProductWhereInput = {};
+    const where: Record<string, any> = {};
     
     if (categorySlug) {
       where.categories = { some: { slug: categorySlug } };
