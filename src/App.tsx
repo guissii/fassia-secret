@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import dynamic from 'next/dynamic';
 import { Hero } from './components/Hero';
 import { EssentialsSection } from './components/EssentialsSection';
@@ -18,6 +19,21 @@ const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSec
 
 function App() {
   const bestSellers = ALL_PRODUCTS.slice(0, 5);
+  const [bestSellersBanner, setBestSellersBanner] = React.useState<string>("19bd7403-d2ac-49a4-a584-be5895add421.png");
+
+  React.useEffect(() => {
+    fetch('/api/admin/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const banner = data.find(b => b.section === 'best_sellers');
+          if (banner && banner.imageUrl) {
+            setBestSellersBanner(banner.imageUrl);
+          }
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <>
@@ -32,7 +48,7 @@ function App() {
 
       <CollectionCarousel 
         title="MEILLEURES VENTES"
-        imageSrc="19bd7403-d2ac-49a4-a584-be5895add421.png"
+        imageSrc={bestSellersBanner}
         products={bestSellers}
         linkHref="/boutique"
         linkTitle="Découvrir les meilleures ventes"

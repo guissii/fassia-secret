@@ -4,6 +4,7 @@ import { Toast, ToastType } from './shared';
 interface Section {
   key: string;
   name: string;
+  defaultImage?: string;
 }
 
 interface SectionGroup {
@@ -15,42 +16,42 @@ const SECTION_GROUPS: SectionGroup[] = [
   {
     title: 'Page d\'Accueil',
     sections: [
-      { key: 'korean-beauty', name: 'Korean Beauty Banner' },
-      { key: 'makeup-parfums', name: 'Maquillage & Parfums Banner' },
-      { key: 'essentials', name: 'Nos Essentiels' },
-      { key: 'best_sellers', name: 'Produits Populaires' },
+      { key: 'korean-beauty', name: 'Korean Beauty Banner', defaultImage: '/logo.png' },
+      { key: 'makeup-parfums', name: 'Maquillage & Parfums Banner', defaultImage: '/logo.png' },
+      { key: 'essentials', name: 'Nos Essentiels', defaultImage: 'ca  quon va utiiser.png' },
+      { key: 'best_sellers', name: 'Produits Populaires', defaultImage: '19bd7403-d2ac-49a4-a584-be5895add421.png' },
     ]
   },
   {
     title: 'Korean Beauty (10 Étapes)',
     sections: [
-      { key: 'kb-oil-cleanser', name: '01. Oil Cleanser' },
-      { key: 'kb-foam-cleanser', name: '02. Foam Cleanser' },
-      { key: 'kb-exfoliator', name: '03. Exfoliator' },
-      { key: 'kb-toner', name: '04. Toner' },
-      { key: 'kb-essence', name: '05. Essence' },
-      { key: 'kb-serum', name: '06. Serum & Ampoule' },
-      { key: 'kb-sheet-mask', name: '07. Sheet Mask' },
-      { key: 'kb-eye-cream', name: '08. Eye Cream' },
-      { key: 'kb-moisturizer', name: '09. Moisturizer' },
-      { key: 'kb-sunscreen', name: '10. Sunscreen' },
+      { key: 'kb-oil-cleanser', name: '01. Oil Cleanser', defaultImage: '/logo.png' },
+      { key: 'kb-foam-cleanser', name: '02. Foam Cleanser', defaultImage: '/logo.png' },
+      { key: 'kb-exfoliator', name: '03. Exfoliator', defaultImage: '/logo.png' },
+      { key: 'kb-toner', name: '04. Toner', defaultImage: '/logo.png' },
+      { key: 'kb-essence', name: '05. Essence', defaultImage: '/logo.png' },
+      { key: 'kb-serum', name: '06. Serum & Ampoule', defaultImage: '/logo.png' },
+      { key: 'kb-sheet-mask', name: '07. Sheet Mask', defaultImage: '/logo.png' },
+      { key: 'kb-eye-cream', name: '08. Eye Cream', defaultImage: '/logo.png' },
+      { key: 'kb-moisturizer', name: '09. Moisturizer', defaultImage: '/logo.png' },
+      { key: 'kb-sunscreen', name: '10. Sunscreen', defaultImage: '/logo.png' },
     ]
   },
   {
     title: 'Maquillage & Parfums',
     sections: [
-      { key: 'mp-teint', name: 'Teint' },
-      { key: 'mp-yeux', name: 'Yeux' },
-      { key: 'mp-levres', name: 'Lèvres' },
-      { key: 'mp-demaquillage', name: 'Démaquillage' },
-      { key: 'mp-parfums-femme', name: 'Parfums Femme' },
-      { key: 'mp-parfums-homme', name: 'Parfums Homme' },
+      { key: 'mp-teint', name: 'Teint', defaultImage: '/logo.png' },
+      { key: 'mp-yeux', name: 'Yeux', defaultImage: '/logo.png' },
+      { key: 'mp-levres', name: 'Lèvres', defaultImage: '/logo.png' },
+      { key: 'mp-demaquillage', name: 'Démaquillage', defaultImage: '/logo.png' },
+      { key: 'mp-parfums-femme', name: 'Parfums Femme', defaultImage: '/logo.png' },
+      { key: 'mp-parfums-homme', name: 'Parfums Homme', defaultImage: '/logo.png' },
     ]
   },
   {
     title: 'Compléments Alimentaires',
     sections: [
-      { key: 'complements-hero', name: 'Hero Banner Compléments' },
+      { key: 'complements-hero', name: 'Hero Banner Compléments', defaultImage: '/logo.png' },
     ]
   }
 ];
@@ -165,6 +166,17 @@ export function BannersTab() {
                     alt={section.name} 
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
                   />
+                </div>
+              ) : section.defaultImage ? (
+                <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#f3f4f6', borderRadius: '8px', overflow: 'hidden' }}>
+                  <img 
+                    src={section.defaultImage.startsWith('/') ? section.defaultImage : `/uploads/${section.defaultImage}`} 
+                    alt={section.name} 
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} 
+                  />
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.1)' }}>
+                    <span style={{ backgroundColor: 'rgba(255,255,255,0.8)', padding: '4px 8px', borderRadius: '4px', color: '#374151', fontSize: '0.8rem', fontWeight: 500 }}>Image par défaut</span>
+                  </div>
                 </div>
               ) : (
                 <div style={{ width: '100%', paddingTop: '56.25%', background: '#f3f4f6', borderRadius: '8px', border: '1px dashed #d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
