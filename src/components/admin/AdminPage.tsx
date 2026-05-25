@@ -8,7 +8,8 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  Activity
 } from 'lucide-react';
 import './AdminPage.css';
 import { AdminLogin } from './AdminLogin';
@@ -20,8 +21,9 @@ import { CategoriesTab } from './CategoriesTab';
 import { PromosTab } from './PromosTab';
 import { BannersTab } from './BannersTab';
 import { SettingsTab } from './SettingsTab';
+import { ServerTab } from './ServerTab';
 
-type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'banners' | 'settings';
+type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'banners' | 'settings' | 'server';
 
 export function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -53,6 +55,7 @@ export function AdminPage() {
     { id: 'promos', label: 'Promotions', icon: TicketPercent },
     { id: 'banners', label: 'Bannières', icon: LayoutDashboard },
     { id: 'settings', label: 'Paramètres', icon: Settings },
+    { id: 'server', label: 'Serveur (VPS)', icon: Activity },
   ] as const;
 
   if (!isAuthenticated) {
@@ -68,6 +71,7 @@ export function AdminPage() {
       case 'promos': return <PromosTab />;
       case 'banners': return <BannersTab />;
       case 'settings': return <SettingsTab />;
+      case 'server': return <ServerTab />;
       default: return <DashboardTab />;
     }
   };

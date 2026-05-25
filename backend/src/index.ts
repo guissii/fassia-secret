@@ -49,6 +49,8 @@ app.use(hpp()); // Prevent HTTP Parameter Pollution
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '../../public/uploads'), { maxAge: '1y' })); // Cache uploaded images
 
+import serverRoutes from './routes/serverRoutes';
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -56,6 +58,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/server', serverRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
