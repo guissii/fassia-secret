@@ -1,23 +1,42 @@
 import React, { useState } from 'react';
 import './AdminLogin.css';
 import { publicAssetUrl } from '../../lib/publicUrl';
+import { API_URL } from '../../lib/api';
 
 interface AdminLoginProps {
   onLogin: () => void;
 }
 
 export function AdminLogin({ onLogin }: AdminLoginProps) {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'fassia2024') {
-      setError(false);
-      onLogin();
-    } else {
-      setError(true);
-      setTimeout(() => setError(false), 500); // Remove shake animation class
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        sessionStorage.setItem('adminToken', data.token);
+        onLogin();
+      } else {
+        setError(data.message || 'Identifiants incorrects');
+        setTimeout(() => setError(''), 2000);
+      }
+    } catch {
+      setError('Erreur de connexion au serveur');
+      setTimeout(() => setError(''), 2000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,6 +51,18 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
         
         <form onSubmit={handleSubmit} className="admin-login-form">
           <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@fassia-secret.com"
+              autoFocus
+              required
+            />
+          </div>
+          <div className="form-group">
             <label htmlFor="password">Mot de passe</label>
             <input
               type="password"
@@ -39,11 +70,13 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              autoFocus
+              required
             />
           </div>
-          {error && <p className="admin-login-error">Mot de passe incorrect</p>}
-          <button type="submit" className="admin-login-btn">Accéder</button>
+          {error && <p className="admin-login-error">{error}</p>}
+          <button type="submit" className="admin-login-btn" disabled={loading}>
+            {loading ? 'Connexion...' : 'Accéder'}
+          </button>
         </form>
       </div>
     </div>

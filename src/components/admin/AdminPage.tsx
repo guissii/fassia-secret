@@ -30,20 +30,18 @@ export function AdminPage() {
   const [pendingOrdersCount, setPendingOrdersCount] = useState(14);
 
   useEffect(() => {
-    // Check if already authenticated in this session
-    const auth = sessionStorage.getItem('adminAuth');
-    if (auth === 'true') {
+    const token = sessionStorage.getItem('adminToken');
+    if (token) {
       setIsAuthenticated(true);
     }
   }, []);
 
   const handleLogin = () => {
-    sessionStorage.setItem('adminAuth', 'true');
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('adminAuth');
+    sessionStorage.removeItem('adminToken');
     setIsAuthenticated(false);
   };
 
