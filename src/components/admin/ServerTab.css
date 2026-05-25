@@ -1,0 +1,428 @@
+/* ═══════════════════════════════════════════════════════════════
+   Server Tab — Premium Dark Monitoring Dashboard
+   ═══════════════════════════════════════════════════════════════ */
+
+.server-tab {
+  padding: 0;
+}
+
+/* ─── Loading ──────────────────────────────────────────────── */
+.server-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1.5rem;
+  color: var(--admin-text-muted);
+}
+
+.server-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--admin-primary);
+  border-radius: 50%;
+  animation: server-spin 0.8s linear infinite;
+}
+
+@keyframes server-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Error ────────────────────────────────────────────────── */
+.server-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: var(--admin-text-muted);
+  text-align: center;
+}
+
+.server-error h3 {
+  color: var(--admin-text);
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.server-error p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.server-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--admin-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+
+.server-retry-btn:hover {
+  background: var(--admin-primary-hover);
+  transform: translateY(-1px);
+}
+
+/* ─── Header ───────────────────────────────────────────────── */
+.server-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.server-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.server-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: server-pulse 2s ease-in-out infinite;
+}
+
+@keyframes server-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+  50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.9); }
+}
+
+.server-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--admin-text);
+}
+
+.server-subtitle {
+  margin: 0.25rem 0 0 1.6rem;
+  color: var(--admin-text-muted);
+  font-size: 0.875rem;
+}
+
+.server-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.server-last-update {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+}
+
+.server-refresh-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.server-refresh-btn:hover {
+  color: var(--admin-text);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--admin-surface-hover);
+}
+
+.server-refresh-btn.spinning svg {
+  animation: server-spin 0.8s linear infinite;
+}
+
+/* ─── Main Stats Grid ──────────────────────────────────────── */
+.server-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Server Card ──────────────────────────────────────────── */
+.server-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.server-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.server-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.server-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cpu-icon {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+}
+
+.mem-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.server-card-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.server-card-body {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* ─── Circular Gauge ───────────────────────────────────────── */
+.server-gauge-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.server-gauge {
+  width: 100%;
+  height: 100%;
+}
+
+.server-gauge-fill {
+  transition: stroke-dasharray 1s ease, stroke 0.5s ease;
+}
+
+.server-gauge-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.server-gauge-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text);
+  line-height: 1;
+}
+
+.server-gauge-sublabel {
+  font-size: 0.7rem;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* ─── Card Details ─────────────────────────────────────────── */
+.server-card-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.server-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--admin-text-muted);
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.server-detail-row:last-child {
+  border-bottom: none;
+}
+
+.server-detail-value {
+  font-weight: 600;
+  color: var(--admin-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Memory Bar ───────────────────────────────────────────── */
+.server-mem-bar-container {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.server-mem-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.server-mem-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s ease, background 0.5s ease;
+}
+
+.server-mem-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+}
+
+/* ─── Bottom Info Cards ────────────────────────────────────── */
+.server-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.server-info-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.server-info-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.server-info-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.uptime-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.status-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.perf-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.server-icon {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
+.server-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.server-info-label {
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.server-info-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  line-height: 1.3;
+}
+
+.server-online {
+  color: #10b981;
+}
+
+.server-info-sub {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .server-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .server-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .server-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .server-card-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .server-detail-row {
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .server-header {
+    flex-direction: column;
+  }
+}
