@@ -13,7 +13,7 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 # Copy source code and build
-COPY backend ./backend
+COPY backend .
 WORKDIR /app/backend
 RUN npm run build
 
