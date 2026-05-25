@@ -106,7 +106,7 @@ export default function ProductClientPage({ product }: { product: Product }) {
                 {isPromo && saving ? <div className="product-saving">Économisez {formatPrice(saving)}</div> : null}
               </div>
 
-              <p className="product-desc">{product.description}</p>
+              <div className="product-desc"><ExpandableText text={product.description} maxLength={100} /></div>
 
               <div className="product-actions">
                 <div className="product-qty" aria-label="Quantité">
@@ -155,13 +155,12 @@ export default function ProductClientPage({ product }: { product: Product }) {
             <div className="product-details-grid">
               <div className="product-detail">
                 <div className="product-detail-title">Description</div>
-                <div className="product-detail-text">{product.description}</div>
+                <div className="product-detail-text"><ExpandableText text={product.description} maxLength={150} /></div>
               </div>
               <div className="product-detail">
                 <div className="product-detail-title">Conseils</div>
                 <div className="product-detail-text">
-                  Pour de meilleurs résultats, suivez les recommandations du fabricant. En cas de doute, demandez conseil à un
-                  professionnel de santé.
+                  <ExpandableText text="Pour de meilleurs résultats, suivez les recommandations du fabricant. En cas de doute, demandez conseil à un professionnel de santé." maxLength={80} />
                 </div>
               </div>
             </div>
@@ -193,8 +192,33 @@ export default function ProductClientPage({ product }: { product: Product }) {
               </div>
             </section>
           ) : null}
+
+          <div style={{ textAlign: 'center', marginTop: '40px', paddingBottom: '60px' }}>
+            <Link href="/boutique" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '16px 40px', background: '#000', color: '#fff', textDecoration: 'none', fontWeight: 600, borderRadius: '8px', letterSpacing: '1px', fontSize: '0.95rem', transition: 'transform 0.2s' }}>
+              VOIR TOUS LES PRODUITS <ChevronRight size={18} />
+            </Link>
+          </div>
         </div>
       </main>
     </>
+  );
+}
+
+function ExpandableText({ text, maxLength = 120 }: { text: string; maxLength?: number }) {
+  const [expanded, setExpanded] = useState(false);
+  if (!text) return null;
+  if (text.length <= maxLength) return <span>{text}</span>;
+  
+  return (
+    <span>
+      {expanded ? text : `${text.slice(0, maxLength).trim()}...`}
+      <button 
+        type="button" 
+        onClick={() => setExpanded(!expanded)} 
+        style={{ background: 'none', border: 'none', color: '#000', fontWeight: 600, textDecoration: 'underline', cursor: 'pointer', marginLeft: '5px', padding: 0 }}
+      >
+        {expanded ? 'Voir moins' : 'Lire la suite'}
+      </button>
+    </span>
   );
 }

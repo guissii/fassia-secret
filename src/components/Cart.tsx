@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck, CheckCircle2, Loader2, Tag } from 'lucide-react';
+import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck, CheckCircle2, Loader2, Tag, MessageCircle } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
 import { useCart } from './CartContext';
 
@@ -70,6 +70,22 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       alert("Code promo invalide");
       setPromoDiscount(0);
     }
+  };
+
+  const handleWhatsAppCheckout = () => {
+    const number = "212774656745";
+    let message = "Bonjour, je souhaite passer la commande suivante sur Fassia Secret :\n\n";
+    items.forEach(item => {
+      message += `- ${item.quantity}x ${item.name} (${(item.price * item.quantity).toFixed(2)} MAD)\n`;
+    });
+    message += `\nSous-total : ${subtotal.toFixed(2)} MAD\n`;
+    if (promoDiscount > 0) message += `Remise Promo : -${discountAmount.toFixed(2)} MAD\n`;
+    message += `Livraison : ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
+    message += `*Total : ${total.toFixed(2)} MAD*\n\n`;
+    message += "Merci de me confirmer la disponibilité.";
+    
+    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
   };
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
@@ -261,6 +277,19 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
                 <button className="cart-checkout-btn" type="button" onClick={() => setCheckoutMode(true)}>
                   VALIDER MON PANIER <ArrowRight size={16} />
+                </button>
+
+                <button 
+                  type="button" 
+                  onClick={handleWhatsAppCheckout} 
+                  style={{ 
+                    width: '100%', padding: '15px', background: '#25D366', color: '#fff', 
+                    border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.95rem',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    marginBottom: '10px' 
+                  }}
+                >
+                  <MessageCircle size={18} /> COMMANDER PAR WHATSAPP
                 </button>
 
                 <button className="cart-continue-btn" onClick={onClose} type="button">
