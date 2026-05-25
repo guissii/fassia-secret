@@ -34,6 +34,21 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const progressPct = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
 
+  const handleCheckout = () => {
+    const number = "212774656745"; // Numéro WhatsApp
+    let message = "Bonjour, je souhaite passer la commande suivante sur Fassia Secret :\n\n";
+    items.forEach(item => {
+      message += `- ${item.quantity}x ${item.name} (${(item.price * item.quantity).toFixed(2)} MAD)\n`;
+    });
+    message += `\nSous-total : ${subtotal.toFixed(2)} MAD\n`;
+    message += `Livraison : ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
+    message += `*Total : ${total.toFixed(2)} MAD*\n\n`;
+    message += "Merci de me confirmer la disponibilité.";
+    
+    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
   // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -161,7 +176,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
               </div>
             </div>
 
-            <button className="cart-checkout-btn" type="button">
+            <button className="cart-checkout-btn" type="button" onClick={handleCheckout}>
               PASSER LA COMMANDE <ArrowRight size={16} />
             </button>
 

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ShoppingBag, Check, Loader2 } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
 import './ProductCard.css';
 
@@ -26,7 +27,7 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
   const hasPromo = typeof product.oldPrice === 'number' && product.oldPrice > product.price;
   const promoLabel = product.badge ?? (hasPromo ? 'Promo' : '');
   const imageSrc = product.image.startsWith('http') ? product.image : publicAssetUrl(product.image);
-  const ctaText = ctaState === 'added' ? '✓' : ctaState === 'loading' ? '…' : '+';
+  const ctaIcon = ctaState === 'added' ? <Check size={16} /> : ctaState === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <ShoppingBag size={16} />;
 
   return (
     <article
@@ -57,7 +58,7 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
             onAddToCart?.();
           }}
         >
-          {ctaText}
+          {ctaIcon}
         </button>
         {promoLabel ? (
           <span className="product-badge" style={{ backgroundColor: product.badgeColor || 'var(--color-primary)' }}>
