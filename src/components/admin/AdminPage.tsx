@@ -24,14 +24,17 @@ import { SettingsTab } from './SettingsTab';
 type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'banners' | 'settings';
 
 export function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true); // BYPASSED FOR DEV
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [pendingOrdersCount, setPendingOrdersCount] = useState(14); // Mock data
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(14);
 
   useEffect(() => {
-    // Auth logic bypassed for development
-    sessionStorage.setItem('adminAuth', 'true');
+    // Check if already authenticated in this session
+    const auth = sessionStorage.getItem('adminAuth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
   }, []);
 
   const handleLogin = () => {
