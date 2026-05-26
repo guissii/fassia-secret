@@ -16,19 +16,25 @@ export function Hero() {
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
 
-  const slides = useMemo<HeroSlide[]>(() => {
-    return [
-      {
-        id: 'promo-1',
-        imageMobile: 'eee.webp',
-        imageDesktop: 'eee.webp',
-      },
-      {
-        id: 'promo-2',
-        imageMobile: 'B.BENEFPRODUIT2.webp',
-        imageDesktop: 'B.BENEFPRODUIT2.webp',
-      },
-    ];
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+
+  useEffect(() => {
+    fetch('/api/banners')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const heroBanners = data
+            .filter((b: any) => b.section === 'home_hero' && b.isActive !== false)
+            .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+            .map((b: any) => ({
+              id: b.id,
+              imageMobile: b.imageUrl,
+              imageDesktop: b.imageUrl,
+            }));
+          setSlides(heroBanners);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const slideCount = slides.length;
@@ -63,6 +69,8 @@ export function Hero() {
 
   const goPrev = () => goTo(activeIndex - 1);
   const goNext = () => goTo(activeIndex + 1);
+
+  if (slides.length === 0) return null;
 
   return (
     <section className="hero-section" aria-label="Bannière principale">
