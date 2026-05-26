@@ -31,15 +31,17 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
 
         <div className="essentials-carousel">
           <div className="essentials-hero-pair">
-            <div className="essentials-visual-tile">
-              <img
-                src={publicAssetUrl(imageSrc)}
-                alt={`${title} Visuel`}
-                className="essentials-visual-img"
-                loading="lazy"
-              />
-            </div>
-            {products.slice(0, 1).map((p) => (
+            {imageSrc ? (
+              <div className="essentials-visual-tile">
+                <img
+                  src={publicAssetUrl(imageSrc)}
+                  alt={`${title} Visuel`}
+                  className="essentials-visual-img"
+                  loading="lazy"
+                />
+              </div>
+            ) : null}
+            {products.slice(0, imageSrc ? 1 : 2).map((p) => (
               <ProductCard
                 key={p.id}
                 product={p}
@@ -49,7 +51,7 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
             ))}
           </div>
 
-          {products.slice(1).map((p) => (
+          {products.slice(imageSrc ? 1 : 2).map((p) => (
             <ProductCard
               key={p.id}
               product={p}

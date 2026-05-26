@@ -8,11 +8,11 @@ import { ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import { useCart } from './components/CartContext';
 import { publicAssetUrl } from './lib/publicUrl';
 import { productHref } from './lib/productSlug';
-import { ALL_PRODUCTS } from './data/products';
+
 import { ProductCard } from './components/ProductCard';
 import './PromotionsClientPage.css';
 
-type PromoProduct = (typeof ALL_PRODUCTS)[number] & { oldPrice: number };
+type PromoProduct = any;
 
 const discountPct = (price: number, oldPrice: number) => {
   const pct = Math.round((1 - price / oldPrice) * 100);
@@ -53,8 +53,20 @@ export default function PromotionsClientPage() {
   const toastTimeoutRef = useRef<number | null>(null);
   const ctaTimeoutsRef = useRef<number[]>([]);
 
-  const promos = useMemo<PromoProduct[]>(() => {
-    return ALL_PRODUCTS.filter((p): p is PromoProduct => typeof p.oldPrice === 'number' && p.oldPrice > p.price);
+  const [promos, setPromos] = useState<PromoProduct[]>([]);
+
+  useEffect(() => {
+    fetch('/api/products?limit=100')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.products) {
+          const promoProducts = data.products.filter(
+            (p: any) => typeof p.oldPrice === 'number' && p.oldPrice > p.price
+          );
+          setPromos(promoProducts);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const filters = useMemo(

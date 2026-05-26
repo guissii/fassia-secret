@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { Hero } from './components/Hero';
 import { EssentialsSection } from './components/EssentialsSection';
 import { MakeupParfumsSection } from './components/MakeupParfumsSection';
-import { ALL_PRODUCTS } from './data/products';
+
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -18,10 +18,17 @@ const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brand
 const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSection').then(mod => mod.KoreanRoutineSection));
 
 function App() {
-  const bestSellers = ALL_PRODUCTS.slice(0, 5);
-  const [bestSellersBanner, setBestSellersBanner] = React.useState<string>("19bd7403-d2ac-49a4-a584-be5895add421.png");
+  const [bestSellers, setBestSellers] = React.useState<any[]>([]);
+  const [bestSellersBanner, setBestSellersBanner] = React.useState<string>("");
 
   React.useEffect(() => {
+    fetch('/api/products?limit=5')
+      .then(res => res.json())
+      .then(data => {
+        if (data.products) setBestSellers(data.products);
+      })
+      .catch(console.error);
+
     fetch('/api/banners')
       .then(res => res.json())
       .then(data => {

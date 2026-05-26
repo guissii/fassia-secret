@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
-import { ALL_PRODUCTS } from '../data/products';
+
 import { CollectionCarousel } from './CollectionCarousel';
 
 export function EssentialsSection() {
-  const [bannerUrl, setBannerUrl] = useState<string>("ca  quon va utiiser.png");
-  const essentials = ALL_PRODUCTS.filter((p) => p.category === 'K-Beauty').slice(0, 3);
+  const [bannerUrl, setBannerUrl] = useState<string>("");
+  const [essentials, setEssentials] = useState<any[]>([]);
 
   useEffect(() => {
+    fetch('/api/products?category=K-Beauty&limit=3')
+      .then(res => res.json())
+      .then(data => {
+        if (data.products) setEssentials(data.products);
+      })
+      .catch(console.error);
+
     fetch('/api/banners')
       .then(res => res.json())
       .then(data => {

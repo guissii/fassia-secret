@@ -30,8 +30,8 @@ export function ProductsTab() {
       setProducts(data);
       
       // Extract unique categories for filter
-      const allCategories = data.flatMap(p => p.categories);
-      const uniqueCats = Array.from(new Set(allCategories)).filter(Boolean);
+      const allCategories = data.flatMap((p: AdminProduct) => p.categories || []);
+      const uniqueCats = Array.from(new Set(allCategories)).filter(Boolean) as string[];
       setCategories(uniqueCats);
     } catch (e) {
       setToast({ message: "Erreur de chargement", type: 'error' });

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
 import { productHref } from './lib/productSlug';
-import { ALL_PRODUCTS } from './data/products';
+
 import { ProductCard } from './components/ProductCard';
 import { useCart } from './components/CartContext';
 
@@ -22,6 +22,17 @@ export default function BoutiqueClientPage() {
     return window.localStorage.getItem('shopSidebarCollapsed') === '1';
   });
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/products?limit=500')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.products) setAllProducts(data.products);
+      })
+      .catch(console.error);
+  }, []);
 
   const query = useMemo(() => searchParams.get('q') ?? '', [searchParams]);
   const selectedCategories = useMemo(() => {
@@ -62,15 +73,15 @@ export default function BoutiqueClientPage() {
       'Préoccupations', 'Compléments Alimentaires', 'Premium Hair Care'
     ];
     const set = new Set<string>(predefined);
-    for (const p of ALL_PRODUCTS) set.add(p.category);
+    for (const p of allProducts) set.add(p.category);
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
-  }, []);
+  }, [allProducts]);
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const keywords = normalized.split(/\s+/).filter(Boolean);
 
-    let list = ALL_PRODUCTS.filter((p) => {
+    let list = allProducts.filter((p) => {
       if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
       if (onlyPromos && !(typeof p.oldPrice === 'number' && p.oldPrice > p.price)) return false;
       if (onlyNew && p.badge !== 'Nouveau') return false;
@@ -83,7 +94,7 @@ export default function BoutiqueClientPage() {
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [query, onlyNew, onlyPromos, selectedCategories, sort]);
+  }, [query, onlyNew, onlyPromos, selectedCategories, sort, allProducts]);
 
   const PAGE_SIZE = 20;
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));

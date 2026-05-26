@@ -5,6 +5,7 @@ const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 // In-memory fallback cache when Redis is not available
 class MemoryCache {
   private cache = new Map<string, { value: string; expiresAt: number }>();
+  private readonly MAX_SIZE = 200;
 
   async get(key: string): Promise<string | null> {
     const entry = this.cache.get(key);
@@ -17,6 +18,13 @@ class MemoryCache {
   }
 
   async setex(key: string, seconds: number, value: string): Promise<void> {
+    if (this.cache.size >= this.MAX_SIZE) {
+      // Very simple LRU/cleanup: just delete the oldest 50 items to free up space quickly
+      const oldestKeys = Array.from(this.cache.keys()).slice(0, 50);
+      for (const k of oldestKeys) {
+        this.cache.delete(k);
+      }
+    }
     this.cache.set(key, { value, expiresAt: Date.now() + seconds * 1000 });
   }
 

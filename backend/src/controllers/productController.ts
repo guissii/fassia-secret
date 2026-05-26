@@ -14,7 +14,8 @@ export const getProducts = async (req: Request, res: Response) => {
     const isVisible = req.query.isVisible as string;
     const includeArchived = req.query.includeArchived as string;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
+    let limit = parseInt(req.query.limit as string) || 50;
+    if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
     const cacheKey = `products:${categorySlug || 'all'}:${isVisible || 'all'}:${includeArchived || 'false'}:${page}:${limit}`;

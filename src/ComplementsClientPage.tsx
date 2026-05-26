@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { useCart } from './components/CartContext';
 import { productHref } from './lib/productSlug';
-import { ALL_PRODUCTS, type CatalogProduct } from './data/products';
+
 import { ProductCard } from './components/ProductCard';
 import './styles/CollectionLayout.css';
 import './ComplementsClientPage.css';
@@ -86,7 +86,7 @@ const normalize = (s: string) =>
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
 
-const matchesQuery = (p: CatalogProduct, q: string) => {
+const matchesQuery = (p: any, q: string) => {
   const hay = normalize(`${p.brand} ${p.name} ${p.description}`);
   const tokens = q
     .split(/\s+/)
@@ -98,12 +98,19 @@ const matchesQuery = (p: CatalogProduct, q: string) => {
 
 export default function ComplementsClientPage() {
   const router = useRouter();
-  const supplements = useMemo(() => ALL_PRODUCTS.filter((p) => p.category === 'Compléments'), []);
+  const [supplements, setSupplements] = useState<any[]>([]);
   const { addToCart } = useCart();
   
   const [heroImage, setHeroImage] = useState<string>(HERO_IMAGE);
 
   useEffect(() => {
+    fetch('/api/products?category=Compl%C3%A9ments&limit=100')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.products) setSupplements(data.products);
+      })
+      .catch(console.error);
+
     fetch('/api/banners')
       .then(res => res.json())
       .then(data => {

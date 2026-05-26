@@ -1,19 +1,18 @@
 "use client";
 
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Heart, Minus, Plus, ShoppingBag, Star } from 'lucide-react';
 import { useCart } from './components/CartContext';
 import { ProductCard } from './components/ProductCard';
 import { publicAssetUrl } from './lib/publicUrl';
-import type { CatalogProduct } from './data/products';
-import { ALL_PRODUCTS } from './data/products';
+
 import { productHref } from './lib/productSlug';
 import './ProductClientPage.css';
 
-type Product = CatalogProduct;
+type Product = any;
 
 const formatPrice = (price: number) => price.toFixed(2) + ' MAD';
 
@@ -41,23 +40,18 @@ export default function ProductClientPage({ product }: { product: Product }) {
     return Number.isFinite(diff) && diff > 0 ? diff : 0;
   }, [isPromo, product.oldPrice, product.price]);
 
-  const related = useMemo(() => {
-    const picked: Product[] = [];
-    const seen = new Set<number>();
+  const [related, setRelated] = useState<any[]>([]);
 
-    const push = (p: Product) => {
-      if (p.id === product.id) return;
-      if (seen.has(p.id)) return;
-      seen.add(p.id);
-      picked.push(p);
-    };
-
-    ALL_PRODUCTS.filter((p) => p.category === product.category).forEach(push);
-    ALL_PRODUCTS.filter((p) => p.brand === product.brand && p.category !== product.category).forEach(push);
-    ALL_PRODUCTS.forEach(push);
-
-    return picked.slice(0, 6);
-  }, [product.brand, product.category, product.id]);
+  useEffect(() => {
+    fetch(`/api/products?category=${encodeURIComponent(product.category)}&limit=10`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.products) {
+          setRelated(data.products.filter((p: any) => p.id !== product.id).slice(0, 6));
+        }
+      })
+      .catch(console.error);
+  }, [product.category, product.id]);
 
   const addProductToCart = (p: Product, quantity: number) => {
     for (let i = 0; i < quantity; i++) {
