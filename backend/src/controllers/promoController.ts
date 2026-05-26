@@ -37,7 +37,7 @@ export const createPromo = async (req: Request, res: Response) => {
 
 export const updatePromo = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { code, type, value, expiresAt, usageLimit, isActive } = req.body;
 
     const promo = await prisma.promo.update({
@@ -61,7 +61,7 @@ export const updatePromo = async (req: Request, res: Response) => {
 
 export const deletePromo = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await prisma.promo.delete({ where: { id } });
     res.json({ success: true, message: 'Promo deleted' });
   } catch (error) {

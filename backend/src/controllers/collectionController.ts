@@ -56,7 +56,7 @@ export const createCollection = async (req: Request, res: Response) => {
 
 export const updateCollection = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { name, slug, description, image, page, order } = req.body;
 
     const updated = await prisma.collection.update({
@@ -75,7 +75,7 @@ export const updateCollection = async (req: Request, res: Response) => {
 
 export const deleteCollection = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     await prisma.collection.delete({ where: { id } });
     await invalidateCollectionCache();

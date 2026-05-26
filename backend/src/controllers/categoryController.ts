@@ -55,7 +55,7 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { name, nameAr, slug } = req.body;
 
     const updated = await prisma.category.update({
@@ -74,7 +74,7 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { migrateToId } = req.body;
 
     // If products need to be migrated

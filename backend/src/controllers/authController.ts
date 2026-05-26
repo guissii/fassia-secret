@@ -102,7 +102,7 @@ export const getAdmins = async (req: Request, res: Response) => {
 
 export const deleteAdmin = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     
     // Count total admins to prevent deleting the last one
     const count = await prisma.adminUser.count();
