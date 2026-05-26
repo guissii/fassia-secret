@@ -10,7 +10,8 @@
     "build": "next build",
     "lint": "eslint .",
     "start": "next start",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:scraped": "tsx prisma/seed-scraped.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
