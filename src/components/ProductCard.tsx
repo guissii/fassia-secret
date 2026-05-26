@@ -26,7 +26,7 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
   const formatPriceValue = (value: number) => value.toFixed(2);
   const hasPromo = typeof product.oldPrice === 'number' && product.oldPrice > product.price;
   const promoLabel = product.badge ?? (hasPromo ? 'Promo' : '');
-  const imageSrc = product.image.startsWith('http') ? product.image : publicAssetUrl(product.image);
+  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image);
   const ctaIcon = ctaState === 'added' ? <Check size={16} /> : ctaState === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <ShoppingBag size={16} />;
 
   return (

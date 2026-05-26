@@ -221,7 +221,7 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 <div className="image-upload-area">
                   {formData.image ? (
                     <div className="image-preview">
-                      <img src={formData.image.startsWith('blob:') || formData.image.startsWith('http') ? formData.image : publicAssetUrl(formData.image)} alt="Preview" />
+                      <img src={formData.image.startsWith('data:') || formData.image.startsWith('blob:') || formData.image.startsWith('http') ? formData.image : publicAssetUrl(formData.image)} alt="Preview" />
                       <button type="button" className="remove-image-btn" onClick={() => setFormData(prev => ({ ...prev, image: '' }))}>
                         <X size={16} />
                       </button>

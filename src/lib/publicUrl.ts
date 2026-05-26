@@ -1,52 +1,31 @@
-export function getBasePath() {
-  const envBasePath = process.env.NEXT_PUBLIC_BASE_PATH;
-  if (envBasePath) return envBasePath;
-
-  if (typeof window === 'undefined') return '';
-
-  const { hostname, pathname } = window.location;
-  if (!hostname.endsWith('github.io')) return '';
-
-  const firstSegment = pathname.split('/').filter(Boolean)[0];
-  return firstSegment ? `/${firstSegment}` : '';
-}
-
-function safeEncodePath(path: string) {
-  try {
-    return encodeURI(decodeURI(path));
-  } catch {
-    return encodeURI(path);
-  }
-}
-
-export function publicAssetUrl(inputPath: string) {
-  const basePath = getBasePath();
-
-  if (!inputPath) {
-    return basePath || '/';
+/**
+ * Returns the public asset URL for a given path.
+ * Handles base64 data URIs, HTTP URLs, and local public assets.
+ */
+export function publicAssetUrl(inputPath: string): string {
+  if (!inputPath || !inputPath.trim()) {
+    return '/';
   }
 
   const trimmed = inputPath.trim();
-  if (!trimmed) {
-    return basePath || '/';
-  }
 
+  // Already a full URL, data URI, or blob — return as-is
   if (/^(https?:)?\/\//.test(trimmed) || /^data:/.test(trimmed) || /^blob:/.test(trimmed)) {
     return trimmed;
   }
 
-  const baseNoSlash = basePath.replace(/^\/+/, '').replace(/\/+$/, '');
-  let pathNoSlash = trimmed.replace(/^\/+/, '');
+  // Ensure leading slash for local public assets
+  const pathWithSlash = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
 
-  if (baseNoSlash && pathNoSlash.startsWith(`${baseNoSlash}/`)) {
-    pathNoSlash = pathNoSlash.slice(baseNoSlash.length + 1);
+  // Encode special characters in the path
+  try {
+    return encodeURI(decodeURI(pathWithSlash));
+  } catch {
+    return encodeURI(pathWithSlash);
   }
+}
 
-  const encoded = safeEncodePath(pathNoSlash);
-
-  if (!basePath) {
-    return `/${encoded}`;
-  }
-
-  return `${basePath.replace(/\/+$/, '')}/${encoded}`;
+// Kept for backwards compatibility
+export function getBasePath(): string {
+  return '';
 }

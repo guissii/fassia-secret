@@ -107,7 +107,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const productId = parseInt(id);
     
     if (isNaN(productId)) {
@@ -158,7 +158,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const productId = parseInt(id);
 
     if (isNaN(productId)) {
@@ -181,7 +181,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
 export const toggleVisibility = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const productId = parseInt(id);
 
     if (isNaN(productId)) {
@@ -209,7 +209,7 @@ export const toggleVisibility = async (req: Request, res: Response) => {
 
 export const toggleArchive = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const productId = parseInt(id);
 
     if (isNaN(productId)) {

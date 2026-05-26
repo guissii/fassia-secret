@@ -244,7 +244,7 @@ export function ProductsTab() {
                 <tr><td colSpan={6} className="text-center py-lg text-muted">Aucun produit trouvé.</td></tr>
               ) : (
                 filteredProducts.map(product => {
-                  const imageSrc = product.image.startsWith('http') || product.image.startsWith('blob:') 
+                  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') 
                     ? product.image 
                     : publicAssetUrl(product.image);
                   

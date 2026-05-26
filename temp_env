@@ -1,6 +1,0 @@
-DATABASE_URL="postgresql://fassia_user:fassia_pass@localhost:5432/fassia_secret"
-JWT_SECRET="very_long_random_jwt_secret_key_123"
-ADMIN_SECRET="admin_super_secret"
-REDIS_URL="redis://localhost:6379"
-PORT=5000
-NODE_ENV="production"

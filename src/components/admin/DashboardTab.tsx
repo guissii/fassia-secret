@@ -182,7 +182,7 @@ export function DashboardTab() {
               </thead>
               <tbody>
                 {popularProducts.map(product => {
-                  const imageSrc = product.image.startsWith('http') ? product.image : publicAssetUrl(product.image);
+                  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image);
                   const isLowStock = product.stock < 10;
                   
                   return (

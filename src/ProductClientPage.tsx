@@ -65,7 +65,7 @@ export default function ProductClientPage({ product }: { product: Product }) {
     }
   };
 
-  const imageSrc = product.image.startsWith('http') ? product.image : publicAssetUrl(product.image);
+  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image);
 
   return (
     <>
