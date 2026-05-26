@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Store, Truck, Bell, Share2 } from 'lucide-react';
+import { Save, Store, Truck, Bell, Share2, Users, Plus } from 'lucide-react';
 import { delay } from './mockData';
 import { Toast, ToastType } from './shared';
 
@@ -190,6 +190,59 @@ export function SettingsTab() {
                 disabled={loading}
               >
                 <Save size={16} /> Sauvegarder
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Gestion des Administrateurs */}
+        <div className="admin-card">
+          <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Users size={20} className="text-primary" /> Gestion des Administrateurs
+            </h3>
+          </div>
+          
+          <div className="form-col" style={{ gap: '1.5rem' }}>
+            <p className="text-muted text-sm">Ajouter un nouveau compte administrateur pour gérer la boutique.</p>
+            <div className="form-group">
+              <label>Email de l'administrateur</label>
+              <input type="email" className="admin-input" id="newAdminEmail" placeholder="admin@fassiasecret.com" />
+            </div>
+            <div className="form-group">
+              <label>Mot de passe</label>
+              <input type="password" className="admin-input" id="newAdminPassword" placeholder="••••••••" minLength={6} />
+            </div>
+            <div>
+              <button 
+                className="admin-btn-primary" 
+                onClick={async () => {
+                  const emailInput = document.getElementById('newAdminEmail') as HTMLInputElement;
+                  const passwordInput = document.getElementById('newAdminPassword') as HTMLInputElement;
+                  if (!emailInput.value || !passwordInput.value) {
+                    setToast({ message: "Veuillez remplir tous les champs", type: 'error' });
+                    return;
+                  }
+                  
+                  setLoading(true);
+                  try {
+                    const { api } = await import('./mockData');
+                    await api.fetchWithAuth('/auth/register', {
+                      method: 'POST',
+                      body: JSON.stringify({ email: emailInput.value, password: passwordInput.value })
+                    });
+                    setToast({ message: "Nouvel administrateur créé avec succès !", type: 'success' });
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                  } catch (error: any) {
+                    setToast({ message: error.message || "Erreur lors de la création de l'admin", type: 'error' });
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                disabled={loading}
+              >
+                <Plus size={16} /> Ajouter l'administrateur
               </button>
             </div>
           </div>

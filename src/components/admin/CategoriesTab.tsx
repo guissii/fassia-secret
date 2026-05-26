@@ -63,31 +63,38 @@ export function CategoriesTab() {
       return;
     }
 
-    // Simulate migration + delete
-    await delay(500);
-    const migratedTo = categories.find(c => c.id === migrateToId);
+    try {
+      await api.fetchWithAuth(`/categories/${deleteTarget.id}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ migrateToId: migrateToId || null })
+      });
+      
+      const migratedTo = categories.find(c => c.id === migrateToId);
 
-    setCategories(prev => {
-      let updated = prev.filter(c => c.id !== deleteTarget.id);
-      // If migration target exists, add product count
-      if (migratedTo) {
-        updated = updated.map(c =>
-          c.id === migrateToId
-            ? { ...c, productCount: c.productCount + deleteTarget.productCount }
-            : c
-        );
-      }
-      return updated;
-    });
+      setCategories(prev => {
+        let updated = prev.filter(c => c.id !== deleteTarget.id);
+        // If migration target exists, add product count
+        if (migratedTo) {
+          updated = updated.map(c =>
+            c.id === migrateToId
+              ? { ...c, productCount: c.productCount + deleteTarget.productCount }
+              : c
+          );
+        }
+        return updated;
+      });
 
-    setToast({
-      message: migratedTo
-        ? `Catégorie supprimée. ${deleteTarget.productCount} produit(s) migré(s) vers "${migratedTo.name}"`
-        : 'Catégorie supprimée',
-      type: 'success',
-    });
-    setIsDeleteModalOpen(false);
-    setDeleteTarget(null);
+      setToast({
+        message: migratedTo
+          ? `Catégorie supprimée. ${deleteTarget.productCount} produit(s) migré(s) vers "${migratedTo.name}"`
+          : 'Catégorie supprimée',
+        type: 'success',
+      });
+      setIsDeleteModalOpen(false);
+      setDeleteTarget(null);
+    } catch (error) {
+      setToast({ message: 'Erreur lors de la suppression de la catégorie', type: 'error' });
+    }
   };
 
   return (

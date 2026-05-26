@@ -56,40 +56,60 @@ export function ProductsTab() {
   });
 
   const toggleVisibility = async (id: number) => {
-    // Optimistic update
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, isVisible: !p.isVisible } : p));
-    const isNowVisible = !products.find(p => p.id === id)?.isVisible;
-    setToast({ message: `Produit ${isNowVisible ? 'visible' : 'masqué'}`, type: 'info' });
-    await delay(300);
+    try {
+      // Optimistic update
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isVisible: !p.isVisible } : p));
+      
+      const response = await api.fetchWithAuth(`/products/${id}/visibility`, { method: 'PATCH' });
+      const isNowVisible = response.product.isVisible;
+      
+      setToast({ message: `Produit ${isNowVisible ? 'visible' : 'masqué'}`, type: 'info' });
+    } catch (error) {
+      setToast({ message: "Erreur lors de la modification de la visibilité", type: 'error' });
+      // Revert optimistic update on error
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isVisible: !p.isVisible } : p));
+    }
   };
 
   const toggleArchive = async (id: number) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, isArchived: !p.isArchived } : p));
-    const isNowArchived = !products.find(p => p.id === id)?.isArchived;
-    setToast({ message: `Produit ${isNowArchived ? 'archivé' : 'désarchivé'}`, type: 'info' });
-    await delay(300);
+    try {
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isArchived: !p.isArchived } : p));
+      
+      const response = await api.fetchWithAuth(`/products/${id}/archive`, { method: 'PATCH' });
+      const isNowArchived = response.product.isArchived;
+      
+      setToast({ message: `Produit ${isNowArchived ? 'archivé' : 'désarchivé'}`, type: 'info' });
+    } catch (error) {
+      setToast({ message: "Erreur lors de l'archivage", type: 'error' });
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isArchived: !p.isArchived } : p));
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    setToast({ message: "Produit supprimé", type: 'success' });
+  const handleDelete = async (id: number) => {
+    try {
+      await api.fetchWithAuth(`/products/${id}`, { method: 'DELETE' });
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isArchived: true } : p).filter(p => p.id !== id));
+      setToast({ message: "Produit supprimé", type: 'success' });
+    } catch (error) {
+      setToast({ message: "Erreur lors de la suppression", type: 'error' });
+    }
   };
 
   const handleSaveProduct = (productData: AdminProduct) => {
-    if (productData.id) {
+    const existingIndex = products.findIndex(p => p.id === productData.id);
+    if (existingIndex >= 0) {
       // Update
       setProducts(prev => prev.map(p => p.id === productData.id ? productData : p));
       setToast({ message: "Produit mis à jour", type: 'success' });
     } else {
       // Create new
-      const newProduct = { ...productData, id: Date.now() };
-      setProducts(prev => [newProduct, ...prev]);
+      setProducts(prev => [productData, ...prev]);
       setToast({ message: "Produit créé avec succès", type: 'success' });
       
       // Update category list if there are new categories
-      const newCats = (productData.categories || []).filter(cat => !categories.includes(cat));
+      const newCats = (productData.categories || []).filter(cat => !categories.includes(cat as string));
       if (newCats.length > 0) {
-        setCategories(prev => [...prev, ...newCats]);
+        setCategories(prev => [...prev, ...(newCats as string[])]);
       }
     }
   };

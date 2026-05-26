@@ -50,7 +50,19 @@ async function main() {
     update: { password: hashedPassword },
     create: { email: adminEmail, password: hashedPassword },
   });
-  console.log(`   ✅ Admin: ${adminEmail} / mot de passe: ${adminPassword}\n`);
+  console.log(`   ✅ Admin: ${adminEmail} / mot de passe: ${adminPassword}`);
+
+  // Create second admin
+  const adminEmail2 = 'admin2@fassiasecret.com';
+  const adminPassword2 = 'FassiaAdmin2026!';
+  const hashedPassword2 = await bcrypt.hash(adminPassword2, 10);
+  
+  await prisma.adminUser.upsert({
+    where: { email: adminEmail2 },
+    update: { password: hashedPassword2 },
+    create: { email: adminEmail2, password: hashedPassword2 },
+  });
+  console.log(`   ✅ Admin 2: ${adminEmail2} / mot de passe: ${adminPassword2}\n`);
 
   // ─── 1. Catégories ────────────────────────────────────────────────────
   console.log('📂 Création des catégories...');

@@ -97,8 +97,12 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const url = URL.createObjectURL(e.target.files[0]);
-      setFormData(prev => ({ ...prev, image: url }));
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -107,17 +111,57 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
     setLoading(true);
     
     // Obligatory fields based on user feedback
-    if (!formData.name || !formData.nameAr || !formData.price || !formData.categories || formData.categories.length === 0) {
+    if (!formData.name || !formData.nameAr || formData.price === undefined || !formData.categories || formData.categories.length === 0) {
       alert("Veuillez remplir les champs obligatoires (Nom FR/AR, Prix, Catégories)");
       setLoading(false);
       return;
     }
     
-    setTimeout(() => {
-      onSave(formData as AdminProduct);
-      setLoading(false);
+    try {
+      // Map category names to IDs
+      const categoryIds = formData.categories
+        .map(name => categories.find(c => c.name === name)?.id)
+        .filter(Boolean);
+
+      // Map collection names to IDs
+      const collectionIds = (formData.collections || [])
+        .map(name => collections.find(c => c.name === name)?.id)
+        .filter(Boolean);
+
+      const payload = {
+        ...formData,
+        categoryIds,
+        collectionIds
+      };
+
+      let response;
+      if (isEditing && product?.id) {
+        response = await api.fetchWithAuth(`/products/${product.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+      } else {
+        response = await api.fetchWithAuth('/products', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+
+      // Convert backend product format to frontend AdminProduct format
+      const backendProduct = response.product;
+      const formattedProduct = {
+        ...backendProduct,
+        categories: backendProduct.categories?.map((c: any) => c.name) || [],
+        collections: backendProduct.collections?.map((c: any) => c.name) || [],
+      };
+
+      onSave(formattedProduct as AdminProduct);
       onClose();
-    }, 800);
+    } catch (error: any) {
+      alert("Erreur lors de l'enregistrement : " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;

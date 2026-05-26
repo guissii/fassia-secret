@@ -228,31 +228,53 @@ export const mockPromos: Promo[] = [
   { id: 'pro_3', code: 'FLASH20', type: 'percentage', value: 20, expiresAt: new Date(Date.now() - 100000).toISOString(), usageLimit: 100, usageCount: 100, isActive: false },
 ];
 
-// --- Mock API Fetchers ---
+// --- Mock Data (kept for types, but API is real now) ---
+// All previous mock variables are untouched for backwards compatibility
+
+// Helper for API calls
+const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
+  const token = sessionStorage.getItem('adminToken');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+
+  const res = await fetch(`/api${url}`, { ...options, headers });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP error! status: ${res.status}`);
+  }
+  return res.json();
+};
 
 export const api = {
   getStats: async () => {
+    // Backend doesn't have a dedicated stats route yet, returning mock for now
     await delay(600);
     return mockStats;
   },
   getOrders: async () => {
-    await delay(800);
-    return [...mockOrders];
+    const data = await fetchWithAuth('/orders?limit=100');
+    return data.orders || [];
   },
   getProducts: async () => {
-    await delay(700);
-    return [...mockAdminProducts];
+    const data = await fetchWithAuth('/products?limit=1000');
+    return data.products || [];
   },
   getCategories: async () => {
-    await delay(400);
-    return [...mockCategories];
+    const data = await fetchWithAuth('/categories');
+    return data.categories || [];
   },
   getCollections: async () => {
+    // No collections API yet, returning mock
     await delay(400);
     return [...mockCollections];
   },
   getPromos: async () => {
-    await delay(500);
-    return [...mockPromos];
+    return fetchWithAuth('/promos');
   },
+  
+  // Expose fetchWithAuth for POST/PUT/DELETE
+  fetchWithAuth
 };

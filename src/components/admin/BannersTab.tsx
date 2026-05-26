@@ -63,32 +63,40 @@ export function BannersTab() {
   const [activeGroup, setActiveGroup] = useState<number>(0);
 
   useEffect(() => {
-    fetch('/api/banners')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const map = data.reduce((acc: any, item: any) => ({
-            ...acc,
-            [item.section]: { imageUrl: item.imageUrl, linkUrl: item.linkUrl || '', title: item.title || '' }
-          }), {});
-          setBanners(map);
-        }
-      });
+    import('./mockData').then(({ api }) => {
+      api.fetchWithAuth('/banners')
+        .then(data => {
+          if (Array.isArray(data)) {
+            const map = data.reduce((acc: any, item: any) => ({
+              ...acc,
+              [item.section]: { imageUrl: item.imageUrl, linkUrl: item.linkUrl || '', title: item.title || '' }
+            }), {});
+            setBanners(map);
+          }
+        })
+        .catch(() => setToast({ message: 'Erreur lors du chargement des bannières', type: 'error' }));
+    });
   }, []);
 
   const handleUpdate = async (key: string, data: { imageUrl: string; linkUrl: string; title: string }) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/banners', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: key, imageUrl: data.imageUrl, linkUrl: data.linkUrl, title: data.title }),
-      });
-      if (res.ok) {
-        setToast({ message: 'Bannière mise à jour', type: 'success' });
+      const { api } = await import('./mockData');
+      
+      // If imageUrl is base64, send it as imageData
+      const payload: any = { section: key, linkUrl: data.linkUrl, title: data.title };
+      if (data.imageUrl.startsWith('data:image')) {
+        payload.imageData = data.imageUrl;
       } else {
-        throw new Error('Failed');
+        payload.imageUrl = data.imageUrl;
       }
+
+      await api.fetchWithAuth('/banners', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      
+      setToast({ message: 'Bannière mise à jour', type: 'success' });
     } catch {
       setToast({ message: 'Erreur lors de la mise à jour', type: 'error' });
     } finally {
@@ -101,29 +109,23 @@ export function BannersTab() {
     const file = e.target.files[0];
     
     setLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
+    
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      if (res.ok) {
-        const { url } = await res.json();
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
         setBanners(prev => ({
           ...prev,
-          [key]: { ...(prev[key] || { linkUrl: '', title: '' }), imageUrl: url }
+          [key]: { ...(prev[key] || { linkUrl: '', title: '' }), imageUrl: base64data }
         }));
-        setToast({ message: 'Image téléchargée avec succès', type: 'success' });
-      } else {
-        throw new Error('Upload failed');
-      }
+        setToast({ message: 'Image chargée localement (N\'oubliez pas de sauvegarder)', type: 'info' });
+        setLoading(false);
+      };
+      reader.readAsDataURL(file);
     } catch {
-      setToast({ message: "Erreur lors du téléchargement de l'image", type: 'error' });
-    } finally {
+      setToast({ message: "Erreur lors du traitement de l'image", type: 'error' });
       setLoading(false);
-      // Reset input
+    } finally {
       e.target.value = '';
     }
   };

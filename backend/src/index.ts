@@ -14,6 +14,7 @@ import orderRoutes from './routes/orderRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import bannerRoutes from './routes/bannerRoutes';
 import uploadRoutes from './routes/uploadRoutes';
+import promoRoutes from './routes/promoRoutes';
 
 dotenv.config();
 
@@ -41,9 +42,9 @@ app.use(cors({
   credentials: true
 }));
 
-// Body parser with size limit to prevent Payload Too Large attacks (DoS)
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+// Body parser with size limit to prevent Payload Too Large attacks (DoS), increased for base64 images
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 app.use(cookieParser());
@@ -59,6 +60,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/server', serverRoutes);
+app.use('/api/promos', promoRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
