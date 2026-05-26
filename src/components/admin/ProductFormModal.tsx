@@ -1,8 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import { X, Upload, Plus, Languages } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Upload, Plus, Languages, Search, ChevronDown, Check } from 'lucide-react';
 import { AdminProduct, Category, api } from './mockData';
 import { publicAssetUrl } from '../../lib/publicUrl';
 import { ProductCard } from '../ProductCard';
+
+/* ── Reusable Multi-Select Chip Picker ── */
+interface ChipPickerProps {
+  label: string;
+  required?: boolean;
+  options: { id: string; name: string }[];
+  selected: string[];
+  onChange: (selected: string[]) => void;
+  placeholder?: string;
+}
+
+function ChipPicker({ label, required, options, selected, onChange, placeholder }: ChipPickerProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const filtered = options.filter(o => o.name.toLowerCase().includes(search.toLowerCase()));
+  const toggle = (name: string) => {
+    onChange(selected.includes(name) ? selected.filter(n => n !== name) : [...selected, name]);
+  };
+  const remove = (name: string) => onChange(selected.filter(n => n !== name));
+
+  return (
+    <div className="form-group chip-picker-group" ref={wrapperRef}>
+      <label>{label} {required && '*'}</label>
+
+      {/* Selected chips */}
+      {selected.length > 0 && (
+        <div className="chip-picker-chips">
+          {selected.map(name => (
+            <span key={name} className="chip-picker-chip">
+              {name}
+              <button type="button" onClick={() => remove(name)} aria-label={`Retirer ${name}`}><X size={12} /></button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Trigger / search */}
+      <div className={`chip-picker-trigger ${open ? 'is-open' : ''}`} onClick={() => setOpen(true)}>
+        <Search size={14} className="chip-picker-search-icon" />
+        <input
+          type="text"
+          className="chip-picker-input"
+          placeholder={placeholder || 'Rechercher...'}
+          value={search}
+          onChange={e => { setSearch(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+        />
+        <ChevronDown size={16} className={`chip-picker-chevron ${open ? 'rotated' : ''}`} />
+      </div>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="chip-picker-dropdown">
+          {filtered.length === 0 && (
+            <div className="chip-picker-empty">Aucun résultat</div>
+          )}
+          {filtered.map(o => {
+            const isActive = selected.includes(o.name);
+            return (
+              <button
+                key={o.id}
+                type="button"
+                className={`chip-picker-option ${isActive ? 'is-selected' : ''}`}
+                onClick={() => toggle(o.name)}
+              >
+                <span className="chip-picker-check">{isActive && <Check size={14} />}</span>
+                {o.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface ProductFormModalProps {
   product: AdminProduct | null;
@@ -254,34 +339,21 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
 
               <div className="form-section-title">Organisation</div>
               <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Catégories *</label>
-                  <div className="checkbox-list">
-                    {categories.map(c => (
-                      <label key={c.id}>
-                        <input type="checkbox" checked={formData.categories?.includes(c.name) || false} onChange={(e) => {
-                          if (e.target.checked) setFormData(prev => ({ ...prev, categories: [...(prev.categories || []), c.name] }));
-                          else setFormData(prev => ({ ...prev, categories: prev.categories?.filter(n => n !== c.name) }));
-                        }} />
-                        {c.name}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Collections / Sections</label>
-                  <div className="checkbox-list">
-                    {collections.map(c => (
-                      <label key={c.id}>
-                        <input type="checkbox" checked={formData.collections?.includes(c.name) || false} onChange={(e) => {
-                          if (e.target.checked) setFormData(prev => ({ ...prev, collections: [...(prev.collections || []), c.name] }));
-                          else setFormData(prev => ({ ...prev, collections: prev.collections?.filter(n => n !== c.name) }));
-                        }} />
-                        {c.name}
-                      </label>
-                    ))}
-                  </div>
-                </div>
+                <ChipPicker
+                  label="Catégories"
+                  required
+                  options={categories}
+                  selected={formData.categories || []}
+                  onChange={cats => setFormData(prev => ({ ...prev, categories: cats }))}
+                  placeholder="Rechercher une catégorie..."
+                />
+                <ChipPicker
+                  label="Collections / Sections"
+                  options={collections}
+                  selected={formData.collections || []}
+                  onChange={cols => setFormData(prev => ({ ...prev, collections: cols }))}
+                  placeholder="Rechercher une collection..."
+                />
               </div>
 
               <div className="form-group">
