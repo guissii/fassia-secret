@@ -7,7 +7,7 @@ export function EssentialsSection() {
   const [essentials, setEssentials] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/products?category=K-Beauty&limit=3')
+    fetch('/api/products?category=K-Beauty&limit=6')
       .then(res => res.json())
       .then(data => {
         if (data.products) setEssentials(data.products);

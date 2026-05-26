@@ -22,7 +22,7 @@ function App() {
   const [bestSellersBanner, setBestSellersBanner] = React.useState<string>("");
 
   React.useEffect(() => {
-    fetch('/api/products?limit=5')
+    fetch('/api/products?limit=6')
       .then(res => res.json())
       .then(data => {
         if (data.products) setBestSellers(data.products);

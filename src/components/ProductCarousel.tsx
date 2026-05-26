@@ -21,8 +21,10 @@ export function ProductCarousel({
   productLabel,
   seeMoreHref,
 }: ProductCarouselProps) {
-  const firstProduct = products[0];
-  const rest = products.slice(1);
+  const MAX_PRODUCTS = 6;
+  const displayProducts = products.slice(0, MAX_PRODUCTS);
+  const firstProduct = displayProducts[0];
+  const rest = displayProducts.slice(1);
 
   return (
     <div className="essentials-carousel">

@@ -17,6 +17,8 @@ interface CollectionCarouselProps {
 
 export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTitle }: CollectionCarouselProps) {
   const router = useRouter();
+  const MAX_PRODUCTS = 6;
+  const displayProducts = products.slice(0, MAX_PRODUCTS);
 
   return (
     <section className="essentials-section">
@@ -41,7 +43,7 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
                 />
               </div>
             ) : null}
-            {products.slice(0, imageSrc ? 1 : 2).map((p) => (
+            {displayProducts.slice(0, imageSrc ? 1 : 2).map((p) => (
               <ProductCard
                 key={p.id}
                 product={p}
@@ -51,7 +53,7 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
             ))}
           </div>
 
-          {products.slice(imageSrc ? 1 : 2).map((p) => (
+          {displayProducts.slice(imageSrc ? 1 : 2).map((p) => (
             <ProductCard
               key={p.id}
               product={p}
