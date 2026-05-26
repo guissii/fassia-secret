@@ -26,7 +26,8 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
   const formatPriceValue = (value: number) => value.toFixed(2);
   const hasPromo = typeof product.oldPrice === 'number' && product.oldPrice > product.price;
   const promoLabel = product.badge ?? (hasPromo ? 'Promo' : '');
-  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image);
+  const hasImage = product.image && product.image.trim().length > 0 && product.image !== '/';
+  const imageSrc = hasImage ? (product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image)) : '';
   const ctaIcon = ctaState === 'added' ? <Check size={16} /> : ctaState === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <ShoppingBag size={16} />;
 
   return (
@@ -46,7 +47,13 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
     >
       <div className="product-image-area">
         <div className="product-image-frame" style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
-          <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" loading="lazy" style={{ objectFit: 'cover' }} />
+          {hasImage ? (
+            <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" loading="lazy" style={{ objectFit: 'cover' }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#9ca3af', fontSize: '12px' }}>Pas d'image</span>
+            </div>
+          )}
         </div>
         <button
           className="product-cta-circle"

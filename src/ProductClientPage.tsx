@@ -65,7 +65,8 @@ export default function ProductClientPage({ product }: { product: Product }) {
     }
   };
 
-  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image);
+  const hasImage = product.image && product.image.trim().length > 0 && product.image !== '/';
+  const imageSrc = hasImage ? (product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') ? product.image : publicAssetUrl(product.image)) : '';
 
   return (
     <>
@@ -83,7 +84,13 @@ export default function ProductClientPage({ product }: { product: Product }) {
             <section className="product-media" aria-label="Visuel produit">
               <div className="product-media-frame" style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
                 {isPromo ? <div className="product-media-badge">−{discount}%</div> : null}
-                <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} priority />
+                {hasImage ? (
+                  <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} priority />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>
+                    <span style={{ color: '#9ca3af', fontSize: '14px' }}>Pas d'image</span>
+                  </div>
+                )}
               </div>
             </section>
 
