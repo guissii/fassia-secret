@@ -25,7 +25,7 @@ export function Hero() {
         if (Array.isArray(data)) {
           const heroBanners = data
             .filter((b: any) => b.section === 'home_hero' && b.isActive !== false)
-            .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+            .sort((a: any, b: any) => (b.order || 0) - (a.order || 0))
             .map((b: any) => ({
               id: b.id,
               imageMobile: b.imageUrl,
@@ -53,14 +53,14 @@ export function Hero() {
   }, []);
 
   useEffect(() => {
-    if (!isMobile || slideCount < 2) return;
+    if (slideCount < 2) return;
 
     const id = window.setInterval(() => {
       setActiveIndex((i) => (i + 1) % slideCount);
     }, 4500);
 
     return () => window.clearInterval(id);
-  }, [isMobile, slideCount]);
+  }, [slideCount]);
 
   const goTo = (idx: number) => {
     const next = ((idx % slideCount) + slideCount) % slideCount;
@@ -85,18 +85,18 @@ export function Hero() {
           if (e.key === 'ArrowRight') goNext();
         }}
         onTouchStart={(e) => {
-          if (!isMobile || slideCount < 2) return;
+          if (slideCount < 2) return;
           touchStartX.current = e.touches[0]?.clientX ?? null;
           touchDeltaX.current = 0;
         }}
         onTouchMove={(e) => {
-          if (!isMobile || slideCount < 2) return;
+          if (slideCount < 2) return;
           if (touchStartX.current == null) return;
           const x = e.touches[0]?.clientX ?? touchStartX.current;
           touchDeltaX.current = x - touchStartX.current;
         }}
         onTouchEnd={() => {
-          if (!isMobile || slideCount < 2) return;
+          if (slideCount < 2) return;
           const delta = touchDeltaX.current;
           touchStartX.current = null;
           touchDeltaX.current = 0;
@@ -104,6 +104,32 @@ export function Hero() {
           if (Math.abs(delta) < 40) return;
           if (delta < 0) goTo(activeIndex + 1);
           else goTo(activeIndex - 1);
+        }}
+        onMouseDown={(e) => {
+          if (slideCount < 2) return;
+          touchStartX.current = e.clientX;
+          touchDeltaX.current = 0;
+        }}
+        onMouseMove={(e) => {
+          if (slideCount < 2) return;
+          if (touchStartX.current == null) return;
+          touchDeltaX.current = e.clientX - touchStartX.current;
+        }}
+        onMouseUp={() => {
+          if (slideCount < 2) return;
+          const delta = touchDeltaX.current;
+          touchStartX.current = null;
+          touchDeltaX.current = 0;
+
+          if (Math.abs(delta) < 40) return;
+          if (delta < 0) goTo(activeIndex + 1);
+          else goTo(activeIndex - 1);
+        }}
+        onMouseLeave={() => {
+          if (touchStartX.current !== null) {
+            touchStartX.current = null;
+            touchDeltaX.current = 0;
+          }
         }}
       >
         <div className="hero-viewport">
