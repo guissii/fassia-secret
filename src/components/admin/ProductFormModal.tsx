@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Plus, Languages, Search, ChevronDown, Check } from 'lucide-react';
+import { X, Upload, Plus, Languages, Search, ChevronDown, Check, Crop } from 'lucide-react';
 import { AdminProduct, Category, api } from './mockData';
 import { publicAssetUrl } from '../../lib/publicUrl';
 import { ProductCard } from '../ProductCard';
@@ -182,6 +182,11 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
     }));
   };
 
+  const getDisplayImageSrc = (src: string | undefined) => {
+    if (!src) return '';
+    return src.startsWith('data:') || src.startsWith('blob:') || src.startsWith('http') ? src : publicAssetUrl(src);
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -309,10 +314,15 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 <div className="image-upload-area">
                   {formData.image ? (
                     <div className="image-preview">
-                      <img src={formData.image.startsWith('data:') || formData.image.startsWith('blob:') || formData.image.startsWith('http') ? formData.image : publicAssetUrl(formData.image)} alt="Preview" />
-                      <button type="button" className="remove-image-btn" onClick={() => setFormData(prev => ({ ...prev, image: '' }))}>
-                        <X size={16} />
-                      </button>
+                      <img src={getDisplayImageSrc(formData.image)} alt="Preview" />
+                      <div className="image-actions" style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 6 }}>
+                        <button type="button" className="admin-btn-secondary" style={{ padding: 6 }} onClick={() => setCropperSrc(getDisplayImageSrc(formData.image))} title="Recadrer">
+                          <Crop size={16} />
+                        </button>
+                        <button type="button" className="remove-image-btn" style={{ position: 'static' }} onClick={() => setFormData(prev => ({ ...prev, image: '' }))} title="Supprimer">
+                          <X size={16} />
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <label className="upload-placeholder">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Crop } from 'lucide-react';
 import { Toast, ToastType } from './shared';
 import { ImageCropperModal } from './ImageCropperModal';
 
@@ -184,6 +185,28 @@ export function BannersTab() {
                     alt={section.name} 
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
                   />
+                  <button
+                    type="button"
+                    title="Recadrer l'image"
+                    onClick={() => setCropperData({ src: displaySrc, key: section.key })}
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      background: 'rgba(0,0,0,0.6)',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '6px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backdropFilter: 'blur(4px)'
+                    }}
+                  >
+                    <Crop size={16} />
+                  </button>
                 </div>
               ) : (
                 <div style={{ width: '100%', paddingTop: '56.25%', background: '#f3f4f6', borderRadius: '8px', border: '1px dashed #d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
