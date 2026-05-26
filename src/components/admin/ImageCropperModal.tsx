@@ -25,12 +25,20 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
   // Load image
   useEffect(() => {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // Only use crossOrigin for external http URLs, otherwise it can block local/data URIs
+    if (imageSrc.startsWith('http')) {
+      img.crossOrigin = 'anonymous';
+    }
     img.onload = () => {
       imgRef.current = img;
       setImgLoaded(true);
       setZoom(1);
       setOffset({ x: 0, y: 0 });
+    };
+    img.onerror = (err) => {
+      console.error('Failed to load image for cropping:', imageSrc, err);
+      // fallback just in case
+      setImgLoaded(true);
     };
     img.src = imageSrc;
   }, [imageSrc]);

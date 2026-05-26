@@ -91,6 +91,7 @@
   position: relative;
   overflow: hidden;
   background: #0a0a0f;
+  min-height: 250px;
 }
 
 .crop-canvas-area canvas {
