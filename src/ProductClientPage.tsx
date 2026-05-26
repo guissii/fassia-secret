@@ -41,17 +41,45 @@ export default function ProductClientPage({ product }: { product: Product }) {
   }, [isPromo, product.oldPrice, product.price]);
 
   const [related, setRelated] = useState<any[]>([]);
+  const MIN_RELATED = 6;
 
   useEffect(() => {
-    fetch(`/api/products?category=${encodeURIComponent(product.category)}&limit=10`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.products) {
-          setRelated(data.products.filter((p: any) => p.id !== product.id).slice(0, 6));
+    const mainCategory = product.categories?.[0]?.slug;
+
+    const fetchRelated = async () => {
+      try {
+        let items: any[] = [];
+
+        // 1. Fetch products from the same category (if category exists)
+        if (mainCategory) {
+          const catRes = await fetch(`/api/products?category=${encodeURIComponent(mainCategory)}&limit=20`);
+          const catData = await catRes.json();
+          if (catData.products) {
+            items = catData.products.filter((p: any) => p.id !== product.id);
+          }
         }
-      })
-      .catch(console.error);
-  }, [product.category, product.id]);
+
+        // 2. Fallback: if not enough, fetch more products to fill the gap
+        if (items.length < MIN_RELATED) {
+          const fallbackRes = await fetch(`/api/products?limit=30`);
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.products) {
+            const existingIds = new Set([product.id, ...items.map((p: any) => p.id)]);
+            const extras = fallbackData.products
+              .filter((p: any) => !existingIds.has(p.id))
+              .sort(() => Math.random() - 0.5); // shuffle for variety
+            items = [...items, ...extras];
+          }
+        }
+
+        setRelated(items.slice(0, MIN_RELATED));
+      } catch (err) {
+        console.error('Failed to load related products:', err);
+      }
+    };
+
+    fetchRelated();
+  }, [product.categories, product.id]);
 
   const addProductToCart = (p: Product, quantity: number) => {
     for (let i = 0; i < quantity; i++) {
@@ -93,7 +121,7 @@ export default function ProductClientPage({ product }: { product: Product }) {
               <h1 className="product-title">{product.name}</h1>
 
               <div className="product-meta-row">
-                <span className="product-category">{product.category}</span>
+                <span className="product-category">{product.categories?.[0]?.name || ''}</span>
                 {product.badge ? <span className="product-chip">{product.badge}</span> : null}
               </div>
 
