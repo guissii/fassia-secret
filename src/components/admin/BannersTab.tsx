@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toast, ToastType } from './shared';
+import { ImageCropperModal } from './ImageCropperModal';
 
 interface Section {
   key: string;
@@ -60,6 +61,7 @@ export function BannersTab() {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
   const [activeGroup, setActiveGroup] = useState<number>(0);
+  const [cropperData, setCropperData] = useState<{ src: string; key: string } | null>(null);
 
   const loadBanners = async () => {
     try {
@@ -121,23 +123,14 @@ export function BannersTab() {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
     
-    setLoading(true);
-    
     try {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64data = reader.result as string;
-        setBanners(prev => ({
-          ...prev,
-          [key]: { ...(prev[key] || { linkUrl: '', title: '' }), imageUrl: base64data }
-        }));
-        setToast({ message: 'Image chargée — cliquez "Sauvegarder" pour confirmer', type: 'info' });
-        setLoading(false);
+        setCropperData({ src: reader.result as string, key }); // Open cropper
       };
       reader.readAsDataURL(file);
     } catch {
       setToast({ message: "Erreur lors du traitement de l'image", type: 'error' });
-      setLoading(false);
     } finally {
       e.target.value = '';
     }
@@ -151,6 +144,7 @@ export function BannersTab() {
   };
 
   return (
+    <>
     <div className="admin-tab">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <div className="admin-header-flex">
@@ -243,5 +237,25 @@ export function BannersTab() {
         })}
       </div>
     </div>
+
+      {/* Image Cropper Modal */}
+      {cropperData && (
+        <ImageCropperModal
+          imageSrc={cropperData.src}
+          aspectRatio={16 / 9}
+          aspectLabel="Bannière (16:9)"
+          onConfirm={(croppedBase64) => {
+            const key = cropperData.key;
+            setBanners(prev => ({
+              ...prev,
+              [key]: { ...(prev[key] || { linkUrl: '', title: '' }), imageUrl: croppedBase64 }
+            }));
+            setCropperData(null);
+            setToast({ message: 'Image ajustée — cliquez "Sauvegarder" pour confirmer', type: 'info' });
+          }}
+          onCancel={() => setCropperData(null)}
+        />
+      )}
+    </>
   );
 }

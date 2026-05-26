@@ -3,6 +3,7 @@ import { X, Upload, Plus, Languages, Search, ChevronDown, Check } from 'lucide-r
 import { AdminProduct, Category, api } from './mockData';
 import { publicAssetUrl } from '../../lib/publicUrl';
 import { ProductCard } from '../ProductCard';
+import { ImageCropperModal } from './ImageCropperModal';
 
 /* ── Reusable Multi-Select Chip Picker ── */
 interface ChipPickerProps {
@@ -104,6 +105,7 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
   const [tagInput, setTagInput] = useState('');
   const [concernInput, setConcernInput] = useState('');
   const [previewLang, setPreviewLang] = useState<'fr' | 'ar'>('fr');
+  const [cropperSrc, setCropperSrc] = useState<string | null>(null);
 
   const loadCategories = async () => {
     const cats = await api.getCategories();
@@ -185,7 +187,7 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, image: reader.result as string }));
+        setCropperSrc(reader.result as string); // Open cropper instead of setting directly
       };
       reader.readAsDataURL(file);
     }
@@ -257,6 +259,7 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
   const previewDesc = previewLang === 'fr' ? (formData.description || 'Description du produit') : (formData.descriptionAr || formData.description || 'وصف المنتج');
 
   return (
+    <>
     <div className="admin-modal-overlay" onClick={onClose}>
       <div className="admin-modal-content product-form-modal large-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
@@ -428,5 +431,20 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
         </form>
       </div>
     </div>
+
+      {/* Image Cropper Modal */}
+      {cropperSrc && (
+        <ImageCropperModal
+          imageSrc={cropperSrc}
+          aspectRatio={4 / 5}
+          aspectLabel="Produit (4:5)"
+          onConfirm={(croppedBase64) => {
+            setFormData(prev => ({ ...prev, image: croppedBase64 }));
+            setCropperSrc(null);
+          }}
+          onCancel={() => setCropperSrc(null)}
+        />
+      )}
+    </>
   );
 }
