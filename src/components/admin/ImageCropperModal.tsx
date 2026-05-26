@@ -10,6 +10,8 @@ interface ImageCropperModalProps {
   onCancel: () => void;
 }
 
+type CropMode = 'standard' | 'original' | 'square' | 'landscape' | 'portrait';
+
 export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, onConfirm, onCancel }: ImageCropperModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,6 +23,8 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imgLoaded, setImgLoaded] = useState(false);
   const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
+  const [cropMode, setCropMode] = useState<CropMode>('standard');
+  const [imgNaturalSize, setImgNaturalSize] = useState({ w: 1, h: 1 });
 
   // Load image
   useEffect(() => {
@@ -31,6 +35,7 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
     }
     img.onload = () => {
       imgRef.current = img;
+      setImgNaturalSize({ w: img.naturalWidth, h: img.naturalHeight });
       setImgLoaded(true);
       setZoom(1);
       setOffset({ x: 0, y: 0 });
@@ -55,6 +60,19 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
     return () => ro.disconnect();
   }, []);
 
+  // Compute active aspect ratio based on mode
+  const getActiveAspectRatio = useCallback(() => {
+    switch (cropMode) {
+      case 'original': return imgNaturalSize.w / imgNaturalSize.h;
+      case 'square': return 1;
+      case 'landscape': return 4 / 3;
+      case 'portrait': return 3 / 4;
+      case 'standard':
+      default:
+        return aspectRatio;
+    }
+  }, [cropMode, aspectRatio, imgNaturalSize]);
+
   // Compute crop viewport in the container
   const getCropRect = useCallback(() => {
     const { w, h } = containerSize;
@@ -64,13 +82,15 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
     const availW = w - padding * 2;
     const availH = h - padding * 2;
 
+    const activeRatio = getActiveAspectRatio();
+
     let cropW: number, cropH: number;
-    if (availW / availH > aspectRatio) {
+    if (availW / availH > activeRatio) {
       cropH = availH;
-      cropW = cropH * aspectRatio;
+      cropW = cropH * activeRatio;
     } else {
       cropW = availW;
-      cropH = cropW / aspectRatio;
+      cropH = cropW / activeRatio;
     }
 
     return {
@@ -79,7 +99,7 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
       w: cropW,
       h: cropH,
     };
-  }, [containerSize, aspectRatio]);
+  }, [containerSize, getActiveAspectRatio]);
 
   // Draw preview
   useEffect(() => {
@@ -239,8 +259,9 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
     const sh = crop.h * scaleY;
 
     // Output canvas
+    const activeRatio = getActiveAspectRatio();
     const outW = Math.min(1200, Math.round(sw));
-    const outH = Math.round(outW / aspectRatio);
+    const outH = Math.round(outW / activeRatio);
 
     const outCanvas = document.createElement('canvas');
     outCanvas.width = outW;
@@ -265,6 +286,23 @@ export function ImageCropperModal({ imageSrc, aspectRatio = 4 / 5, aspectLabel, 
         <div className="crop-modal-header">
           <h3><Move size={18} /> Ajuster l'image</h3>
           {aspectLabel && <span className="crop-aspect-badge">{aspectLabel}</span>}
+          <div className="crop-mode-selector" style={{ marginLeft: 'auto', marginRight: '1rem' }}>
+            <select 
+              value={cropMode} 
+              onChange={e => {
+                setCropMode(e.target.value as CropMode);
+                handleReset();
+              }}
+              className="admin-input"
+              style={{ padding: '4px 8px', height: 'auto', fontSize: '13px' }}
+            >
+              <option value="standard">Standard ({aspectLabel})</option>
+              <option value="original">Originale (Libre)</option>
+              <option value="square">Carré (1:1)</option>
+              <option value="portrait">Portrait (3:4)</option>
+              <option value="landscape">Paysage (4:3)</option>
+            </select>
+          </div>
           <button type="button" className="crop-close-btn" onClick={onCancel}><X size={20} /></button>
         </div>
 
