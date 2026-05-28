@@ -30,7 +30,9 @@ model Product {
   id          Int         @id @default(autoincrement())
   brand       String
   name        String
+  nameAr      String?
   description String
+  descriptionAr String?
   price       Float
   oldPrice    Float?
   image       String

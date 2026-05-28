@@ -69,13 +69,15 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { brand, name, description, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible } = req.body;
 
     const newProduct = await prisma.product.create({
       data: {
         brand,
         name,
+        nameAr: nameAr || null,
         description: description || '',
+        descriptionAr: descriptionAr || null,
         price,
         oldPrice,
         image: image || '',
@@ -115,7 +117,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
 
-    const { brand, name, description, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived } = req.body;
 
     // Disconnect all existing relations before reconnecting
     const updatedProduct = await prisma.product.update({
@@ -123,7 +125,9 @@ export const updateProduct = async (req: Request, res: Response) => {
       data: {
         brand,
         name,
+        nameAr: nameAr || null,
         description: description || '',
+        descriptionAr: descriptionAr || null,
         price,
         oldPrice: oldPrice || null,
         image: image || '',
