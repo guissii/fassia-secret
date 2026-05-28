@@ -117,7 +117,11 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
   useEffect(() => {
     if (isOpen) {
       if (product) {
-        setFormData({ ...product });
+        setFormData({
+          ...product,
+          categories: (product.categories || []).map((c: any) => typeof c === 'string' ? c : c.name),
+          collections: (product.collections || []).map((c: any) => typeof c === 'string' ? c : c.name),
+        });
       } else {
         setFormData({
           name: '',
