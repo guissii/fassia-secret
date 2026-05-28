@@ -45,7 +45,6 @@ export interface AdminProduct {
   isArchived: boolean;
   salesCount: number;
   stock: number;
-  step?: string;
   tags: string[];
 }
 

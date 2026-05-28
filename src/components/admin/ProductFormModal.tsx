@@ -131,7 +131,6 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
           descriptionAr: '',
           price: 0,
           stock: 0,
-          step: '',
           categories: [],
           collections: [],
           concerns: [],
@@ -354,54 +353,6 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                   <input type="number" name="stock" className="admin-input" min="0" value={formData.stock || 0} onChange={handleChange} required />
                 </div>
               </div>
-
-              {/* Step selector based on category */}
-              {(() => {
-                const cats = (formData.categories || []).map((c: any) => typeof c === 'string' ? c : c.name);
-                const kBeauty = cats.includes('K-Beauty');
-                const maquillage = cats.includes('Maquillage');
-                const parfums = cats.includes('Parfums');
-                const complements = cats.includes('Compléments');
-
-                const steps: { label: string; options: string[] } | null =
-                  kBeauty ? {
-                    label: 'Étape K-Beauty',
-                    options: ['1 - Huile Démaquillante', '2 - Nettoyant Moussant', '3 - Exfoliant', '4 - Lotion Tonique', '5 - Essence', '6 - Sérum & Ampoule', '7 - Masque Tissu', '8 - Contour des Yeux', '9 - Crème Hydratante', '10 - Crème Solaire']
-                  } :
-                  maquillage ? {
-                    label: 'Section Maquillage',
-                    options: ['Teint', 'Yeux', 'Lèvres', 'Démaquillage']
-                  } :
-                  parfums ? {
-                    label: 'Type Parfum',
-                    options: ['Parfums Femme', 'Parfums Homme']
-                  } :
-                  complements ? {
-                    label: 'Objectif Complément',
-                    options: ['Sommeil', 'Stress', 'Digestion', 'Poids & Métabolisme', 'Immunité', 'Beauté']
-                  } : null;
-
-                if (!steps) return null;
-
-                return (
-                  <div className="form-row">
-                    <div className="form-group" style={{ flex: 1 }}>
-                      <label>{steps.label}</label>
-                      <select
-                        name="step"
-                        className="admin-input"
-                        value={formData.step || ''}
-                        onChange={handleChange}
-                      >
-                        <option value="">— Sélectionner —</option>
-                        {steps.options.map(opt => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                );
-              })()}
 
               <div className="form-section-title">Organisation</div>
               <div className="form-row">

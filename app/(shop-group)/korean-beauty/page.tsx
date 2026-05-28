@@ -1,15 +1,24 @@
 
-'use client';
-
-import { useState, useEffect } from 'react';
-import { ArrowRight, ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 import './page.css';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
+
+async function getKBeautyProducts() {
+  try {
+    const res = await fetch(`${API_URL}/api/products?limit=100&category=K-Beauty`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.products || [];
+  } catch {
+    return [];
+  }
+}
 
 // Check if image is data URI (base64) - higher priority
 function isDataUri(image: string): boolean {
@@ -25,7 +34,6 @@ type DBProduct = {
   description: string;
   nameAr?: string;
   descriptionAr?: string;
-  step?: string;
 };
 
 function sortByImagePriority(products: DBProduct[]): DBProduct[] {
@@ -184,234 +192,65 @@ const STEPS: Step[] = [
 ];
 
 
-// Map product step field to step ID (1-10)
-const STEP_MAP: Record<string, number> = {
-  '1 - Huile Démaquillante': 1,
-  '2 - Nettoyant Moussant': 2,
-  '3 - Exfoliant': 3,
-  '4 - Lotion Tonique': 4,
-  '5 - Essence': 5,
-  '6 - Sérum & Ampoule': 6,
-  '7 - Masque Tissu': 7,
-  '8 - Contour des Yeux': 8,
-  '9 - Crème Hydratante': 9,
-  '10 - Crème Solaire': 10,
-};
-
-function assignStep(product: DBProduct): number {
-  if (product.step && STEP_MAP[product.step]) return STEP_MAP[product.step];
-
-  // Fallback: detect from name/description
-  const text = (product.name + ' ' + product.description).toLowerCase();
-  if (text.includes('oil') || text.includes('huile') || text.includes('cleansing oil') || text.includes('démaquillant')) return 1;
-  if (text.includes('foam') || text.includes('mousse') || text.includes('cleanser') || text.includes('nettoyant') || text.includes('gel')) return 2;
-  if (text.includes('exfoliant') || text.includes('peeling') || text.includes('scrub') || text.includes('aha') || text.includes('bha')) return 3;
-  if (text.includes('toner') || text.includes('lotion') || text.includes('tonique')) return 4;
-  if (text.includes('essence') && !text.includes('sun')) return 5;
-  if (text.includes('serum') || text.includes('sérum') || text.includes('ampoule')) return 6;
-  if (text.includes('mask') || text.includes('masque')) return 7;
-  if (text.includes('eye') || text.includes('yeux') || text.includes('contour')) return 8;
-  if (text.includes('sun') || text.includes('solaire') || text.includes('spf') || text.includes('sunscreen')) return 10;
-
-  return 9;
-}
-
 export default function KoreanBeautyPage() {
-  const [selectedStep, setSelectedStep] = useState<number | null>(null);
-  const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
-  const [loading, setLoading] = useState(true);
   const banners: Record<string, string> = {};
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/products?limit=100&category=K-Beauty`)
-      .then((res) => res.json())
-      .then((data) => {
-        setDbProducts(data.products || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  // Map DB products to steps
-  const stepProducts: Record<number, DBProduct[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [] };
-  const sortedDbProducts = sortByImagePriority(dbProducts);
-  for (const product of sortedDbProducts) {
-    const stepId = assignStep(product);
-    stepProducts[stepId].push(product);
-  }
-
-  // Merge with hardcoded steps
-  const mergedSteps = STEPS.map((step) => {
-    const hardcoded = step.products.map((p) => ({ ...p, description: p.description || '' }));
-    const scraped = stepProducts[step.id] || [];
-    const dataUriProducts = scraped.filter((p) => isDataUri(p.image));
-    const regularScraped = scraped.filter((p) => !isDataUri(p.image));
-
-    const combined = [
-      ...dataUriProducts.map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image, description: p.descriptionAr || p.description || '' })),
-      ...hardcoded,
-      ...regularScraped.map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image, description: p.descriptionAr || p.description || '' })),
-    ];
-
-    return { ...step, products: combined.slice(0, 6) };
-  });
-
-  const currentStep = selectedStep ? mergedSteps.find((s) => s.id === selectedStep) : null;
 
   return (
     <>
       <main className="kb-page">
         {/* Hero */}
-        <section className="kb-hero">
-          <div className="container">
-            <h1 className="kb-hero-title">10-Step <span>Glow</span> Routine</h1>
-            <p className="kb-hero-desc">
-              {selectedStep
-                ? `Étape ${selectedStep.toString().padStart(2, '0')} — ${currentStep?.title}`
-                : 'Sélectionnez une étape pour découvrir les produits coréens'}
-            </p>
-          </div>
-        </section>
+      <section className="kb-hero">
+        <div className="container">
+          <h1 className="kb-hero-title">10-Step <span>Glow</span> Routine</h1>
+          <p className="kb-hero-desc">
+            Parcourez chaque étape. Shoppez les meilleurs produits coréens.
+          </p>
+        </div>
+      </section>
 
-        {/* Step Selector or Products */}
-        {selectedStep && currentStep ? (
-          <section className="essentials-section">
+      {/* 10 Steps — each is an exact copy of the Centella EssentialsSection layout */}
+      {STEPS.map((step) => {
+        const visualImageUrl = banners[step.sectionKey] || step.visualImage;
+        return (
+          <section className="essentials-section" key={step.id}>
             <div className="container">
-              {/* Back button */}
-              <button
-                onClick={() => setSelectedStep(null)}
-                className="kb-back-btn"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'none',
-                  border: 'none',
-                  color: '#FF4FA3',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  marginBottom: '1.5rem',
-                  padding: 0,
-                }}
-              >
-                <ArrowLeft size={20} />
-                Retour aux étapes
-              </button>
-
+              {/* Step Header — like Centella's "NOS ESSENTIELS" title */}
               <div className="essentials-header-row">
                 <div className="essentials-title-group">
                   <h2 className="essentials-title">
-                    <span className="highlight">{currentStep.id.toString().padStart(2, '0')}.</span> {currentStep.title}
+                    <span className="highlight">{step.id.toString().padStart(2, '0')}.</span> {step.title}
                   </h2>
                 </div>
               </div>
 
               <ProductCarousel
-                stepId={currentStep.id.toString().padStart(2, '0')}
-                title={currentStep.title}
-                visualImage={banners[currentStep.sectionKey] || currentStep.visualImage}
-                products={currentStep.products}
+                stepId={step.id.toString().padStart(2, '0')}
+                title={step.title}
+                visualImage={visualImageUrl}
+                products={step.products}
                 productLabel="K-BEAUTY"
-                seeMoreHref={`/boutique?${currentStep.filterQuery}`}
+                seeMoreHref={`/boutique?${step.filterQuery}`}
               />
             </div>
           </section>
-        ) : (
-          /* Step Selector Grid */
-          <section className="kb-step-selector" style={{ padding: '3rem 0' }}>
-            <div className="container">
-              <h2
-                style={{
-                  textAlign: 'center',
-                  fontSize: '2rem',
-                  fontWeight: 700,
-                  marginBottom: '2rem',
-                  color: '#fff',
-                }}
-              >
-                Choisissez votre étape
-              </h2>
+        );
+      })}
 
-              {loading ? (
-                <p style={{ textAlign: 'center', color: '#ccc' }}>Chargement...</p>
-              ) : (
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '1.5rem',
-                  }}
-                >
-                  {mergedSteps.map((step) => (
-                    <button
-                      key={step.id}
-                      onClick={() => setSelectedStep(step.id)}
-                      className="kb-step-card"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        padding: '1.5rem',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '1rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        textAlign: 'left',
-                        color: '#fff',
-                        width: '100%',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(255,79,163,0.1)';
-                        e.currentTarget.style.borderColor = '#FF4FA3';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '2rem',
-                          fontWeight: 800,
-                          color: '#FF4FA3',
-                          minWidth: '3rem',
-                        }}
-                      >
-                        {step.id.toString().padStart(2, '0')}
-                      </span>
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>
-                          {step.title}
-                        </h3>
-                        <p style={{ margin: '0.25rem 0 0', color: '#aaa', fontSize: '0.85rem' }}>
-                          {step.products.length} produit{step.products.length > 1 ? 's' : ''}
-                        </p>
-                      </div>
-                      <ChevronRight size={24} color="#FF4FA3" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-        )}
+      {/* Global CTA */}
+      <section className="kb-global-cta">
+        <div className="container" style={{ textAlign: 'center' }}>
+          <Link href="/boutique?category=K-Beauty" className="kb-global-cta-link">
+            <span className="kb-global-cta-text">
+              <span className="kb-global-cta-title">Catalogue K-Beauty</span>
+            </span>
+            <span className="kb-global-cta-icon" aria-hidden="true">
+              <ArrowRight size={24} />
+            </span>
+          </Link>
+        </div>
+      </section>
 
-        {/* Global CTA */}
-        <section className="kb-global-cta">
-          <div className="container" style={{ textAlign: 'center' }}>
-            <Link href="/boutique?category=K-Beauty" className="kb-global-cta-link">
-              <span className="kb-global-cta-text">
-                <span className="kb-global-cta-title">Catalogue K-Beauty</span>
-              </span>
-              <span className="kb-global-cta-icon" aria-hidden="true">
-                <ArrowRight size={24} />
-              </span>
-            </Link>
-          </div>
-        </section>
-
-        <Link href="/" className="kb-nav-bubble" aria-label="Retour à l'accueil">
+      <Link href="/" className="kb-nav-bubble" aria-label="Retour à l'accueil">
           N°
         </Link>
       </main>

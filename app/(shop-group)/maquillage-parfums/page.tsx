@@ -1,8 +1,5 @@
 
-'use client';
-
-import { useState } from 'react';
-import { ArrowRight, ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
 import './page.css';
@@ -252,10 +249,7 @@ const STEPS: Step[] = [
 
 
 export default function MaquillageParfumsPage() {
-  const [selectedStep, setSelectedStep] = useState<number | null>(null);
   const banners: Record<string, string> = {};
-
-  const currentStep = selectedStep ? STEPS.find((s) => s.id === selectedStep) : null;
 
   return (
     <>
@@ -266,103 +260,36 @@ export default function MaquillageParfumsPage() {
               Maquillage & <span>Parfums</span>
             </h1>
             <p className="kb-hero-desc">
-              {selectedStep
-                ? `Section ${selectedStep.toString().padStart(2, '0')} — ${currentStep?.title}`
-                : 'Sélectionnez une section pour découvrir nos produits'}
+              Parcourez nos univers. Chaque “Voir plus” ouvre la boutique avec le filtre correspondant.
             </p>
           </div>
         </section>
 
-        {selectedStep && currentStep ? (
-          <section className="essentials-section">
-            <div className="container">
-              <button
-                onClick={() => setSelectedStep(null)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'none',
-                  border: 'none',
-                  color: '#FF4FA3',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  marginBottom: '1.5rem',
-                  padding: 0,
-                }}
-              >
-                <ArrowLeft size={20} />
-                Retour aux sections
-              </button>
-
-              <div className="essentials-header-row">
-                <div className="essentials-title-group">
-                  <h2 className="essentials-title">
-                    <span className="highlight">{currentStep.id.toString().padStart(2, '0')}.</span> {currentStep.title}
-                  </h2>
+        {STEPS.map((step) => {
+          const visualImageUrl = banners[step.sectionKey] || step.visualImage;
+          return (
+            <section className="essentials-section" key={step.id}>
+              <div className="container">
+                <div className="essentials-header-row">
+                  <div className="essentials-title-group">
+                    <h2 className="essentials-title">
+                      <span className="highlight">{step.id.toString().padStart(2, '0')}.</span> {step.title}
+                    </h2>
+                  </div>
                 </div>
-              </div>
 
-              <ProductCarousel
-                stepId={currentStep.id.toString().padStart(2, '0')}
-                title={currentStep.title}
-                visualImage={banners[currentStep.sectionKey] || currentStep.visualImage}
-                products={currentStep.products}
-                productLabel="BEAUTY"
-                seeMoreHref={`/boutique?${currentStep.filterQuery}`}
-              />
-            </div>
-          </section>
-        ) : (
-          <section style={{ padding: '3rem 0' }}>
-            <div className="container">
-              <h2 style={{ textAlign: 'center', fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', color: '#fff' }}>
-                Choisissez une section
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                {STEPS.map((step) => (
-                  <button
-                    key={step.id}
-                    onClick={() => setSelectedStep(step.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                      padding: '1.5rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '1rem',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      color: '#fff',
-                      width: '100%',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,79,163,0.1)';
-                      e.currentTarget.style.borderColor = '#FF4FA3';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                    }}
-                  >
-                    <span style={{ fontSize: '2rem', fontWeight: 800, color: '#FF4FA3', minWidth: '3rem' }}>
-                      {step.id.toString().padStart(2, '0')}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{step.title}</h3>
-                      <p style={{ margin: '0.25rem 0 0', color: '#aaa', fontSize: '0.85rem' }}>
-                        {step.products.length} produit{step.products.length > 1 ? 's' : ''}
-                      </p>
-                    </div>
-                    <ChevronRight size={24} color="#FF4FA3" />
-                  </button>
-                ))}
+                <ProductCarousel
+                  stepId={step.id.toString().padStart(2, '0')}
+                  title={step.title}
+                  visualImage={visualImageUrl}
+                  products={step.products}
+                  productLabel="BEAUTY"
+                  seeMoreHref={`/boutique?${step.filterQuery}`}
+                />
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          );
+        })}
 
         <section className="kb-global-cta">
           <div className="container" style={{ textAlign: 'center' }}>

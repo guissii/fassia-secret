@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useCart } from './components/CartContext';
 import { productHref } from './lib/productSlug';
 
@@ -101,7 +101,6 @@ export default function ComplementsClientPage() {
   const router = useRouter();
   const [supplements, setSupplements] = useState<any[]>([]);
   const { addToCart } = useCart();
-  const [selectedFocus, setSelectedFocus] = useState<string | null>(null);
   
   const [heroImage, setHeroImage] = useState<string>(HERO_IMAGE);
 
@@ -116,9 +115,6 @@ export default function ComplementsClientPage() {
     setHeroImage(LOCAL_BANNERS.complements);
   }, []);
 
-  const currentFocus = selectedFocus ? FOCUSES.find((f) => f.key === selectedFocus) : null;
-  const currentProducts = currentFocus ? supplements.filter((p) => matchesQuery(p, currentFocus.q)) : [];
-
   return (
     <>
       <main className="supp-page">
@@ -128,142 +124,85 @@ export default function ComplementsClientPage() {
           <div className="container">
             <div className="supp-page-hero-inner">
               <p className="supp-page-hero-kicker">COMPLÉMENTS ALIMENTAIRES</p>
-              <h1 className="supp-page-hero-title">
-                {selectedFocus && currentFocus ? currentFocus.title : 'Routines par objectif'}
-              </h1>
+              <h1 className="supp-page-hero-title">Routines par objectif</h1>
               <p className="supp-page-hero-subtitle">
-                {selectedFocus && currentFocus
-                  ? currentFocus.description
-                  : 'Sommeil, stress, digestion, immunité, beauté… Une sélection chic, lisible, et directement shoppable.'}
+                Sommeil, stress, digestion, immunité, beauté… Une sélection chic, lisible, et directement shoppable.
               </p>
-              {!selectedFocus && (
-                <div className="supp-page-hero-actions">
-                  <Link href="/boutique?category=Compléments" className="supp-page-hero-cta">
-                    Voir le catalogue <ArrowRight size={16} />
-                  </Link>
-                  <Link href="/boutique?category=Compléments&new=1" className="supp-page-hero-cta ghost">
-                    Nouveautés <ArrowRight size={16} />
-                  </Link>
-                </div>
-              )}
+              <div className="supp-page-hero-actions">
+                <Link href="/boutique?category=Compléments" className="supp-page-hero-cta">
+                  Voir le catalogue <ArrowRight size={16} />
+                </Link>
+                <Link href="/boutique?category=Compléments&new=1" className="supp-page-hero-cta ghost">
+                  Nouveautés <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        {selectedFocus && currentFocus ? (
-          <section className="supp-need-section pb-3xl" aria-label={currentFocus.title}>
-            <div className="container">
-              <button
-                onClick={() => setSelectedFocus(null)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'none',
-                  border: 'none',
-                  color: '#FF4FA3',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  marginBottom: '1.5rem',
-                  padding: 0,
-                }}
-              >
-                <ArrowLeft size={20} />
-                Retour aux objectifs
-              </button>
+        <section className="supp-page-focus py-3xl" aria-label="Objectifs">
+          <div className="container">
+            <div className="supp-focus-chips" aria-label="Aller à un besoin">
+              {FOCUSES.map((f) => (
+                <Link key={f.key} href={`/complements-alimentaires#${encodeURIComponent(f.key)}`} className="supp-focus-chip-link">
+                  {f.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
-              <div className="supp-need-header">
-                <div className="supp-need-left">
-                  <div className="supp-need-meta">
-                    <span className="supp-need-pill">{currentFocus.label}</span>
-                    <span className="supp-need-timing">{currentFocus.timing}</span>
+        {FOCUSES.map((f) => {
+          const products = supplements.filter((p) => matchesQuery(p, f.q));
+          const href = `/boutique?category=Compléments&q=${encodeURIComponent(f.q)}`;
+
+          return (
+            <section key={f.key} id={f.key} className="supp-need-section pb-3xl" aria-label={f.title}>
+              <div className="container">
+                <div className="supp-need-header">
+                  <div className="supp-need-left">
+                    <div className="supp-need-meta">
+                      <span className="supp-need-pill">{f.label}</span>
+                      <span className="supp-need-timing">{f.timing}</span>
+                    </div>
+                    <h2 className="supp-need-title">{f.title}</h2>
+                    <p className="supp-need-subtitle">{f.description}</p>
                   </div>
-                  <h2 className="supp-need-title">{currentFocus.title}</h2>
-                  <p className="supp-need-subtitle">{currentFocus.description}</p>
+                </div>
+
+                <div className="essentials-carousel supp-need-carousel unified-product-cards">
+                  {products.slice(0, 8).map((p) => (
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      label={p.brand}
+                      onNavigate={() => router.push(productHref(p))}
+                      onAddToCart={() => addToCart(p)}
+                    />
+                  ))}
+
+                  <Link href={href} className="product-card kb-see-more-card" aria-label={`Voir plus ${f.title}`}>
+                    <div className="kb-see-more-inner">
+                      <div className="kb-see-more-label">Explorer</div>
+                      <div className="kb-see-more-title">Tous les produits pour {f.label}</div>
+                      <div className="kb-see-more-icon-circle">
+                        <ArrowRight size={20} />
+                      </div>
+                    </div>
+                  </Link>
                 </div>
               </div>
+            </section>
+          );
+        })}
 
-              <div className="essentials-carousel supp-need-carousel unified-product-cards">
-                {currentProducts.slice(0, 8).map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    label={p.brand}
-                    onNavigate={() => router.push(productHref(p))}
-                    onAddToCart={() => addToCart(p)}
-                  />
-                ))}
-
-                <Link href={`/boutique?category=Compléments&q=${encodeURIComponent(currentFocus.q)}`} className="product-card kb-see-more-card" aria-label={`Voir plus ${currentFocus.title}`}>
-                  <div className="kb-see-more-inner">
-                    <div className="kb-see-more-label">Explorer</div>
-                    <div className="kb-see-more-title">Tous les produits pour {currentFocus.label}</div>
-                    <div className="kb-see-more-icon-circle">
-                      <ArrowRight size={20} />
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="supp-page-focus py-3xl" aria-label="Objectifs">
-            <div className="container">
-              <h2 style={{ textAlign: 'center', fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', color: '#fff' }}>
-                Choisissez votre objectif
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-                {FOCUSES.map((f, idx) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setSelectedFocus(f.key)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                      padding: '1.5rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '1rem',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      color: '#fff',
-                      width: '100%',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,79,163,0.1)';
-                      e.currentTarget.style.borderColor = '#FF4FA3';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                    }}
-                  >
-                    <span style={{ fontSize: '2rem', fontWeight: 800, color: '#FF4FA3', minWidth: '3rem' }}>
-                      {(idx + 1).toString().padStart(2, '0')}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{f.title}</h3>
-                      <p style={{ margin: '0.25rem 0 0', color: '#aaa', fontSize: '0.85rem' }}>{f.description}</p>
-                    </div>
-                    <ChevronRight size={24} color="#FF4FA3" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {!selectedFocus && (
-          <section className="supp-page-all pb-3xl" aria-label="Tous les compléments">
-            <div className="container">
-              <Link href="/boutique?category=Compléments" className="supp-page-all-cta" aria-label="Voir tous les produits compléments">
-                Voir tous les produits <ArrowRight size={18} />
-              </Link>
-            </div>
-          </section>
-        )}
+        <section className="supp-page-all pb-3xl" aria-label="Tous les compléments">
+          <div className="container">
+            <Link href="/boutique?category=Compléments" className="supp-page-all-cta" aria-label="Voir tous les produits compléments">
+              Voir tous les produits <ArrowRight size={18} />
+            </Link>
+          </div>
+        </section>
       </main>
     </>
   );

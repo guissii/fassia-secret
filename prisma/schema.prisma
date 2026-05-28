@@ -43,7 +43,6 @@ model Product {
   isArchived  Boolean     @default(false)
   salesCount  Int         @default(0)
   stock       Int         @default(0)
-  step        String?
   tags        String[]
   concerns    String[]
   createdAt   DateTime    @default(now())
