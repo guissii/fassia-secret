@@ -58,7 +58,7 @@ const STEPS: Step[] = [
     id: 3,
     sectionKey: 'kb-exfoliator',
     title: 'Exfoliant',
-    visualImage: '/images/banners/Exfoliant.png',
+    visualImage: '/images/banners/Exfoliant.webp',
     products: [
       { id: 301, name: 'BHA Blackhead Power Liquid', description: 'Exfoliant chimique contre les points noirs', price: 28.00, image: productImg('Packshot produit K-beauty, exfoliant BHA anti-points noirs, fond blanc rose, style e-commerce, haute définition') },
       { id: 302, name: 'AHA 7 Whitehead Power', description: 'Affine le grain de peau en douceur', price: 26.00, image: productImg('Packshot produit K-beauty, exfoliant AHA doux, fond beige clair, style e-commerce luxe, haute définition') },
@@ -82,7 +82,7 @@ const STEPS: Step[] = [
     id: 5,
     sectionKey: 'kb-essence',
     title: 'Essence',
-    visualImage: '/images/banners/essence.png',
+    visualImage: '/images/banners/essence.webp',
     products: [
       { id: 501, name: 'Snail 96 Mucin Power Essence', description: 'Bave d\'escargot hydratante iconique', price: 32.00, image: productImg('Packshot produit K-beauty, essence mucin snail 96, fond blanc rose, style e-commerce premium, haute définition') },
       { id: 502, name: 'Galactomyces 95 Tone Balancing', description: 'Éclat et unifie le teint', price: 34.00, image: productImg('Packshot produit K-beauty, essence galactomyces 95, fond beige clair, style e-commerce, haute définition') },

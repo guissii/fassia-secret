@@ -33,7 +33,7 @@ const STEPS: Step[] = [
     id: 1,
     sectionKey: 'mp-teint',
     title: 'Teint',
-    visualImage: '/images/banners/teint.png',
+    visualImage: '/images/banners/teint.webp',
     products: [
       {
         id: 101,
@@ -69,7 +69,7 @@ const STEPS: Step[] = [
     id: 2,
     sectionKey: 'mp-yeux',
     title: 'Yeux',
-    visualImage: '/images/banners/yeux.jpg',
+    visualImage: '/images/banners/yeux.webp',
     products: [
       {
         id: 201,
@@ -105,7 +105,7 @@ const STEPS: Step[] = [
     id: 3,
     sectionKey: 'mp-levres',
     title: 'Lèvres',
-    visualImage: '/images/banners/levres.jpg',
+    visualImage: '/images/banners/levres.webp',
     products: [
       {
         id: 301,
@@ -141,7 +141,7 @@ const STEPS: Step[] = [
     id: 4,
     sectionKey: 'mp-demaquillage',
     title: 'Démaquillage',
-    visualImage: '/images/banners/demaquilage.jpg',
+    visualImage: '/images/banners/demaquilage.webp',
     products: [
       {
         id: 401,
