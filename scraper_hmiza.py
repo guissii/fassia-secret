@@ -42,8 +42,15 @@ def parse_collection(html):
     soup = BeautifulSoup(html, "html.parser")
     products = []
 
-    # Shopify product cards
-    for card in soup.find_all("div", class_=re.compile("product-card|grid__item|product-item")):
+    # Shopify product cards - chercher plus largement
+    cards = soup.find_all("li", class_=re.compile("grid__item")) + soup.find_all("div", class_=re.compile("product-card|grid__item|product-item"))
+    if not cards:
+        # Fallback: chercher toutes les balises <a> vers /products/
+        for link in soup.find_all("a", href=re.compile("/products/")):
+            parent = link.find_parent("li") or link.find_parent("div")
+            if parent:
+                cards.append(parent)
+    for card in cards:
         link_tag = card.find("a", href=re.compile("/products/"))
         img_tag = card.find("img")
         brand_tag = card.find("a", href=re.compile("/collections/"))
@@ -56,14 +63,16 @@ def parse_collection(html):
             continue
         product_url = urljoin(BASE_URL, href)
 
-        # Image
+        # Image - remplace {width} par 600
         img_src = None
         if img_tag:
-            img_src = img_tag.get("src") or img_tag.get("data-src")
-            if img_src and img_src.startswith("//"):
-                img_src = "https:" + img_src
-            elif img_src and img_src.startswith("/"):
-                img_src = urljoin(BASE_URL, img_src)
+            img_src = img_tag.get("src") or img_tag.get("data-src") or img_tag.get("data-srcset", "").split(" ")[0]
+            if img_src:
+                img_src = img_src.replace("{width}", "600")
+                if img_src.startswith("//"):
+                    img_src = "https:" + img_src
+                elif img_src.startswith("/"):
+                    img_src = urljoin(BASE_URL, img_src)
 
         # Nom
         title_tag = card.find("span", class_=re.compile("product-card__title|grid-view-item__title"))
@@ -224,13 +233,22 @@ def group_by_brand(products):
 
 def main():
     print("[1/5] Scraping collection...")
-    html = fetch_html(COLLECTION_URL)
-    if not html:
-        print("Impossible de charger la collection")
-        sys.exit(1)
+    all_products = []
+    page = 1
+    while page <= 5:  # Limite à 5 pages pour éviter d'être trop long
+        url = f"{COLLECTION_URL}?page={page}"
+        html = fetch_html(url)
+        if not html:
+            break
+        products = parse_collection(html)
+        if not products:
+            break
+        all_products.extend(products)
+        print(f"  -> Page {page}: {len(products)} produits")
+        page += 1
 
-    products = parse_collection(html)
-    print(f"  -> {len(products)} produits trouvés")
+    products = all_products
+    print(f"  -> Total: {len(products)} produits trouvés")
 
     # Grouper par marque et prendre 2 de chaque
     groups = group_by_brand(products)
