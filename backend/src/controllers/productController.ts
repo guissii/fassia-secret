@@ -71,6 +71,17 @@ export const createProduct = async (req: Request, res: Response) => {
   try {
     const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible } = req.body;
 
+    // Check for duplicate product name
+    const existing = await prisma.product.findFirst({
+      where: {
+        name: { equals: name, mode: 'insensitive' }
+      }
+    });
+
+    if (existing) {
+      return res.status(409).json({ error: 'Un produit avec ce nom existe déjà' });
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         brand,
@@ -118,6 +129,18 @@ export const updateProduct = async (req: Request, res: Response) => {
     }
 
     const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived } = req.body;
+
+    // Check for duplicate product name (excluding current product)
+    const existing = await prisma.product.findFirst({
+      where: {
+        name: { equals: name, mode: 'insensitive' },
+        NOT: { id: productId }
+      }
+    });
+
+    if (existing) {
+      return res.status(409).json({ error: 'Un produit avec ce nom existe déjà' });
+    }
 
     // Disconnect all existing relations before reconnecting
     const updatedProduct = await prisma.product.update({
