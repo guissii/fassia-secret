@@ -25,6 +25,7 @@ type DBProduct = {
   description: string;
   nameAr?: string;
   descriptionAr?: string;
+  step?: string;
 };
 
 function sortByImagePriority(products: DBProduct[]): DBProduct[] {
@@ -183,10 +184,25 @@ const STEPS: Step[] = [
 ];
 
 
-// Map a scraped product to a step (1-10) based on its name/description keywords
-function assignStep(product: DBProduct): number {
-  const text = (product.name + ' ' + product.description).toLowerCase();
+// Map product step field to step ID (1-10)
+const STEP_MAP: Record<string, number> = {
+  '1 - Huile Démaquillante': 1,
+  '2 - Nettoyant Moussant': 2,
+  '3 - Exfoliant': 3,
+  '4 - Lotion Tonique': 4,
+  '5 - Essence': 5,
+  '6 - Sérum & Ampoule': 6,
+  '7 - Masque Tissu': 7,
+  '8 - Contour des Yeux': 8,
+  '9 - Crème Hydratante': 9,
+  '10 - Crème Solaire': 10,
+};
 
+function assignStep(product: DBProduct): number {
+  if (product.step && STEP_MAP[product.step]) return STEP_MAP[product.step];
+
+  // Fallback: detect from name/description
+  const text = (product.name + ' ' + product.description).toLowerCase();
   if (text.includes('oil') || text.includes('huile') || text.includes('cleansing oil') || text.includes('démaquillant')) return 1;
   if (text.includes('foam') || text.includes('mousse') || text.includes('cleanser') || text.includes('nettoyant') || text.includes('gel')) return 2;
   if (text.includes('exfoliant') || text.includes('peeling') || text.includes('scrub') || text.includes('aha') || text.includes('bha')) return 3;
@@ -195,10 +211,8 @@ function assignStep(product: DBProduct): number {
   if (text.includes('serum') || text.includes('sérum') || text.includes('ampoule')) return 6;
   if (text.includes('mask') || text.includes('masque')) return 7;
   if (text.includes('eye') || text.includes('yeux') || text.includes('contour')) return 8;
-  if (text.includes('cream') || text.includes('crème') || text.includes('moisturizer') || text.includes('hydratant') || text.includes('lotion')) return 9;
   if (text.includes('sun') || text.includes('solaire') || text.includes('spf') || text.includes('sunscreen')) return 10;
 
-  // Default: moisturizer (step 9) as catch-all
   return 9;
 }
 
