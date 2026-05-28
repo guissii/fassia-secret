@@ -107,7 +107,11 @@ export default function ProductClientPage({ product }: { product: Product }) {
               <div className="product-media-frame" style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
                 {isPromo ? <div className="product-media-badge">−{discount}%</div> : null}
                 {hasImage ? (
-                  <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} priority />
+                  product.image.startsWith('data:') ? (
+                    <img src={imageSrc} alt={product.name} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                  ) : (
+                    <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} priority />
+                  )
                 ) : (
                   <div style={{ width: '100%', height: '100%', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px' }}>
                     <span style={{ color: '#9ca3af', fontSize: '14px' }}>Pas d'image</span>
