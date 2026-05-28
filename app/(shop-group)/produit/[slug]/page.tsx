@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
-import ProductClientPage from '@/ProductClientPage';
+import ProductClientPage from '../../../../src/ProductClientPage';
 import type { Metadata } from 'next';
-import { parseProductIdFromSlug } from '@/lib/productSlug';
+import { parseProductIdFromSlug } from '../../../../src/lib/productSlug';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

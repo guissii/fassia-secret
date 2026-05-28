@@ -1,4 +1,4 @@
-import App from '@/App';
+import App from '../../src/App';
 
 async function fetchProducts(category?: string) {
   try {

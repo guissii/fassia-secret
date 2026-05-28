@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 import './page.css';
-import { ProductCarousel } from '@/components/ProductCarousel';
+import { ProductCarousel } from '../../../src/components/ProductCarousel';
 
 type Product = {
   id: number;

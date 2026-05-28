@@ -1,7 +1,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { ProductCarousel } from '@/components/ProductCarousel';
+import { ProductCarousel } from '../../../src/components/ProductCarousel';
 import './page.css';
 
 type Product = {
