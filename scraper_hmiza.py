@@ -68,7 +68,12 @@ def parse_collection(html):
         if img_tag:
             img_src = img_tag.get("src") or img_tag.get("data-src") or img_tag.get("data-srcset", "").split(" ")[0]
             if img_src:
+                # Shopify image sizing
+                img_src = img_src.replace("_{width}x", "_600x")
                 img_src = img_src.replace("{width}", "600")
+                # Remove query params that might break
+                if "?" in img_src:
+                    img_src = img_src.split("?")[0] + "?v=" + img_src.split("v=")[-1].split("&")[0] if "v=" in img_src else img_src
                 if img_src.startswith("//"):
                     img_src = "https:" + img_src
                 elif img_src.startswith("/"):

@@ -5,6 +5,45 @@ import Link from 'next/link';
 import './page.css';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
+
+async function getKBeautyProducts() {
+  try {
+    const res = await fetch(`${API_URL}/api/products?limit=100&category=K-Beauty`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.products || [];
+  } catch {
+    return [];
+  }
+}
+
+// Check if image is data URI (base64) - higher priority
+function isDataUri(image: string): boolean {
+  return image?.startsWith('data:') || false;
+}
+
+// Sort products: data URI images first, then by price
+type DBProduct = {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  description: string;
+  nameAr?: string;
+  descriptionAr?: string;
+};
+
+function sortByImagePriority(products: DBProduct[]): DBProduct[] {
+  return [...products].sort((a, b) => {
+    const aData = isDataUri(a.image) ? 1 : 0;
+    const bData = isDataUri(b.image) ? 1 : 0;
+    return bData - aData; // data URI first
+  });
+}
+
 type Product = {
   id: number;
   name: string;
@@ -153,8 +192,56 @@ const STEPS: Step[] = [
 ];
 
 
-export default function KoreanBeautyPage() {
+// Map a scraped product to a step (1-10) based on its name/description keywords
+function assignStep(product: DBProduct): number {
+  const text = (product.name + ' ' + product.description).toLowerCase();
+
+  if (text.includes('oil') || text.includes('huile') || text.includes('cleansing oil') || text.includes('démaquillant')) return 1;
+  if (text.includes('foam') || text.includes('mousse') || text.includes('cleanser') || text.includes('nettoyant') || text.includes('gel')) return 2;
+  if (text.includes('exfoliant') || text.includes('peeling') || text.includes('scrub') || text.includes('aha') || text.includes('bha')) return 3;
+  if (text.includes('toner') || text.includes('lotion') || text.includes('tonique')) return 4;
+  if (text.includes('essence') && !text.includes('sun')) return 5;
+  if (text.includes('serum') || text.includes('sérum') || text.includes('ampoule')) return 6;
+  if (text.includes('mask') || text.includes('masque')) return 7;
+  if (text.includes('eye') || text.includes('yeux') || text.includes('contour')) return 8;
+  if (text.includes('cream') || text.includes('crème') || text.includes('moisturizer') || text.includes('hydratant') || text.includes('lotion')) return 9;
+  if (text.includes('sun') || text.includes('solaire') || text.includes('spf') || text.includes('sunscreen')) return 10;
+
+  // Default: moisturizer (step 9) as catch-all
+  return 9;
+}
+
+export default async function KoreanBeautyPage() {
   const banners: Record<string, string> = {};
+
+  // Fetch real products from DB
+  const dbProducts = await getKBeautyProducts();
+  const sortedDbProducts = sortByImagePriority(dbProducts);
+
+  // Map DB products to steps
+  const stepProducts: Record<number, DBProduct[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [] };
+  for (const product of sortedDbProducts) {
+    const stepId = assignStep(product);
+    stepProducts[stepId].push(product);
+  }
+
+  // Merge with hardcoded steps: data URI products first, then hardcoded, then rest
+  const mergedSteps = STEPS.map((step) => {
+    const hardcoded = step.products.map((p) => ({ ...p, description: p.description || '' }));
+    const scraped = stepProducts[step.id] || [];
+
+    // Combine: data URI first, then hardcoded, then scraped with regular images
+    const dataUriProducts = scraped.filter((p) => isDataUri(p.image));
+    const regularScraped = scraped.filter((p) => !isDataUri(p.image));
+
+    const combined = [
+      ...dataUriProducts.map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image, description: p.descriptionAr || p.description || '' })),
+      ...hardcoded,
+      ...regularScraped.map((p) => ({ id: p.id, name: p.name, price: p.price, image: p.image, description: p.descriptionAr || p.description || '' })),
+    ];
+
+    return { ...step, products: combined.slice(0, 6) }; // Max 6 products per step
+  });
 
   return (
     <>
@@ -169,13 +256,13 @@ export default function KoreanBeautyPage() {
         </div>
       </section>
 
-      {/* 10 Steps — each is an exact copy of the Centella EssentialsSection layout */}
-      {STEPS.map((step) => {
+      {/* 10 Steps — merged with DB products, data URI prioritized */}
+      {mergedSteps.map((step) => {
         const visualImageUrl = banners[step.sectionKey] || step.visualImage;
         return (
           <section className="essentials-section" key={step.id}>
             <div className="container">
-              {/* Step Header — like Centella's "NOS ESSENTIELS" title */}
+              {/* Step Header */}
               <div className="essentials-header-row">
                 <div className="essentials-title-group">
                   <h2 className="essentials-title">
