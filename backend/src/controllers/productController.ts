@@ -13,12 +13,13 @@ export const getProducts = async (req: Request, res: Response) => {
     const categorySlug = req.query.category as string;
     const isVisible = req.query.isVisible as string;
     const includeArchived = req.query.includeArchived as string;
+    const koreanBeautyStep = req.query.koreanBeautyStep as string;
     const page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 50;
     if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
-    const cacheKey = `products:${categorySlug || 'all'}:${isVisible || 'all'}:${includeArchived || 'false'}:${page}:${limit}`;
+    const cacheKey = `products:${categorySlug || 'all'}:${isVisible || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -37,6 +38,13 @@ export const getProducts = async (req: Request, res: Response) => {
 
     if (includeArchived !== 'true') {
       where.isArchived = false;
+    }
+
+    if (koreanBeautyStep) {
+      const stepNum = parseInt(koreanBeautyStep);
+      if (!isNaN(stepNum)) {
+        where.koreanBeautyStep = stepNum;
+      }
     }
 
     const [products, total] = await prisma.$transaction([
@@ -69,7 +77,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, koreanBeautyStep } = req.body;
 
     // Check for duplicate product name
     const existing = await prisma.product.findFirst({
@@ -96,6 +104,7 @@ export const createProduct = async (req: Request, res: Response) => {
         stock: stock || 0,
         tags: tags || [],
         concerns: concerns || [],
+        koreanBeautyStep: koreanBeautyStep ? parseInt(koreanBeautyStep) : null,
         isVisible: isVisible !== false,
         categories: {
           connect: (categoryIds || []).map((id: string) => ({ id }))
@@ -128,7 +137,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
 
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, koreanBeautyStep } = req.body;
 
     // Check for duplicate product name (excluding current product)
     const existing = await prisma.product.findFirst({
@@ -158,6 +167,7 @@ export const updateProduct = async (req: Request, res: Response) => {
         stock: stock || 0,
         tags: tags || [],
         concerns: concerns || [],
+        koreanBeautyStep: koreanBeautyStep ? parseInt(koreanBeautyStep) : null,
         isVisible: isVisible !== false,
         isArchived: isArchived === true,
         categories: {

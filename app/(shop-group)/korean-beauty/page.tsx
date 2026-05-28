@@ -7,9 +7,12 @@ import { ProductCarousel } from '../../../src/components/ProductCarousel';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
 
-async function getKBeautyProducts() {
+async function getKBeautyProducts(step?: number) {
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=100&category=K-Beauty`, {
+    const url = step
+      ? `${API_URL}/api/products?limit=10&category=K-Beauty&koreanBeautyStep=${step}`
+      : `${API_URL}/api/products?limit=100&category=K-Beauty`;
+    const res = await fetch(url, {
       next: { revalidate: 300 },
     });
     if (!res.ok) return [];
@@ -23,25 +26,6 @@ async function getKBeautyProducts() {
 // Check if image is data URI (base64) - higher priority
 function isDataUri(image: string): boolean {
   return image?.startsWith('data:') || false;
-}
-
-// Sort products: data URI images first, then by price
-type DBProduct = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  description: string;
-  nameAr?: string;
-  descriptionAr?: string;
-};
-
-function sortByImagePriority(products: DBProduct[]): DBProduct[] {
-  return [...products].sort((a, b) => {
-    const aData = isDataUri(a.image) ? 1 : 0;
-    const bData = isDataUri(b.image) ? 1 : 0;
-    return bData - aData; // data URI first
-  });
 }
 
 type Product = {
@@ -192,31 +176,39 @@ const STEPS: Step[] = [
 ];
 
 
+interface DBProduct {
+  id: number;
+  name: string;
+  nameAr?: string | null;
+  price: number;
+  image: string;
+  description?: string | null;
+  descriptionAr?: string | null;
+  koreanBeautyStep?: number | null;
+}
+
 export default async function KoreanBeautyPage() {
   const banners: Record<string, string> = {};
 
-  // Récupérer produits de la DB
-  const dbProducts = await getKBeautyProducts();
-  const sortedProducts = sortByImagePriority(dbProducts);
-
-  // Fusionner: 1 hardcodé (data URI) + 2 produits DB par step
-  const stepsWithProducts = STEPS.map((step, idx) => {
-    const hardcoded = step.products.slice(0, 1); // 1 hardcodé avec data URI
-    const dbSlice = sortedProducts
-      .filter(p => !isDataUri(p.image)) // éviter les data URI déjà dans hardcodés
-      .slice(idx * 2, idx * 2 + 2)        // 2 produits DB
-      .map(p => ({
+  // Récupérer produits par étape depuis la DB
+  const stepsWithProducts = await Promise.all(
+    STEPS.map(async (step) => {
+      const dbProducts: DBProduct[] = await getKBeautyProducts(step.id);
+      const dbSlice = dbProducts.map((p: DBProduct) => ({
         id: p.id,
         name: p.nameAr || p.name,
         price: p.price,
         image: p.image,
         description: p.descriptionAr || p.description || '',
       }));
-    return {
-      ...step,
-      products: [...hardcoded, ...dbSlice].slice(0, 3),
-    };
-  });
+      // 1 hardcodé (data URI prioritaire) + produits DB
+      const hardcoded = step.products.slice(0, 1);
+      return {
+        ...step,
+        products: [...hardcoded, ...dbSlice].slice(0, 3),
+      };
+    })
+  );
 
   return (
     <>

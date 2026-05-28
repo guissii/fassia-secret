@@ -373,6 +373,33 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 />
               </div>
 
+              {/* Étape Korean Beauty */}
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>Étape Korean Beauty (1-10)</label>
+                <select
+                  name="koreanBeautyStep"
+                  className="admin-input"
+                  value={formData.koreanBeautyStep || ''}
+                  onChange={handleChange}
+                  style={{ width: '100%' }}
+                >
+                  <option value="">-- Non applicable --</option>
+                  <option value="1">01. Huile Démaquillante</option>
+                  <option value="2">02. Nettoyant Moussant</option>
+                  <option value="3">03. Exfoliant</option>
+                  <option value="4">04. Lotion Tonique</option>
+                  <option value="5">05. Essence</option>
+                  <option value="6">06. Sérum & Ampoule</option>
+                  <option value="7">07. Masque Tissu</option>
+                  <option value="8">08. Contour des Yeux</option>
+                  <option value="9">09. Crème Hydratante</option>
+                  <option value="10">10. Crème Solaire</option>
+                </select>
+                <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0 0' }}>
+                  Si le produit appartient à Korean Beauty, choisissez son étape
+                </p>
+              </div>
+
               <div className="form-group">
                 <label>Tags & Badges (ex: Nouveau, -20%)</label>
                 <div className="tags-input-container">

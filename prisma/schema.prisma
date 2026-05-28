@@ -45,12 +45,14 @@ model Product {
   stock       Int         @default(0)
   tags        String[]
   concerns    String[]
+  koreanBeautyStep Int?      // 1-10 pour les étapes Korean Beauty
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   orderItems  OrderItem[]
 
   @@index([isVisible])
   @@index([createdAt])
+  @@index([koreanBeautyStep])
 }
 
 model Category {

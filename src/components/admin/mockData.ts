@@ -46,6 +46,7 @@ export interface AdminProduct {
   salesCount: number;
   stock: number;
   tags: string[];
+  koreanBeautyStep?: number | null;
 }
 
 export interface Category {
