@@ -75,22 +75,33 @@ async function main() {
     process.exit(1);
   }
 
+  // ── Load existing collections & categories from DB ──
+  const existingCollections = await prisma.collection.findMany();
+  const existingCategories = await prisma.category.findMany();
+
+  const collectionBySlug = new Map(existingCollections.map((c: any) => [c.slug, c]));
+  const collectionByPage = new Map(existingCollections.map((c: any) => [c.page, c]));
+  const collectionByName = new Map(existingCollections.map((c: any) => [c.name.toLowerCase(), c]));
+  const categoryBySlug = new Map(existingCategories.map((c: any) => [c.slug, c]));
+  const categoryByName = new Map(existingCategories.map((c: any) => [c.name.toLowerCase(), c]));
+
+  console.log(`DB has ${existingCollections.length} collections, ${existingCategories.length} categories`);
+  console.log('Collections:', existingCollections.map((c: any) => `${c.name}(${c.slug},page=${c.page})`).join(', '));
+  console.log('Categories:', existingCategories.map((c: any) => `${c.name}(${c.slug})`).join(', '));
+
   const dataRows = rows.slice(1);
   let created = 0;
   let updated = 0;
-
-  // Default category
-  const categorySlug = 'visage';
-  const category = await prisma.category.upsert({
-    where: { slug: categorySlug },
-    update: {},
-    create: { name: 'Visage', nameAr: 'Visage', slug: categorySlug, page: 'general', order: 0 }
-  });
+  let skipped = 0;
 
   for (const row of dataRows) {
     if (row.length < 6) continue;
 
-    const [nameRaw, brandRaw, priceText, descRaw, imageRaw, urlRaw] = row;
+    const [
+      nameRaw, brandRaw, priceText, descRaw, imageRaw, urlRaw,
+      collectionSourceRaw, koreanBeautyStepRaw, categoriesRaw
+    ] = row;
+
     const productName = clean(nameRaw);
     if (!productName) continue;
 
@@ -98,6 +109,40 @@ async function main() {
     const productDesc = clean(descRaw);
     const productImage = clean(imageRaw);
     const price = extractPrice(priceText);
+
+    // ── Resolve collection (existing ONLY) ──
+    const collectionSource = clean(collectionSourceRaw);
+    let collectionConnect: { id: string }[] = [];
+    if (collectionSource) {
+      const col = (collectionBySlug.get(collectionSource)
+        || collectionByPage.get(collectionSource)
+        || collectionByName.get(collectionSource.toLowerCase())) as any;
+      if (col) {
+        collectionConnect.push({ id: col.id });
+      } else {
+        console.warn(`  [SKIP COLLECTION] "${collectionSource}" not found in DB`);
+      }
+    }
+
+    // ── Resolve categories (existing ONLY) ──
+    const categorySlugs = clean(categoriesRaw)
+      .split(',')
+      .map(s => s.trim().toLowerCase())
+      .filter(Boolean);
+    const categoryConnect: { id: string }[] = [];
+    for (const slug of categorySlugs) {
+      const cat = (categoryBySlug.get(slug) || categoryByName.get(slug)) as any;
+      if (cat) {
+        categoryConnect.push({ id: cat.id });
+      } else {
+        console.warn(`  [SKIP CATEGORY] "${slug}" not found in DB`);
+      }
+    }
+
+    // ── Korean Beauty Step ──
+    const stepRaw = clean(koreanBeautyStepRaw);
+    const koreanBeautyStep = stepRaw ? parseInt(stepRaw, 10) : null;
+    const validStep = (koreanBeautyStep && koreanBeautyStep >= 1 && koreanBeautyStep <= 10) ? koreanBeautyStep : null;
 
     // Copy image to public/products
     if (productImage) {
@@ -112,6 +157,8 @@ async function main() {
       where: { name: { equals: productName, mode: 'insensitive' } }
     });
 
+    const imagePath = productImage ? `/products/${productImage}` : '';
+
     if (existing) {
       await prisma.product.update({
         where: { id: existing.id },
@@ -119,13 +166,15 @@ async function main() {
           brand: productBrand,
           description: productDesc,
           price,
-          image: productImage ? `/products/${productImage}` : existing.image,
+          image: imagePath || existing.image,
           isVisible: true,
-          categories: { set: [], connect: { id: category.id } }
+          koreanBeautyStep: validStep ?? existing.koreanBeautyStep,
+          categories: { set: [], connect: categoryConnect },
+          collections: { set: [], connect: collectionConnect },
         }
       });
       updated++;
-      console.log(`[UPDATED] ${productName}`);
+      console.log(`[UPDATED] ${productName}${validStep ? ` (step ${validStep})` : ''}`);
     } else {
       await prisma.product.create({
         data: {
@@ -133,18 +182,20 @@ async function main() {
           brand: productBrand,
           description: productDesc,
           price,
-          image: productImage ? `/products/${productImage}` : '',
+          image: imagePath,
           stock: 50,
           isVisible: true,
-          categories: { connect: { id: category.id } }
+          koreanBeautyStep: validStep,
+          categories: categoryConnect.length > 0 ? { connect: categoryConnect } : undefined,
+          collections: collectionConnect.length > 0 ? { connect: collectionConnect } : undefined,
         }
       });
       created++;
-      console.log(`[CREATED] ${productName}`);
+      console.log(`[CREATED] ${productName}${validStep ? ` (step ${validStep})` : ''}`);
     }
   }
 
-  console.log(`\nDone! Created: ${created} | Updated: ${updated}`);
+  console.log(`\nDone! Created: ${created} | Updated: ${updated} | Skipped warnings: see above`);
 }
 
 main()
