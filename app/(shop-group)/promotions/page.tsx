@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import PromotionsClientPage from '@/PromotionsClientPage';
+import PromotionsClientPage from '../../../src/PromotionsClientPage';
 
 export const metadata: Metadata = {
   title: 'Promotions & Bons Plans',
