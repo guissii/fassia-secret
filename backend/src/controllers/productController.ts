@@ -11,6 +11,7 @@ const invalidateProductCache = async () => {
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const categorySlug = req.query.category as string;
+    const collectionSlug = req.query.collection as string;
     const isVisible = req.query.isVisible as string;
     const includeArchived = req.query.includeArchived as string;
     const koreanBeautyStep = req.query.koreanBeautyStep as string;
@@ -19,7 +20,7 @@ export const getProducts = async (req: Request, res: Response) => {
     if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
-    const cacheKey = `products:${categorySlug || 'all'}:${isVisible || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${page}:${limit}`;
+    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -30,6 +31,10 @@ export const getProducts = async (req: Request, res: Response) => {
     
     if (categorySlug) {
       where.categories = { some: { slug: categorySlug } };
+    }
+
+    if (collectionSlug) {
+      where.collections = { some: { slug: collectionSlug } };
     }
     
     if (isVisible !== undefined) {

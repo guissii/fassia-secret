@@ -97,20 +97,26 @@ const matchesQuery = (p: any, q: string) => {
   return tokens.some((t) => hay.includes(t));
 };
 
-export default function ComplementsClientPage() {
+interface ComplementsClientPageProps {
+  products?: any[];
+}
+
+export default function ComplementsClientPage({ products: initialProducts = [] }: ComplementsClientPageProps) {
   const router = useRouter();
-  const [supplements, setSupplements] = useState<any[]>([]);
+  const [supplements, setSupplements] = useState<any[]>(initialProducts);
   const { addToCart } = useCart();
   
   const [heroImage, setHeroImage] = useState<string>(HERO_IMAGE);
 
   useEffect(() => {
-    fetch('/api/products?category=Compl%C3%A9ments&limit=100')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.products) setSupplements(data.products);
-      })
-      .catch(console.error);
+    if (initialProducts.length === 0) {
+      fetch('/api/products?category=Compl%C3%A9ments&limit=100')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.products) setSupplements(data.products);
+        })
+        .catch(console.error);
+    }
 
     setHeroImage(LOCAL_BANNERS.complements);
   }, []);

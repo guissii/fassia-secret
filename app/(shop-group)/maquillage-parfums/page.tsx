@@ -4,6 +4,21 @@ import Link from 'next/link';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
 import './page.css';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
+
+async function getProducts(category: string, limit = 10) {
+  try {
+    const res = await fetch(`${API_URL}/api/products?limit=${limit}&category=${category}`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.products || [];
+  } catch {
+    return [];
+  }
+}
+
 type Product = {
   id: number;
   name: string;
@@ -247,9 +262,39 @@ const STEPS: Step[] = [
   },
 ];
 
+interface DBProduct {
+  id: number;
+  name: string;
+  nameAr?: string | null;
+  price: number;
+  image: string;
+  description?: string | null;
+  descriptionAr?: string | null;
+}
 
-export default function MaquillageParfumsPage() {
+export default async function MaquillageParfumsPage() {
   const banners: Record<string, string> = {};
+
+  // Récupérer tous les produits Maquillage + Parfums
+  const dbProducts: DBProduct[] = await getProducts('Maquillage', 50);
+
+  // Fusionner: 1 hardcodé + produits DB par step
+  const stepsWithProducts = STEPS.map((step, idx) => {
+    const hardcoded = step.products.slice(0, 1);
+    const dbSlice = dbProducts
+      .slice(idx * 2, idx * 2 + 2)
+      .map((p: DBProduct) => ({
+        id: p.id,
+        name: p.nameAr || p.name,
+        price: p.price,
+        image: p.image,
+        description: p.descriptionAr || p.description || '',
+      }));
+    return {
+      ...step,
+      products: [...hardcoded, ...dbSlice].slice(0, 3),
+    };
+  });
 
   return (
     <>
@@ -265,7 +310,7 @@ export default function MaquillageParfumsPage() {
           </div>
         </section>
 
-        {STEPS.map((step) => {
+        {stepsWithProducts.map((step) => {
           const visualImageUrl = banners[step.sectionKey] || step.visualImage;
           return (
             <section className="essentials-section" key={step.id}>
