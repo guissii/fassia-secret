@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { getCategories, createCategory, updateCategory, deleteCategory } from '../controllers/categoryController';
+import { getCategories, getCategoryProducts, createCategory, updateCategory, deleteCategory } from '../controllers/categoryController';
 import { authenticateAdmin } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { categorySchema } from '../validators';
 
 const router = Router();
 
-// Public route for frontend
+// Public routes for frontend
 router.get('/', getCategories);
+router.get('/:slug/products', getCategoryProducts);
 
 // Protected routes for admin
 router.post('/', authenticateAdmin, validate(categorySchema), createCategory);

@@ -60,11 +60,16 @@ model Category {
   name        String
   nameAr      String
   slug        String    @unique
+  description String?
+  image       String?
+  page        String    @default("general")
+  order       Int       @default(0)
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([slug])
+  @@index([page])
 }
 
 model Collection {

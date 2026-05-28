@@ -22,6 +22,10 @@ export const categorySchema = z.object({
     name: z.string().min(1, "Name is required"),
     nameAr: z.string().min(1, "Arabic name is required"),
     slug: z.string().min(1, "Slug is required"),
+    description: z.string().optional().nullable(),
+    image: z.string().optional().nullable(),
+    page: z.string().optional().nullable(),
+    order: z.number().int().optional(),
   })
 });
 

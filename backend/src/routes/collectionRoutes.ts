@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { getCollections, createCollection, updateCollection, deleteCollection } from '../controllers/collectionController';
+import { getCollections, getCollectionProducts, createCollection, updateCollection, deleteCollection } from '../controllers/collectionController';
 import { authenticateAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// Public route for frontend
+// Public routes for frontend
 router.get('/', getCollections);
+router.get('/:slug/products', getCollectionProducts);
 
 // Protected routes for admin
 router.post('/', authenticateAdmin, createCollection);

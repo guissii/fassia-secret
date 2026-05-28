@@ -5,7 +5,14 @@ import redis from '../config/redis';
 const invalidateProductCache = async () => {
   const keys = await redis.keys('products:*');
   if (keys.length > 0) await redis.del(keys);
-  await redis.del('categories:all');
+  const catKeys = await redis.keys('categories:*');
+  if (catKeys.length > 0) await redis.del(catKeys);
+  const collKeys = await redis.keys('collections:*');
+  if (collKeys.length > 0) await redis.del(collKeys);
+  const catProdKeys = await redis.keys('category:*:products:*');
+  if (catProdKeys.length > 0) await redis.del(catProdKeys);
+  const collProdKeys = await redis.keys('collection:*:products:*');
+  if (collProdKeys.length > 0) await redis.del(collProdKeys);
 };
 
 export const getProducts = async (req: Request, res: Response) => {
@@ -275,5 +282,113 @@ export const toggleArchive = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error toggling archive:', error);
     res.status(500).json({ error: 'Failed to toggle archive' });
+  }
+};
+
+function slugify(text: string): string {
+  return text
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+export const importScrapedProducts = async (req: Request, res: Response) => {
+  try {
+    const products = req.body.products as any[];
+    if (!Array.isArray(products)) {
+      return res.status(400).json({ error: 'Body must contain a "products" array' });
+    }
+
+    let created = 0;
+    let updated = 0;
+    let skipped = 0;
+    const errors: string[] = [];
+
+    for (const p of products) {
+      try {
+        const productName = (p.name_fr || p.name || '').trim();
+        if (!productName) {
+          skipped++;
+          continue;
+        }
+
+        // Upsert categories
+        const categoryNames: string[] = p.categories && p.categories.length > 0
+          ? p.categories
+          : ['Visage'];
+
+        const categoryRecords = [];
+        for (const catName of categoryNames) {
+          const slug = slugify(catName);
+          const category = await prisma.category.upsert({
+            where: { slug },
+            update: {},
+            create: { name: catName, nameAr: catName, slug },
+          });
+          categoryRecords.push(category);
+        }
+
+        const priceNum = parseFloat(p.price);
+        const brand = (p.brand || 'Autre').trim();
+        const description = (p.description_fr || p.name_fr || '').trim();
+        const imagePath = p.image ? `/products/${p.image}` : '';
+
+        // Check duplicate by name
+        const existing = await prisma.product.findFirst({
+          where: { name: { equals: productName, mode: 'insensitive' } },
+        });
+
+        if (existing) {
+          await prisma.product.update({
+            where: { id: existing.id },
+            data: {
+              brand,
+              description,
+              price: isNaN(priceNum) ? existing.price : priceNum,
+              image: imagePath || existing.image,
+              stock: p.stock ?? existing.stock,
+              isVisible: true,
+              categories: {
+                set: [],
+                connect: categoryRecords.map(c => ({ id: c.id })),
+              },
+            },
+          });
+          updated++;
+        } else {
+          await prisma.product.create({
+            data: {
+              name: productName,
+              brand,
+              description,
+              price: isNaN(priceNum) ? 0 : priceNum,
+              image: imagePath,
+              stock: p.stock || 50,
+              isVisible: true,
+              categories: { connect: categoryRecords.map(c => ({ id: c.id })) },
+            },
+          });
+          created++;
+        }
+      } catch (innerErr: any) {
+        errors.push(`Product "${p.name_fr}": ${innerErr.message}`);
+        skipped++;
+      }
+    }
+
+    await invalidateProductCache();
+
+    res.json({
+      summary: { total: products.length, created, updated, skipped },
+      errors: errors.length > 0 ? errors : undefined,
+    });
+  } catch (error) {
+    console.error('Error importing scraped products:', error);
+    res.status(500).json({ error: 'Failed to import products' });
   }
 };

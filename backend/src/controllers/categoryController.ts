@@ -3,27 +3,35 @@ import prisma from '../config/prisma';
 import redis from '../config/redis';
 
 const invalidateCategoryCache = async () => {
-  await redis.del('categories:all');
+  const keys = await redis.keys('categories:*');
+  if (keys.length > 0) await redis.del(keys);
+  const productKeys = await redis.keys('category:*:products:*');
+  if (productKeys.length > 0) await redis.del(productKeys);
 };
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
-    const cacheKey = 'categories:all';
+    const page = req.query.page as string;
+    const cacheKey = page ? `categories:page:${page}` : 'categories:all';
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
       return res.json(JSON.parse(cachedData));
     }
 
+    const where = page ? { page } : {};
     const categories = await prisma.category.findMany({
+      where,
       include: {
         _count: {
           select: { products: true }
         }
       },
-      orderBy: {
-        createdAt: 'asc',
-      },
+      orderBy: [
+        { page: 'asc' },
+        { order: 'asc' },
+        { createdAt: 'asc' },
+      ],
     });
 
     const responseData = { categories };
@@ -36,12 +44,62 @@ export const getCategories = async (req: Request, res: Response) => {
   }
 };
 
+export const getCategoryProducts = async (req: Request, res: Response) => {
+  try {
+    const { slug } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 24;
+    if (limit > 100) limit = 100;
+    const skip = (page - 1) * limit;
+
+    const cacheKey = `category:${slug}:products:${page}:${limit}`;
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      return res.json(JSON.parse(cachedData));
+    }
+
+    const [products, total] = await prisma.$transaction([
+      prisma.product.findMany({
+        where: {
+          categories: { some: { slug } },
+          isVisible: true,
+          isArchived: false,
+        },
+        include: {
+          categories: { select: { id: true, name: true, slug: true } },
+          collections: { select: { id: true, name: true, slug: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip,
+      }),
+      prisma.product.count({
+        where: {
+          categories: { some: { slug } },
+          isVisible: true,
+          isArchived: false,
+        },
+      }),
+    ]);
+
+    const responseData = {
+      products,
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+    await redis.setex(cacheKey, 300, JSON.stringify(responseData));
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error fetching category products:', error);
+    res.status(500).json({ error: 'Failed to fetch category products' });
+  }
+};
+
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const { name, nameAr, slug } = req.body;
+    const { name, nameAr, slug, description, image, page, order } = req.body;
 
     const newCategory = await prisma.category.create({
-      data: { name, nameAr, slug },
+      data: { name, nameAr, slug, description, image, page: page || 'general', order: order || 0 },
     });
 
     await invalidateCategoryCache();
@@ -56,11 +114,11 @@ export const createCategory = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { name, nameAr, slug } = req.body;
+    const { name, nameAr, slug, description, image, page, order } = req.body;
 
     const updated = await prisma.category.update({
       where: { id },
-      data: { name, nameAr, slug },
+      data: { name, nameAr, slug, description, image, page, order },
     });
 
     await invalidateCategoryCache();
