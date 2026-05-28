@@ -1,5 +1,5 @@
-import { getPageCollections } from '@/lib/collections';
-import HommeClientPage from '@/HommeClientPage';
+import { getPageCollections } from '../../../src/lib/collections';
+import HommeClientPage from '../../../src/HommeClientPage';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

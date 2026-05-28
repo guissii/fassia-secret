@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import BoutiqueClientPage from '@/BoutiqueClientPage';
+import BoutiqueClientPage from '../../../src/BoutiqueClientPage';
 
 export const metadata: Metadata = {
   title: 'Boutique — Tous les Produits',

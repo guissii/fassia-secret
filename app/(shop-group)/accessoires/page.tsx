@@ -1,5 +1,5 @@
-import { getPageCollections } from '@/lib/collections';
-import AccessoiresClientPage from '@/AccessoiresClientPage';
+import { getPageCollections } from '../../../src/lib/collections';
+import AccessoiresClientPage from '../../../src/AccessoiresClientPage';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

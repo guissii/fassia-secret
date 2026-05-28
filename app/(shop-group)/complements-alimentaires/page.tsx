@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import ComplementsClientPage from '@/ComplementsClientPage';
+import ComplementsClientPage from '../../../src/ComplementsClientPage';
 
 export const metadata: Metadata = {
   title: 'Compléments Alimentaires',
