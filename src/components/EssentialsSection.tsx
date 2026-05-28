@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 import { CollectionCarousel } from './CollectionCarousel';
 
 import { LOCAL_BANNERS } from '../lib/bannersConfig';

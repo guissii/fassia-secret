@@ -177,7 +177,7 @@ const STEPS: Step[] = [
     id: 5,
     sectionKey: 'mp-parfums-femme',
     title: 'Parfums Femme',
-    visualImage: '/images/banners/PARFUM FEMME.png',
+    visualImage: '/images/banners/PARFUM FEMME.webp',
     products: [
       {
         id: 501,
@@ -213,7 +213,7 @@ const STEPS: Step[] = [
     id: 6,
     sectionKey: 'mp-parfums-homme',
     title: 'Parfums Homme',
-    visualImage: '/images/banners/PARFUMME HOME.png',
+    visualImage: '/images/banners/PARFUMME HOME.webp',
     products: [
       {
         id: 601,

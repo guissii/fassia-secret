@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { publicAssetUrl } from '../lib/publicUrl';
 import { LOCAL_BANNERS } from '../lib/bannersConfig';

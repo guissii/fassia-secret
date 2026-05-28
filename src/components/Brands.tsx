@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import { publicAssetUrl } from '../lib/publicUrl';
 import Link from 'next/link';

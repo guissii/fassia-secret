@@ -1,3 +1,5 @@
+"use client";
+
 import Image from 'next/image';
 import { ShoppingBag, Check, Loader2 } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';

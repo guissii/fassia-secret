@@ -10,38 +10,26 @@ type Tile = {
   image: string;
 };
 
-const imageUrl = (prompt: string) => {
-  return '/logo.png';
-};
-
 const TILES: Tile[] = [
   {
     title: 'Teint',
     href: '/maquillage-parfums',
-    image: imageUrl(
-      'Photographie premium e-commerce beauté, fond beige doux, produits de maquillage pour le teint (fond de teint, poudre, pinceaux), style Dior/Sephora, lumière studio douce, composition minimaliste, haute définition'
-    ),
+    image: '/images/banners/teint.webp',
   },
   {
     title: 'Yeux',
     href: '/maquillage-parfums',
-    image: imageUrl(
-      'Photographie premium e-commerce beauté, palette de fards à paupières, eyeliner et mascara sur fond clair beige rosé, style luxe minimaliste, lumière studio douce, haute définition'
-    ),
+    image: '/images/banners/yeux.webp',
   },
   {
     title: 'Lèvres',
     href: '/maquillage-parfums',
-    image: imageUrl(
-      'Photographie premium e-commerce beauté, rouges à lèvres et gloss, textures glossy, fond beige rosé élégant, style fashion luxury, lumière studio douce, haute définition'
-    ),
+    image: '/images/banners/levres.webp',
   },
   {
     title: 'Parfums',
     href: '/boutique?category=Parfums',
-    image: imageUrl(
-      'Photographie premium e-commerce parfum, flacon de parfum en verre, reflets élégants, fond beige crème, ambiance luxe minimaliste, lumière studio douce, haute définition'
-    ),
+    image: '/images/banners/PARFUM FEMME.webp',
   },
 ];
 
