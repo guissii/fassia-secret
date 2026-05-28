@@ -192,8 +192,31 @@ const STEPS: Step[] = [
 ];
 
 
-export default function KoreanBeautyPage() {
+export default async function KoreanBeautyPage() {
   const banners: Record<string, string> = {};
+
+  // Récupérer produits de la DB
+  const dbProducts = await getKBeautyProducts();
+  const sortedProducts = sortByImagePriority(dbProducts);
+
+  // Fusionner: 1 hardcodé (data URI) + 2 produits DB par step
+  const stepsWithProducts = STEPS.map((step, idx) => {
+    const hardcoded = step.products.slice(0, 1); // 1 hardcodé avec data URI
+    const dbSlice = sortedProducts
+      .filter(p => !isDataUri(p.image)) // éviter les data URI déjà dans hardcodés
+      .slice(idx * 2, idx * 2 + 2)        // 2 produits DB
+      .map(p => ({
+        id: p.id,
+        name: p.nameAr || p.name,
+        price: p.price,
+        image: p.image,
+        description: p.descriptionAr || p.description || '',
+      }));
+    return {
+      ...step,
+      products: [...hardcoded, ...dbSlice].slice(0, 3),
+    };
+  });
 
   return (
     <>
@@ -209,7 +232,7 @@ export default function KoreanBeautyPage() {
       </section>
 
       {/* 10 Steps — each is an exact copy of the Centella EssentialsSection layout */}
-      {STEPS.map((step) => {
+      {stepsWithProducts.map((step) => {
         const visualImageUrl = banners[step.sectionKey] || step.visualImage;
         return (
           <section className="essentials-section" key={step.id}>
