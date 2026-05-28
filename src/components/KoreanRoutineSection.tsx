@@ -2,20 +2,17 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import './KoreanRoutineSection.css';
+import { LOCAL_BANNERS } from '../lib/bannersConfig';
 
 export function KoreanRoutineSection() {
   const [banner, setBanner] = useState<{ imageUrl: string; linkUrl: string; title: string } | null>(null);
 
   useEffect(() => {
-    fetch('/api/banners')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const kbBanner = data.find(b => b.section === 'korean-beauty');
-          if (kbBanner) setBanner(kbBanner);
-        }
-      })
-      .catch(console.error);
+    setBanner({
+      imageUrl: LOCAL_BANNERS.koreanBeauty,
+      linkUrl: '/korean-beauty',
+      title: 'Korean Beauty'
+    });
   }, []);
 
   const defaultImageUrl = '/logo.png';

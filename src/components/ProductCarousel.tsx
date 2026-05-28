@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProductCard } from './ProductCard';
+import Image from 'next/image';
 
 interface ProductCarouselProps {
   stepId?: string;
@@ -28,12 +29,11 @@ export function ProductCarousel({
 
   return (
     <div className="essentials-carousel">
-      <div className="essentials-hero-pair">
         <div className="essentials-visual-tile">
           {visualImageComponent ? (
             visualImageComponent
           ) : (
-            <img src={visualImage} alt={title} className="essentials-visual-img" loading="lazy" />
+            <Image src={visualImage || '/logo.png'} alt={title} className="essentials-visual-img" fill sizes="(max-width: 768px) 50vw, 25vw" />
           )}
           <div className="kb-visual-overlay">
             {stepId && <span className="kb-overlay-step">{stepId}</span>}
@@ -42,7 +42,6 @@ export function ProductCarousel({
         </div>
 
         {firstProduct && <ProductCard product={firstProduct} label={productLabel} />}
-      </div>
 
       {rest.map((p) => (
         <ProductCard key={p.id} product={p} label={productLabel} />

@@ -1,4 +1,3 @@
-"use client";
 
 import React from 'react';
 import dynamic from 'next/dynamic';
@@ -8,6 +7,7 @@ import { MakeupParfumsSection } from './components/MakeupParfumsSection';
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { LOCAL_BANNERS } from './lib/bannersConfig';
 
 // Lazy load components that are below the fold to improve initial page load performance
 const IngredientsSection = dynamic(() => import('./components/IngredientsSection').then(mod => mod.IngredientsSection));
@@ -17,36 +17,14 @@ const Categories = dynamic(() => import('./components/Categories').then(mod => m
 const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
 const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSection').then(mod => mod.KoreanRoutineSection));
 
-function App() {
-  const [bestSellers, setBestSellers] = React.useState<any[]>([]);
-  const [bestSellersBanner, setBestSellersBanner] = React.useState<string>("");
-
-  React.useEffect(() => {
-    fetch('/api/products?limit=6')
-      .then(res => res.json())
-      .then(data => {
-        if (data.products) setBestSellers(data.products);
-      })
-      .catch(console.error);
-
-    fetch('/api/banners')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const banner = data.find(b => b.section === 'best_sellers');
-          if (banner && banner.imageUrl) {
-            setBestSellersBanner(banner.imageUrl);
-          }
-        }
-      })
-      .catch(console.error);
-  }, []);
+function App({ bestSellers, essentials }: { bestSellers: any[], essentials: any[] }) {
+  const bestSellersBanner = LOCAL_BANNERS.bestSellers;
 
   return (
     <>
       <Hero />
 
-      <EssentialsSection />
+      <EssentialsSection products={essentials} />
       <MakeupParfumsSection />
 
       <IngredientsSection />

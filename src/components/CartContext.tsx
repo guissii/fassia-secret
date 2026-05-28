@@ -18,25 +18,7 @@ const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: 'Derma Hydrating Serum',
-      price: 180.0,
-      image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
-      category: 'Visage',
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: 'Hydra Boost Gel Cream',
-      price: 199.0,
-      oldPrice: 249.0,
-      image: '19bd7403-d2ac-49a4-a584-be5895add421.png',
-      category: 'Visage',
-      quantity: 2,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 

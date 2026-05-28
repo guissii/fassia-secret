@@ -16,7 +16,10 @@
   width: calc(100% - 2rem);
   margin: 0 auto;
   border-radius: var(--hero-radius, 2rem);
-  height: min(100vw, 520px);
+  /* Locked aspect ratio — images never deform, only scale */
+  aspect-ratio: 4 / 3;
+  height: auto;
+  max-height: 520px;
 }
 
 .hero-track {
@@ -50,7 +53,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -113,18 +116,14 @@
 
 @media (min-width: 768px) {
   .hero-viewport {
-    height: clamp(520px, 56vh, 620px);
+    aspect-ratio: 16 / 9;
+    max-height: 620px;
   }
 }
 
 @media (min-width: 992px) {
   .hero-viewport {
     aspect-ratio: 16 / 9;
-    height: clamp(520px, 50vh, 680px);
-  }
-
-  .hero-media-img {
-    object-fit: cover;
-    object-position: center;
+    max-height: 680px;
   }
 }

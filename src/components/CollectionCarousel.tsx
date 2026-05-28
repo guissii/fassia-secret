@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { productHref } from '../lib/productSlug';
 import { ProductCard } from './ProductCard';
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 interface CollectionCarouselProps {
   title: string;
@@ -35,11 +36,12 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
           <div className="essentials-hero-pair">
             {imageSrc ? (
               <div className="essentials-visual-tile">
-                <img
+                <Image
                   src={publicAssetUrl(imageSrc)}
                   alt={`${title} Visuel`}
                   className="essentials-visual-img"
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
               </div>
             ) : null}

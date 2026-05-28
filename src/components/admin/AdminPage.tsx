@@ -19,11 +19,11 @@ import { OrdersTab } from './OrdersTab';
 import { ProductsTab } from './ProductsTab';
 import { CategoriesTab } from './CategoriesTab';
 import { PromosTab } from './PromosTab';
-import { BannersTab } from './BannersTab';
+
 import { SettingsTab } from './SettingsTab';
 import { ServerTab } from './ServerTab';
 
-type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'banners' | 'settings' | 'server';
+type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'settings' | 'server';
 
 export function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -53,7 +53,6 @@ export function AdminPage() {
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'categories', label: 'Catégories', icon: FolderTree },
     { id: 'promos', label: 'Promotions', icon: TicketPercent },
-    { id: 'banners', label: 'Bannières', icon: LayoutDashboard },
     { id: 'settings', label: 'Paramètres', icon: Settings },
     { id: 'server', label: 'Serveur (VPS)', icon: Activity },
   ] as const;
@@ -69,7 +68,6 @@ export function AdminPage() {
       case 'products': return <ProductsTab />;
       case 'categories': return <CategoriesTab />;
       case 'promos': return <PromosTab />;
-      case 'banners': return <BannersTab />;
       case 'settings': return <SettingsTab />;
       case 'server': return <ServerTab />;
       default: return <DashboardTab />;

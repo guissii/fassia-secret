@@ -8,6 +8,7 @@ import { useCart } from './components/CartContext';
 import { productHref } from './lib/productSlug';
 
 import { ProductCard } from './components/ProductCard';
+import { LOCAL_BANNERS } from './lib/bannersConfig';
 import './styles/CollectionLayout.css';
 import './ComplementsClientPage.css';
 
@@ -111,17 +112,7 @@ export default function ComplementsClientPage() {
       })
       .catch(console.error);
 
-    fetch('/api/banners')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const compBanner = data.find(b => b.section === 'complements-hero');
-          if (compBanner && compBanner.imageUrl) {
-            setHeroImage(compBanner.imageUrl);
-          }
-        }
-      })
-      .catch(console.error);
+    setHeroImage(LOCAL_BANNERS.complements);
   }, []);
 
   return (

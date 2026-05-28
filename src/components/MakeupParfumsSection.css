@@ -144,7 +144,9 @@
 
   .makeup-parfums-tile {
     width: auto;
-    height: clamp(260px, 18vw, 380px);
+    /* Keep the same 3/4 ratio on desktop — no more deformation */
+    aspect-ratio: 3 / 4;
+    height: auto;
   }
 
   .makeup-parfums-tile:not(:last-child) {
@@ -176,8 +178,10 @@
   }
 
   .makeup-parfums-tile {
-    width: 78vw;
-    max-width: 320px;
+    /* 72vw → on iPhone 15 Pro (393px) leaves ~84px peek of next card,
+       clearly showing the user there's horizontal scroll */
+    width: 72vw;
+    max-width: 300px;
     aspect-ratio: 3 / 4;
     height: auto;
   }

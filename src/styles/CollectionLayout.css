@@ -120,34 +120,27 @@
 }
 
 /* Standalone cards in carousel (PC) */
-.essentials-carousel > .product-card {
+.essentials-carousel > .product-card,
+.essentials-carousel > .essentials-visual-tile {
   flex: 0 0 clamp(260px, 22vw, 300px);
   width: clamp(260px, 22vw, 300px);
   scroll-snap-align: start;
 }
 
-.essentials-hero-pair {
-  flex: 0 0 clamp(520px, 44vw, 600px); /* Exactly 2x a standalone card */
-  width: clamp(520px, 44vw, 600px);
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* 50/50 split */
-  gap: clamp(12px, 1.6vw, 18px);
-  align-items: stretch;
-}
-
 .essentials-visual-tile {
   position: relative;
-  width: 100%;
-  min-height: 0;            /* let grid stretch decide height */
+  height: auto;
   border-radius: 0;
   overflow: hidden;
   background: #f3f4f6;
+  aspect-ratio: 4 / 5;
 }
 
 .essentials-visual-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
@@ -311,33 +304,26 @@
     padding-right: 0;
   }
 
-  .essentials-hero-pair {
-    flex: 0 0 90vw;
-    width: 90vw;
-    max-width: 400px;
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 50/50 for symmetry */
-    gap: 10px;
-    scroll-snap-align: start;
-  }
-
   .essentials-visual-tile {
     min-height: 0;
+    aspect-ratio: 4 / 5;
   }
 
   .kb-overlay-title {
     font-size: 0.95rem;
   }
 
-  .essentials-carousel > .product-card {
-    flex: 0 0 45vw; /* Exactly 1/2 of hero pair */
-    width: 45vw;
-    max-width: 200px; /* 1/2 of 400px */
+  .essentials-carousel > .product-card,
+  .essentials-carousel > .essentials-visual-tile {
+    /* 42vw → shows peek of next card on small phones */
+    flex: 0 0 42vw;
+    width: 42vw;
+    max-width: 190px;
     scroll-snap-align: start;
   }
 
   .kb-see-more-card {
-    flex: 0 0 45vw;
-    max-width: 200px;
+    flex: 0 0 42vw;
+    max-width: 190px;
   }
 }

@@ -1,4 +1,3 @@
-"use client";
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -34,9 +33,7 @@ const STEPS: Step[] = [
     id: 1,
     sectionKey: 'mp-teint',
     title: 'Teint',
-    visualImage: visualImg(
-      "Photographie e-commerce maquillage premium, fond de teint et poudre sur vanity marbre, ambiance rose nude minimal luxe, lumière studio douce, haute définition"
-    ),
+    visualImage: '/images/banners/teint.png',
     products: [
       {
         id: 101,
@@ -72,9 +69,7 @@ const STEPS: Step[] = [
     id: 2,
     sectionKey: 'mp-yeux',
     title: 'Yeux',
-    visualImage: visualImg(
-      "Photographie e-commerce maquillage yeux, mascara et palette fards à paupières sur fond rose nude, ambiance luxe minimal, lumière studio douce, haute définition"
-    ),
+    visualImage: '/images/banners/yeux.jpg',
     products: [
       {
         id: 201,
@@ -110,9 +105,7 @@ const STEPS: Step[] = [
     id: 3,
     sectionKey: 'mp-levres',
     title: 'Lèvres',
-    visualImage: visualImg(
-      "Photographie e-commerce maquillage lèvres, rouges à lèvres et gloss sur fond rose nude, texture velours, ambiance luxe minimal, haute définition"
-    ),
+    visualImage: '/images/banners/levres.jpg',
     products: [
       {
         id: 301,
@@ -148,9 +141,7 @@ const STEPS: Step[] = [
     id: 4,
     sectionKey: 'mp-demaquillage',
     title: 'Démaquillage',
-    visualImage: visualImg(
-      "Photographie e-commerce démaquillage, huile et eau micellaire sur fond marbre clair, ambiance rose beige minimal luxe, lumière studio douce, haute définition"
-    ),
+    visualImage: '/images/banners/demaquilage.jpg',
     products: [
       {
         id: 401,
@@ -186,9 +177,7 @@ const STEPS: Step[] = [
     id: 5,
     sectionKey: 'mp-parfums-femme',
     title: 'Parfums Femme',
-    visualImage: visualImg(
-      "Photographie e-commerce parfum femme, flacons verre raffinés, reflets dorés, ambiance rose nude minimal luxe, haute définition"
-    ),
+    visualImage: '/images/banners/PARFUM FEMME.png',
     products: [
       {
         id: 501,
@@ -224,9 +213,7 @@ const STEPS: Step[] = [
     id: 6,
     sectionKey: 'mp-parfums-homme',
     title: 'Parfums Homme',
-    visualImage: visualImg(
-      "Photographie e-commerce parfum homme, flacons verre fumé, ambiance boisée, fond neutre premium, lumière studio douce, haute définition"
-    ),
+    visualImage: '/images/banners/PARFUMME HOME.png',
     products: [
       {
         id: 601,
@@ -260,27 +247,9 @@ const STEPS: Step[] = [
   },
 ];
 
-import { useEffect, useState } from 'react';
 
 export default function MaquillageParfumsPage() {
-  const [banners, setBanners] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    fetch('/api/banners')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const map = data.reduce((acc: any, b: any) => {
-            if (b.imageUrl) {
-              acc[b.section] = b.imageUrl;
-            }
-            return acc;
-          }, {});
-          setBanners(map);
-        }
-      })
-      .catch(console.error);
-  }, []);
+  const banners: Record<string, string> = {};
 
   return (
     <>

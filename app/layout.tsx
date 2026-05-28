@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   const style: CSSProperties & CssVars = {
-    '--site-bg-image': `url("${basePath}/arrier%20plan.png")`,
+    '--site-bg-image': 'none',
   };
 
   return (

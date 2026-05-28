@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { publicAssetUrl } from '../lib/publicUrl';
+import { LOCAL_BANNERS } from '../lib/bannersConfig';
+import Image from 'next/image';
 
 type HeroSlide = {
   id: string;
@@ -19,22 +21,13 @@ export function Hero() {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
 
   useEffect(() => {
-    fetch('/api/banners')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const heroBanners = data
-            .filter((b: any) => b.section === 'home_hero' && b.isActive !== false)
-            .sort((a: any, b: any) => (b.order || 0) - (a.order || 0))
-            .map((b: any) => ({
-              id: b.id,
-              imageMobile: b.imageUrl,
-              imageDesktop: b.imageUrl,
-            }));
-          setSlides(heroBanners);
-        }
-      })
-      .catch(console.error);
+    // Utiliser les bannières locales au lieu de l'API pour plus de rapidité et fiabilité
+    const heroBanners = LOCAL_BANNERS.hero.map((b) => ({
+      id: b.id,
+      imageMobile: b.imageMobile,
+      imageDesktop: b.imageDesktop,
+    }));
+    setSlides(heroBanners);
   }, []);
 
   const slideCount = slides.length;
@@ -138,26 +131,20 @@ export function Hero() {
               <article
                 key={s.id}
                 className="hero-slide"
-                style={
-                  {
-                    ['--hero-bg']: `url('${publicAssetUrl(isMobile ? s.imageMobile : s.imageDesktop)}')`,
-                  } as unknown as CSSProperties
-                }
                 aria-roledescription="slide"
                 aria-label={`${i + 1} / ${slideCount}`}
                 aria-hidden={i !== activeIndex}
               >
-                <picture className="hero-media">
-                  <source media="(min-width: 992px)" srcSet={publicAssetUrl(s.imageDesktop)} />
-                  <img
-                    className="hero-media-img"
-                    src={publicAssetUrl(s.imageMobile)}
+                <div className="hero-media">
+                  <Image
+                    src={publicAssetUrl(s.imageDesktop)}
                     alt=""
-                    loading={i === 0 ? 'eager' : 'lazy'}
-                    fetchPriority={i === 0 ? 'high' : 'auto'}
-                    decoding="async"
+                    fill
+                    className="hero-media-img"
+                    priority={i === 0}
+                    sizes="100vw"
                   />
-                </picture>
+                </div>
               </article>
             ))}
           </div>
