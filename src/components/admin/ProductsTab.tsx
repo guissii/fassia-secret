@@ -30,7 +30,7 @@ export function ProductsTab() {
       setProducts(data);
       
       // Extract unique categories for filter
-      const allCategories = data.flatMap((p: AdminProduct) => p.categories || []);
+      const allCategories = data.flatMap((p: AdminProduct) => (p.categories || []).map((c: any) => typeof c === 'string' ? c : c.name));
       const uniqueCats = Array.from(new Set(allCategories)).filter(Boolean) as string[];
       setCategories(uniqueCats);
     } catch (e) {
@@ -49,7 +49,7 @@ export function ProductsTab() {
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesCategory = categoryFilter === 'all' || product.categories.includes(categoryFilter);
+    const matchesCategory = categoryFilter === 'all' || product.categories.some((c: any) => (typeof c === 'string' ? c : c.name) === categoryFilter);
     const matchesArchive = showArchived ? product.isArchived : !product.isArchived;
     
     return matchesSearch && matchesCategory && matchesArchive;
@@ -283,8 +283,8 @@ export function ProductsTab() {
                         </span>
                       </td>
                       <td>
-                        {product.categories && product.categories.length > 0 
-                          ? product.categories.join(', ') 
+                        {product.categories && product.categories.length > 0
+                          ? product.categories.map((c: any) => typeof c === 'string' ? c : c.name).join(', ')
                           : <span className="text-muted">—</span>}
                       </td>
                       <td>
