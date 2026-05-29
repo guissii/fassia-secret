@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "start": "next start",
     "postinstall": "prisma generate",
-    "seed:scraped": "tsx prisma/seed-scraped.ts"
+    "seed:scraped": "tsx prisma/seed-scraped.ts",
+    "scrape:paradiscount": "tsx scripts/scrape-paradiscount.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
