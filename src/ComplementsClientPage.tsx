@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
@@ -8,7 +8,6 @@ import { useCart } from './components/CartContext';
 import { productHref } from './lib/productSlug';
 
 import { ProductCard } from './components/ProductCard';
-import { LOCAL_BANNERS } from './lib/bannersConfig';
 import './styles/CollectionLayout.css';
 import './ComplementsClientPage.css';
 
@@ -20,15 +19,6 @@ type Focus = {
   description: string;
   q: string;
 };
-
-const imageUrl = (prompt: string, imageSize?: string) => {
-  return '/logo.png';
-};
-
-const HERO_IMAGE = imageUrl(
-  'Photographie premium e-commerce compléments alimentaires, flacons ambrés et gélules, ambiance rose nude et beige crème, lumière studio douce, style laboratoire chic, haute définition',
-  'landscape_16_9'
-);
 
 const FOCUSES: Focus[] = [
   {
@@ -105,8 +95,6 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
   const router = useRouter();
   const [supplements, setSupplements] = useState<any[]>(initialProducts);
   const { addToCart } = useCart();
-  
-  const [heroImage, setHeroImage] = useState<string>(HERO_IMAGE);
 
   useEffect(() => {
     if (initialProducts.length === 0) {
@@ -117,16 +105,12 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
         })
         .catch(console.error);
     }
-
-    setHeroImage(LOCAL_BANNERS.complements);
   }, [initialProducts]);
 
   return (
     <>
       <main className="supp-page">
         <section className="supp-page-hero" aria-label="Compléments Alimentaires">
-          <div className="supp-page-hero-bg" style={{ backgroundImage: `url('${heroImage}')` }} aria-hidden="true" />
-          <div className="supp-page-hero-noise" aria-hidden="true" />
           <div className="container">
             <div className="supp-page-hero-inner">
               <p className="supp-page-hero-kicker">COMPLÉMENTS ALIMENTAIRES</p>
