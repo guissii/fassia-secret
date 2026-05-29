@@ -14,8 +14,8 @@ const prisma = new PrismaClient();
 
 const BASE_URL = 'https://universparadiscount.ma';
 const COLLECTION_PATH = '/376-vitamines-et-formes';
-const MAX_PAGES = 10;
-const TARGET_COUNT = 30;
+const MAX_PAGES = 5;
+const TARGET_COUNT = 10;
 const IMAGES_DIR = path.join(process.cwd(), 'public', 'products-paradiscount');
 
 // Mapping supplementFocus par mots-clés dans le nom
@@ -29,13 +29,15 @@ const FOCUS_MAP: Record<string, string[]> = {
 };
 
 // Collections Fassia correspondantes
+// Chaque produit est assigné au MAXIMUM de collections qui correspondent
 const COLLECTION_MAP: Record<string, string[]> = {
-  'Immunité & Ruche': ['immunité', 'immunity', 'propolis', 'zinc', 'vitamine c', 'echinacea', 'défense', 'defense', 'vitamine d', 'vitamine d3', 'd3'],
+  'Immunité & Ruche': ['immunité', 'immunity', 'propolis', 'zinc', 'echinacea', 'défense', 'defense'],
   'Sommeil & Relaxation': ['sommeil', 'sleep', 'magnésium', 'magnesium', 'melatonine', 'melatonin', 'relax', 'calm', 'zen'],
   'Poids & Métabolisme': ['poids', 'weight', 'minceur', 'slimming', 'métbolisme', 'metabolism', 'chrome', 'berberine', 'draineur', 'drainage', 'détox'],
   'Beauté In & Out': ['beauté', 'beauty', 'collagène', 'collagen', 'biotine', 'biotin', 'hyaluronique', 'hyaluronic', 'peau', 'skin', 'ongles', 'cheveux'],
   'Digestion & Probiotiques': ['digestion', 'probiotique', 'probiotic', 'intestin', 'gut', 'enzyme', 'flore', 'bloating', 'ballonnement'],
   'Stress & Humeur': ['stress', 'humeur', 'mood', 'ashwagandha', 'rhodiola', 'theanine', 'l-theanine', 'adaptogène', 'adaptogen'],
+  'Vitamines & Minéraux': ['vitamine', 'vitamin', 'minéral', 'mineral', 'multivitamine', 'complex', 'calcium', 'magnésium', 'zinc', 'fer', 'omega', 'omega 3', 'oméga', 'd3', 'b12', 'vitamine c', 'vitamine d'],
 };
 
 interface ScrapedProduct {
@@ -109,13 +111,12 @@ function detectSupplementFocus(name: string): string | null {
 
 function detectCollections(name: string): string[] {
   const lower = name.toLowerCase();
-  const collections: string[] = [];
+  const collections: string[] = ['Compléments Alimentaires']; // Toujours présent
   for (const [collName, keywords] of Object.entries(COLLECTION_MAP)) {
     if (keywords.some(k => lower.includes(k))) {
       collections.push(collName);
     }
   }
-  if (collections.length === 0) collections.push('Compléments Alimentaires');
   return collections;
 }
 
@@ -131,52 +132,73 @@ async function scrapeProductList(): Promise<ScrapedProduct[]> {
 
     const $ = cheerio.load(html);
 
-    // UniversParadiscount product selectors (PrestaShop)
-    const items = $('.product-miniature, .js-product-miniature, .item-product, .product-container');
-    console.log(`   Found ${items.length} product items`);
+    // Method 1: Extract from dataLayer JSON
+    let found = 0;
+    const scripts = $('script').toArray();
+    for (const scriptEl of scripts) {
+      const text = $(scriptEl).text();
+      if (text.includes('"ecommerce"') && text.includes('"items"')) {
+        try {
+          // Extract the dataLayer object
+          const match = text.match(/cdcDatalayer\s*=\s*(\{.*?\});/s);
+          if (match) {
+            const data = JSON.parse(match[1]);
+            const items = data?.ecommerce?.items || [];
+            for (const item of items) {
+              const name = cleanName(item.item_name || '');
+              const price = parseFloat(item.price) || 0;
+              const brand = item.item_brand || name.split(' ')[0] || 'Univers Paradiscount';
 
-    let added = 0;
-    items.each((_, el) => {
-      const $el = $(el);
+              // Build image URL from item_id
+              const itemId = item.item_id?.replace('-0', '') || '';
+              const imageUrl = `${BASE_URL}/${itemId}-large_default/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
 
-      // Try multiple selectors for name
-      const name = cleanName(
-        $el.find('.product-title a, .product-name a, h3 a, h2 a, .product-title, .product-name').first().text()
-      );
-
-      // Try multiple selectors for price
-      const priceText = $el.find('.price, .current-price, .product-price, .regular-price').first().text();
-      const price = parsePrice(priceText);
-
-      // Try old price
-      const oldPriceText = $el.find('.old-price, .regular-price.crossed').first().text();
-      const oldPrice = oldPriceText ? parsePrice(oldPriceText) : undefined;
-
-      // Try multiple selectors for image
-      let imageUrl = $el.find('img').attr('data-src') ||
-                     $el.find('img').attr('data-original') ||
-                     $el.find('img').attr('src') || '';
-
-      // Fix relative URLs
-      if (imageUrl && !imageUrl.startsWith('http')) {
-        imageUrl = imageUrl.startsWith('/') ? `${BASE_URL}${imageUrl}` : `${BASE_URL}/${imageUrl}`;
+              if (name && price > 0 && !seen.has(name)) {
+                seen.add(name);
+                products.push({ name, price, imageUrl, brand });
+                found++;
+              }
+            }
+          }
+        } catch (e) {
+          // ignore parse errors
+        }
       }
+    }
 
-      if (name && price > 0 && imageUrl && !seen.has(name)) {
-        seen.add(name);
-        products.push({
-          name,
-          price,
-          oldPrice: oldPrice && oldPrice > price ? oldPrice : undefined,
-          imageUrl,
-          brand: name.split(' ')[0] || 'Univers Paradiscount',
-        });
-        added++;
-      }
-    });
+    // Method 2: Fallback to Schema.org JSON-LD
+    if (found === 0) {
+      $('script[type="application/ld+json"]').each((_, el) => {
+        try {
+          const json = JSON.parse($(el).text());
+          if (json['@type'] === 'ItemList' && Array.isArray(json.itemListElement)) {
+            for (const item of json.itemListElement) {
+              const name = cleanName(item.name || '');
+              const url = item.url || '';
+              if (name && !seen.has(name)) {
+                seen.add(name);
+                // Extract item ID from URL to build image URL
+                const idMatch = url.match(/(\d+)-/);
+                const itemId = idMatch ? idMatch[1] : '';
+                const imageUrl = itemId ? `${BASE_URL}/${itemId}-large_default/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg` : '';
+                products.push({
+                  name,
+                  price: 0, // Will be fetched from product page
+                  imageUrl,
+                  brand: name.split(' ')[0] || 'Univers Paradiscount',
+                });
+                found++;
+              }
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      });
+    }
 
-    console.log(`   Added ${added} unique products`);
-    if (added === 0) break;
+    console.log(`   Found ${found} products from JSON data`);
+    if (found === 0) break;
     await new Promise(r => setTimeout(r, 800));
   }
 
