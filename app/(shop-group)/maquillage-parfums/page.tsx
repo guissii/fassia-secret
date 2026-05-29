@@ -275,8 +275,8 @@ interface DBProduct {
 export default async function MaquillageParfumsPage() {
   const banners: Record<string, string> = {};
 
-  // Récupérer tous les produits Maquillage + Parfums
-  const dbProducts: DBProduct[] = await getProducts('Maquillage', 50);
+  // Récupérer tous les produits de la catégorie Maquillage et Parfums
+  const dbProducts: DBProduct[] = await getProducts('maquillage-et-parfums', 50);
 
   // Fusionner: 1 hardcodé + produits DB par step
   const stepsWithProducts = STEPS.map((step, idx) => {

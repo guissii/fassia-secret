@@ -226,6 +226,21 @@ async function main() {
         collections.push({ id: coll.id });
       }
 
+      // Get or create category
+      let category = await prisma.category.findFirst({ where: { slug: 'maquillage-et-parfums' } });
+      if (!category) {
+        category = await prisma.category.create({
+          data: {
+            name: 'Maquillage et Parfums',
+            nameAr: 'مكياج وعطور',
+            slug: 'maquillage-et-parfums',
+            page: 'maquillage-parfums',
+            description: 'Maquillage et Parfums',
+            order: 0,
+          }
+        });
+      }
+
       // Create product
       await prisma.product.create({
         data: {
@@ -242,6 +257,7 @@ async function main() {
           concerns: [],
           makeupStep: makeupStep,
           collections: { connect: collections },
+          categories: { connect: { id: category.id } },
         }
       });
 
