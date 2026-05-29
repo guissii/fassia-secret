@@ -375,8 +375,9 @@ export const importScrapedProducts = async (req: Request, res: Response) => {
           });
           created++;
         }
-      } catch (innerErr: any) {
-        errors.push(`Product "${p.name_fr}": ${innerErr.message}`);
+      } catch (innerErr) {
+        const errMsg = innerErr instanceof Error ? innerErr.message : String(innerErr);
+        errors.push(`Product "${p.name_fr}": ${errMsg}`);
         skipped++;
       }
     }
