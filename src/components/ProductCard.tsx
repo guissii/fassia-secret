@@ -51,9 +51,9 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
         <div className="product-image-frame" style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
           {hasImage ? (
             product.image.startsWith('data:') ? (
-              <img src={imageSrc} alt={product.name} className="product-image" loading="lazy" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+              <img src={imageSrc} alt={product.name} className="product-image" loading="lazy" style={{ objectFit: 'cover', width: '100%', height: '100%', pointerEvents: 'none' }} />
             ) : (
-              <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" loading="lazy" style={{ objectFit: 'cover' }} />
+              <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" loading="lazy" style={{ objectFit: 'cover', pointerEvents: 'none' }} />
             )
           ) : (
             <div style={{ width: '100%', height: '100%', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
