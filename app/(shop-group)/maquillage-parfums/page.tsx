@@ -27,238 +27,55 @@ type Product = {
   description: string;
 };
 
-type Step = {
-  id: number;
-  sectionKey: string;
-  title: string;
-  visualImage: string;
-  products: Product[];
-  filterQuery: string;
-};
-
-const imageUrl = (prompt: string, imageSize: string = 'portrait_4_3') => {
-  return '/logo.png';
-};
-
-const visualImg = (prompt: string) => imageUrl(prompt, 'portrait_4_3');
-const productImg = (prompt: string) => imageUrl(prompt, 'square');
-
-const STEPS: Step[] = [
+const STEPS = [
   {
     id: 1,
     sectionKey: 'mp-teint',
     title: 'Teint',
     visualImage: '/images/banners/teint.webp',
-    products: [
-      {
-        id: 101,
-        name: 'Fond de Teint Lumineux',
-        description: 'Fini glow naturel, couvrance modulable',
-        price: 245,
-        image: productImg(
-          "Packshot maquillage premium, flacon fond de teint verre dépoli, fond blanc rose, style e-commerce, lumière studio douce, haute définition"
-        ),
-      },
-      {
-        id: 102,
-        name: 'BB Crème Hydratante',
-        description: 'Hydrate et unifie le teint',
-        price: 185,
-        image: productImg(
-          "Packshot maquillage premium, tube BB crème, fond beige rosé clair, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 103,
-        name: 'Anti-cernes Éclat',
-        description: 'Corrige et illumine le regard',
-        price: 145,
-        image: productImg(
-          "Packshot maquillage premium, anti-cernes applicateur, fond blanc premium, style e-commerce, haute définition"
-        ),
-      },
-    ],
     filterQuery: 'category=Maquillage&q=teint',
+    keywords: ['teint', 'fond', 'bb', 'correcteur', 'poudre', 'anticerne'],
   },
   {
     id: 2,
     sectionKey: 'mp-yeux',
     title: 'Yeux',
     visualImage: '/images/banners/yeux.webp',
-    products: [
-      {
-        id: 201,
-        name: 'Mascara Volume Noir',
-        description: 'Volume intense, tenue longue durée',
-        price: 195,
-        image: productImg(
-          "Packshot maquillage premium, mascara tube noir mat, fond rose pâle premium, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 202,
-        name: 'Eyeliner Précision',
-        description: 'Trait net, pointe ultra fine',
-        price: 125,
-        image: productImg(
-          "Packshot maquillage premium, eyeliner feutre, fond beige clair, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 203,
-        name: 'Palette Nude',
-        description: 'Neutres chauds & reflets satinés',
-        price: 345,
-        image: productImg(
-          "Packshot maquillage premium, palette fards nude ouverte, fond blanc rosé, style e-commerce luxe, haute définition"
-        ),
-      },
-    ],
     filterQuery: 'category=Maquillage&q=yeux',
+    keywords: ['yeux', 'mascara', 'eyeliner', 'fard', 'palette', 'crayon'],
   },
   {
     id: 3,
     sectionKey: 'mp-levres',
     title: 'Lèvres',
     visualImage: '/images/banners/levres.webp',
-    products: [
-      {
-        id: 301,
-        name: 'Rouge à Lèvres Velours',
-        description: 'Couleur intense, confort toute la journée',
-        price: 175,
-        image: productImg(
-          "Packshot maquillage premium, rouge à lèvres raisin, étui doré, fond blanc premium, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 302,
-        name: 'Gloss Repulpant',
-        description: 'Brillance miroir, effet repulpant',
-        price: 145,
-        image: productImg(
-          "Packshot maquillage premium, gloss transparent, fond rose pâle premium, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 303,
-        name: 'Baume Teinté',
-        description: 'Hydratation + voile de couleur',
-        price: 95,
-        image: productImg(
-          "Packshot maquillage premium, baume à lèvres teinté, fond beige rosé, style e-commerce, haute définition"
-        ),
-      },
-    ],
     filterQuery: 'category=Maquillage&q=lèvres',
+    keywords: ['lèvres', 'rouge', 'gloss', 'baume', 'crayon'],
   },
   {
     id: 4,
     sectionKey: 'mp-demaquillage',
     title: 'Démaquillage',
     visualImage: '/images/banners/demaquilage.webp',
-    products: [
-      {
-        id: 401,
-        name: 'Huile Démaquillante',
-        description: 'Dissout waterproof, fini soyeux',
-        price: 215,
-        image: productImg(
-          "Packshot skincare premium, huile démaquillante en flacon pompe, fond blanc rosé, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 402,
-        name: 'Eau Micellaire Apaisante',
-        description: 'Nettoie sans agresser',
-        price: 125,
-        image: productImg(
-          "Packshot skincare premium, eau micellaire flacon transparent, fond beige clair premium, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 403,
-        name: 'Lait Nettoyant Doux',
-        description: 'Confort peaux sensibles',
-        price: 145,
-        image: productImg(
-          "Packshot skincare premium, lait nettoyant tube blanc, fond rose pâle premium, style e-commerce, haute définition"
-        ),
-      },
-    ],
     filterQuery: 'category=K-Beauty&q=démaquillant',
+    keywords: ['démaquillant', 'micellaire', 'nettoyant', 'demaquillage'],
   },
   {
     id: 5,
     sectionKey: 'mp-parfums-femme',
     title: 'Parfums Femme',
     visualImage: '/images/banners/PARFUM FEMME.webp',
-    products: [
-      {
-        id: 501,
-        name: 'Éclat de Rose',
-        description: 'Rose fraîche, musc délicat',
-        price: 850,
-        image: productImg(
-          "Packshot parfum premium femme, flacon élégant rose clair, fond blanc premium, style e-commerce luxe, haute définition"
-        ),
-      },
-      {
-        id: 502,
-        name: 'Nuit Ambrée',
-        description: 'Ambre & vanille, sillage intense',
-        price: 920,
-        image: productImg(
-          "Packshot parfum premium femme, flacon ambré, fond beige rosé, style e-commerce luxe, haute définition"
-        ),
-      },
-      {
-        id: 503,
-        name: 'Fleur de Vanille',
-        description: 'Gourmand, floral, doux',
-        price: 780,
-        image: productImg(
-          "Packshot parfum premium femme, flacon vanille crème, fond rose pâle, style e-commerce, haute définition"
-        ),
-      },
-    ],
     filterQuery: 'category=Parfums&q=femme',
+    keywords: ['parfum', 'eau de toilette', 'eau de parfum'],
+    excludeKeywords: ['homme'],
   },
   {
     id: 6,
     sectionKey: 'mp-parfums-homme',
     title: 'Parfums Homme',
     visualImage: '/images/banners/PARFUMME HOME.webp',
-    products: [
-      {
-        id: 601,
-        name: 'Bois de Cèdre',
-        description: 'Boisé sec, élégant',
-        price: 890,
-        image: productImg(
-          "Packshot parfum premium homme, flacon verre fumé, fond beige clair, style e-commerce luxe, haute définition"
-        ),
-      },
-      {
-        id: 602,
-        name: 'Océan Frais',
-        description: 'Agrumes & notes marines',
-        price: 750,
-        image: productImg(
-          "Packshot parfum premium homme, flacon bleu transparent, fond blanc premium, style e-commerce, haute définition"
-        ),
-      },
-      {
-        id: 603,
-        name: "Épices d'Orient",
-        description: 'Épices chaudes, ambré',
-        price: 980,
-        image: productImg(
-          "Packshot parfum premium homme, flacon sombre, reflets dorés, fond rosé beige, style e-commerce luxe, haute définition"
-        ),
-      },
-    ],
     filterQuery: 'category=Parfums&q=homme',
+    keywords: ['parfum', 'eau de toilette', 'eau de parfum', 'homme'],
   },
 ];
 
@@ -270,19 +87,32 @@ interface DBProduct {
   image: string;
   description?: string | null;
   descriptionAr?: string | null;
+  tags?: string[];
+}
+
+function matchKeywords(product: DBProduct, keywords: string[], excludeKeywords?: string[]): boolean {
+  const text = (product.name + ' ' + (product.description || '') + ' ' + (product.tags?.join(' ') || '')).toLowerCase();
+  const hasKeyword = keywords.some(k => text.includes(k.toLowerCase()));
+  const hasExcluded = excludeKeywords?.some(k => text.includes(k.toLowerCase())) || false;
+  return hasKeyword && !hasExcluded;
 }
 
 export default async function MaquillageParfumsPage() {
   const banners: Record<string, string> = {};
 
-  // Récupérer tous les produits de la catégorie Maquillage et Parfums
-  const dbProducts: DBProduct[] = await getProducts('maquillage-et-parfums', 50);
+  // Récupérer les vrais produits des catégories Maquillage et Parfums
+  const [makeupProducts, parfumsProducts] = await Promise.all([
+    getProducts('Maquillage', 50),
+    getProducts('Parfums', 50),
+  ]);
 
-  // Fusionner: 1 hardcodé + produits DB par step
-  const stepsWithProducts = STEPS.map((step, idx) => {
-    const hardcoded = step.products.slice(0, 1);
-    const dbSlice = dbProducts
-      .slice(idx * 2, idx * 2 + 2)
+  const allDbProducts: DBProduct[] = [...makeupProducts, ...parfumsProducts];
+
+  // Distribuer les produits DB dans les sections selon les mots-clés
+  const stepsWithProducts = STEPS.map((step) => {
+    const matched = allDbProducts
+      .filter((p) => matchKeywords(p, step.keywords, step.excludeKeywords))
+      .slice(0, 5)
       .map((p: DBProduct) => ({
         id: p.id,
         name: p.nameAr || p.name,
@@ -292,7 +122,7 @@ export default async function MaquillageParfumsPage() {
       }));
     return {
       ...step,
-      products: [...hardcoded, ...dbSlice].slice(0, 3),
+      products: matched,
     };
   });
 
