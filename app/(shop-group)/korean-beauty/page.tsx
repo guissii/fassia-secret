@@ -206,11 +206,10 @@ export default async function KoreanBeautyPage() {
         image: p.image,
         description: p.descriptionAr || p.description || '',
       }));
-      // 1 hardcodé (data URI prioritaire) + produits DB
-      const hardcoded = step.products.slice(0, 1);
+      // Afficher uniquement les produits de la DB (pas de hardcodés)
       return {
         ...step,
-        products: [...hardcoded, ...dbSlice].slice(0, 3),
+        products: dbSlice.slice(0, 3),
       };
     })
   );
