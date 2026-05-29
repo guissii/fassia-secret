@@ -20,14 +20,16 @@ export const getProducts = async (req: Request, res: Response) => {
     const categorySlug = req.query.category as string;
     const collectionSlug = req.query.collection as string;
     const isVisible = req.query.isVisible as string;
+    const isEssential = req.query.isEssential as string;
     const includeArchived = req.query.includeArchived as string;
     const koreanBeautyStep = req.query.koreanBeautyStep as string;
+    const random = req.query.random as string;
     const page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 50;
     if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
-    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${page}:${limit}`;
+    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${random || 'false'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -59,6 +61,12 @@ export const getProducts = async (req: Request, res: Response) => {
       }
     }
 
+    if (isEssential !== undefined && isEssential !== '') {
+      where.isEssential = isEssential === 'true';
+    }
+
+    const orderBy = random === 'true' ? undefined : { createdAt: 'desc' as const };
+
     const [products, total] = await prisma.$transaction([
       prisma.product.findMany({
         where,
@@ -68,12 +76,18 @@ export const getProducts = async (req: Request, res: Response) => {
           categories: { select: { id: true, name: true, slug: true } },
           collections: { select: { id: true, name: true, slug: true } },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy,
       }),
       prisma.product.count({ where })
     ]);
+
+    // Random shuffle if requested
+    if (random === 'true') {
+      for (let i = products.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [products[i], products[j]] = [products[j], products[i]];
+      }
+    }
 
     // Map categories array to category string for frontend compatibility
     const mappedProducts = products.map((p: any) => ({
@@ -292,6 +306,35 @@ export const toggleArchive = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error toggling archive:', error);
     res.status(500).json({ error: 'Failed to toggle archive' });
+  }
+};
+
+export const toggleEssential = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const productId = parseInt(id);
+
+    if (isNaN(productId)) {
+      return res.status(400).json({ error: 'Invalid product ID' });
+    }
+
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const { isEssential } = req.body;
+    const updated = await prisma.product.update({
+      where: { id: productId },
+      data: { isEssential: isEssential === true },
+    });
+
+    await invalidateProductCache();
+
+    res.json({ product: updated });
+  } catch (error) {
+    console.error('Error toggling essential:', error);
+    res.status(500).json({ error: 'Failed to toggle essential' });
   }
 };
 

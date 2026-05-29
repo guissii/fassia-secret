@@ -41,6 +41,7 @@ model Product {
   badge       String?
   isVisible   Boolean     @default(true)
   isArchived  Boolean     @default(false)
+  isEssential Boolean     @default(false)
   salesCount  Int         @default(0)
   stock       Int         @default(0)
   tags        String[]
@@ -53,6 +54,7 @@ model Product {
   orderItems  OrderItem[]
 
   @@index([isVisible])
+  @@index([isEssential])
   @@index([createdAt])
   @@index([koreanBeautyStep])
 }

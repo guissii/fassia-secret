@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProducts, createProduct, updateProduct, deleteProduct, toggleVisibility, toggleArchive, importScrapedProducts } from '../controllers/productController';
+import { getProducts, createProduct, updateProduct, deleteProduct, toggleVisibility, toggleArchive, toggleEssential, importScrapedProducts } from '../controllers/productController';
 import { authenticateAdmin } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { productSchema } from '../validators';
@@ -16,5 +16,6 @@ router.put('/:id', authenticateAdmin, updateProduct);
 router.delete('/:id', authenticateAdmin, deleteProduct);
 router.patch('/:id/visibility', authenticateAdmin, toggleVisibility);
 router.patch('/:id/archive', authenticateAdmin, toggleArchive);
+router.patch('/:id/essential', authenticateAdmin, toggleEssential);
 
 export default router;

@@ -43,6 +43,7 @@ export interface AdminProduct {
   badge?: string;
   isVisible: boolean;
   isArchived: boolean;
+  isEssential: boolean;
   salesCount: number;
   stock: number;
   tags: string[];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, Tag, Filter, X, Trash } from 'lucide-react';
+import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, Tag, Filter, X, Trash, Star } from 'lucide-react';
 import './ProductsTab.css';
 import { api, AdminProduct, delay } from './mockData';
 import { ProductFormModal } from './ProductFormModal';
@@ -159,6 +159,21 @@ export function ProductsTab() {
       setToast({ message: `${ids.length} produit(s) ${archive ? 'archivé(s)' : 'désarchivé(s)'}`, type: 'success' });
     } catch {
       setToast({ message: "Erreur lors de l'archivage", type: 'error' });
+    }
+  };
+
+  const handleBulkEssential = async (essential: boolean) => {
+    if (selectedIds.size === 0) return;
+    try {
+      setToast({ message: `${essential ? 'Ajout' : 'Retrait'} de ${selectedIds.size} produit(s) aux Essentiels...`, type: 'info' });
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        await api.fetchWithAuth(`/products/${id}/essential`, { method: 'PATCH', body: JSON.stringify({ isEssential: essential }) });
+      }
+      setProducts(prev => prev.map(p => selectedIds.has(p.id) ? { ...p, isEssential: essential } : p));
+      setToast({ message: `${ids.length} produit(s) ${essential ? 'ajouté(s) aux' : 'retiré(s) des'} Essentiels`, type: 'success' });
+    } catch {
+      setToast({ message: "Erreur lors de la modification des Essentiels", type: 'error' });
     }
   };
 
@@ -413,6 +428,9 @@ export function ProductsTab() {
             <button className="admin-btn-outline text-sm" onClick={() => handleBulkArchive(true)} title="Archiver">
               <Archive size={14} /> Archiver
             </button>
+            <button className="admin-btn-outline text-sm" onClick={() => handleBulkEssential(true)} title="Ajouter aux Essentiels" style={{ background: '#fef3c7', borderColor: '#f59e0b', color: '#92400e' }}>
+              <Star size={14} /> Essentiel
+            </button>
             <button 
               className="admin-btn-outline text-sm" 
               onClick={clearSelection}
@@ -503,6 +521,11 @@ export function ProductsTab() {
                                 ))}
                               </div>
                             )}
+                            {product.isEssential && (
+                              <span className="admin-badge" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', marginTop: '0.25rem', background: '#fef3c7', color: '#92400e', border: '1px solid #f59e0b' }}>
+                                ★ Essentiel
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -544,6 +567,20 @@ export function ProductsTab() {
                             onClick={() => { setSelectedProduct(product); setIsModalOpen(true); }}
                           >
                             <Pencil size={18} />
+                          </button>
+                          <button 
+                            className={`action-btn ${product.isEssential ? 'text-warning' : 'text-muted'}`}
+                            title={product.isEssential ? "Retirer des Essentiels" : "Ajouter aux Essentiels"}
+                            onClick={() => {
+                              api.fetchWithAuth(`/products/${product.id}/essential`, { method: 'PATCH', body: JSON.stringify({ isEssential: !product.isEssential }) })
+                                .then(() => {
+                                  setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isEssential: !p.isEssential } : p));
+                                  setToast({ message: product.isEssential ? 'Retiré des Essentiels' : 'Ajouté aux Essentiels', type: 'success' });
+                                })
+                                .catch(() => setToast({ message: 'Erreur', type: 'error' }));
+                            }}
+                          >
+                            <Star size={18} />
                           </button>
                           <button 
                             className="action-btn" 
