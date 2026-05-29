@@ -7,7 +7,7 @@ async function fetchEssentials(limit: number) {
     url.searchParams.append('isEssential', 'true');
     url.searchParams.append('random', 'true');
 
-    const res = await fetch(url.toString(), { next: { revalidate: 60 } });
+    const res = await fetch(url.toString(), { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return data.products || [];
@@ -39,12 +39,8 @@ export default async function Page() {
     fetchEssentials(20)
   ]);
 
-  // Séparer Korean Beauty (koreanBeautyStep) et Compléments (supplementFocus)
-  const koreanBeauty = allEssentials.filter((p: any) => p.koreanBeautyStep != null);
-  const complements = allEssentials.filter((p: any) => p.supplementFocus != null);
-
-  // 5 de chaque, mélanger
-  const essentials = [...koreanBeauty.slice(0, 5), ...complements.slice(0, 5)];
+  // Tous les essentiels selectionnes par etoile dans admin
+  const essentials = allEssentials.slice(0, 10);
 
   return <App bestSellers={bestSellers} essentials={essentials} />;
 }
