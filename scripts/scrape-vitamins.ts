@@ -339,7 +339,7 @@ async function main() {
         const collection = await prisma.collection.upsert({
           where: { slug: collSlug },
           update: {},
-          create: { name: collName, nameAr: collName, slug: collSlug, description: `Collection ${collName}` },
+          create: { name: collName, nameAr: collName, slug: collSlug, description: `Collection ${collName}`, page: 'complements-alimentaires', order: 0 },
         });
         collectionIds.push(collection.id);
       }
@@ -349,7 +349,7 @@ async function main() {
         const kbColl = await prisma.collection.upsert({
           where: { slug: 'korean-beauty' },
           update: {},
-          create: { name: 'Korean Beauty', nameAr: 'Korean Beauty', slug: 'korean-beauty', description: 'Routine Korean Beauty' },
+          create: { name: 'Korean Beauty', nameAr: 'Korean Beauty', slug: 'korean-beauty', description: 'Routine Korean Beauty', page: 'korean-beauty', order: 0 },
         });
         if (!collectionIds.includes(kbColl.id)) {
           collectionIds.push(kbColl.id);
