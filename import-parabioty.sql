@@ -33,73 +33,79 @@ coll_ids AS (
   SELECT id, slug FROM "Collection"
   WHERE slug IN ('cheveux', 'ongles', 'immunite', 'complements-alimentaires', 'visage')
 ),
--- Insert Products
+-- Insert Products (skip if already exists)
 new_products AS (
   INSERT INTO "Product" (
     id, brand, name, "nameAr", description, "descriptionAr", price, "oldPrice", image,
     badge, stock, tags, concerns, "koreanBeautyStep", "supplementFocus", "makeupStep",
     "isVisible", "isArchived", "isEssential", "salesCount", "createdAt", "updatedAt"
   )
-  VALUES 
-    (gen_random_uuid(), 'ACM', 'ACM NOVOPHANE Anti Chute 60 Gelules', '', 
+  SELECT * FROM (VALUES
+    (gen_random_uuid(), 'ACM', 'ACM NOVOPHANE Anti Chute 60 Gelules', '',
      'Complément alimentaire pour la chute de cheveux. Formule fortifiante avec vitamines et minéraux essentiels.', '',
      229, 275, '/images/scraped/parabioty/ACM_NOVOPHANE_Anti_Chute_60_Ge_0.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Anti-chute'], ARRAY['Chute de cheveux'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'ACM', 'ACM Vitix 30Comprime', '',
      'VITIX comprimés aide à protéger les cellules contre le stress oxydatif. Formule originale associant un extrait végétal de melon breveté à un ensemble de vitamines (C, E, B9, B12) et de minéraux (Sélénium, Cuivre, Zinc).', '',
      222, 266, '/images/scraped/parabioty/ACM_Vitix_30Comprime_1.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Antioxydant', 'Vitamines'], ARRAY['Immunité', 'Stress oxydatif'],
      NULL, 'immunity', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'ALLVIT', 'ALLVIT 20 gelules', '',
      'Complexe dynamisant, stimulant et fortifiant à base de vitamines, minéraux, oligo-élément et ginseng. ALLVIT est spécialement formulé pour donner à l''organisme de l''énergie, vigueur et vitalité en cas de fatigue.', '',
      44.1, 53, '/images/scraped/parabioty/ALLVIT_20_gelules_2.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Énergie', 'Ginseng'], ARRAY['Immunité', 'Fatigue'],
      NULL, 'immunity', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'Capiderma', 'Capiderma Capiphan ongles & cheveux 60 capsules', '',
      'Supplément vitaminique et minéral, stimule la croissance et régénérescence des phanères. Formule basée sur un complexe riche en vitamines et minéraux.', '',
      270, 324, '/images/scraped/parabioty/Capiderma_Capiphan_ongles___ch_3.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Ongles', 'Vitamines'], ARRAY['Chute de cheveux', 'Ongles cassants'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'DUCRAY', 'DUCRAY Anacaps Reactiv 30 Capsules', '',
      'Complément alimentaire pour la chute de cheveux réactive (stress, fatigue, saisonnière). Formule concentrée en vitamines B, fer, zinc et sélénium.', '',
      259, 311, '/images/scraped/parabioty/DUCRAY_Anacaps_Reactiv_30_Caps_4.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Anti-chute', 'Reactiv'], ARRAY['Chute de cheveux', 'Cheveux fins'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'DUCRAY', 'DUCRAY Anacaps Progressiv 30 Capsules', '',
      'ANACAPS PROGRESSIV contribue à préserver le capital capillaire en cas de chute de cheveux chronique (hormonale, vasculaire, héréditaire). Formule avec FER, ZINC, SELENIUM, MOLYBDENE et 6 vitamines.', '',
      259, 311, '/images/scraped/parabioty/DUCRAY__Anacaps_Progressiv_30__5.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Anti-chute', 'Progressiv'], ARRAY['Chute de cheveux', 'Cheveux fins'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'Ecrinal', 'Ecrinal Complément Alimentaire Cheveux et Ongles 30 Capsules', '',
      'Complément alimentaire pour la force et beauté des ongles et cheveux. Formule riche en cystine, silicium, vitamines B3, B5, B6, B8 et huile de bourrache.', '',
      500, 600, '/images/scraped/parabioty/Ecrinal_Compl_ment_Alimentaire_6.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Ongles', 'Ecrinal'], ARRAY['Chute de cheveux', 'Ongles cassants'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'Forcapil', 'Forcapil Cheveux et Ongles Formule Fortifiante 180 GELULES', '',
      'Complément alimentaire fortifiant pour cheveux et ongles. Formule riche en vitamines du groupe B, minéraux et acides aminés essentiels.', '',
      357, 428, '/images/scraped/parabioty/Forcapil_Cheveux_et_Ongles_For_7.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Ongles', 'Fortifiant'], ARRAY['Chute de cheveux', 'Ongles cassants'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'Gayelord Hauser', 'Levure de bière au sélénium', '',
      'Levure de Bière et Sélénium avec germes de blé, vitamine E et sélénium. Contribue à l''éclat des cheveux et ongles. Antioxydants pour préserver le capital jeunesse de la peau.', '',
      135, 162, '/images/scraped/parabioty/Levure_de_bi_re_au_s_l_nium_8.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Cheveux', 'Peau', 'Antioxydant'], ARRAY['Chute de cheveux', 'Ongles cassants', 'Peau sèche'],
      NULL, 'beauty', NULL, true, false, false, 0, NOW(), NOW()),
-    
+
     (gen_random_uuid(), 'Hydra Phyt''s', 'Hydra Phyt''s Vitamine C 500 mg - 36 gélules', '',
      'Vitamine C 500 mg. Réputée pour son action contre la fatigue et soutient le système immunitaire. Puissant antioxydant pour l''éclat de la peau.', '',
      105, 126, '/images/scraped/parabioty/Hydra_Phyt_s_Vitamine_C_500_mg_9.webp',
      NULL, 10, ARRAY['Complément', 'Alimentaire', 'Vitamine C', 'Immunité', 'Antioxydant'], ARRAY['Immunité', 'Fatigue', 'Teint terne'],
      NULL, 'immunity', NULL, true, false, false, 0, NOW(), NOW())
+  ) AS v(id, brand, name, "nameAr", description, "descriptionAr", price, "oldPrice", image,
+    badge, stock, tags, concerns, "koreanBeautyStep", "supplementFocus", "makeupStep",
+    "isVisible", "isArchived", "isEssential", "salesCount", "createdAt", "updatedAt")
+  WHERE NOT EXISTS (
+    SELECT 1 FROM "Product" p WHERE p.name = v.name
+  )
   RETURNING id, name
 )
 SELECT * FROM new_products;
