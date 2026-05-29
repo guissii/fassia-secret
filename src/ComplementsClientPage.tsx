@@ -110,26 +110,6 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
   return (
     <>
       <main className="supp-page">
-        <section className="supp-page-hero" aria-label="Compléments Alimentaires">
-          <div className="container">
-            <div className="supp-page-hero-inner">
-              <p className="supp-page-hero-kicker">COMPLÉMENTS ALIMENTAIRES</p>
-              <h1 className="supp-page-hero-title">Routines par objectif</h1>
-              <p className="supp-page-hero-subtitle">
-                Sommeil, stress, digestion, immunité, beauté… Une sélection chic, lisible, et directement shoppable.
-              </p>
-              <div className="supp-page-hero-actions">
-                <Link href="/boutique?category=complements-alimentaires" className="supp-page-hero-cta">
-                  Voir le catalogue <ArrowRight size={16} />
-                </Link>
-                <Link href="/boutique?category=complements-alimentaires&new=1" className="supp-page-hero-cta ghost">
-                  Nouveautés <ArrowRight size={16} />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="supp-page-focus py-lg" aria-label="Objectifs">
           <div className="container">
             <div className="supp-focus-chips" aria-label="Aller à un besoin">
