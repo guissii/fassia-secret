@@ -241,13 +241,7 @@ async function extractProductsFromHtml(html: string, seen: Set<string>): Promise
             const price = parseFloat(item.price) || 0;
             const brand = item.item_brand || name.split(' ')[0] || 'Univers Paradiscount';
             const itemId = item.item_id?.replace('-0', '') || '';
-            const slug = name.toLowerCase()
-              .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-              .replace(/[^a-z0-9\s-]/g, '')
-              .replace(/\s+/g, '-')
-              .replace(/-+/g, '-')
-              .substring(0, 60);
-            const imageUrl = `${BASE_URL}/${itemId}-large_default/${slug}.jpg`;
+            const imageUrl = `${BASE_URL}/${itemId}-large_default.jpg`;
 
             if (name && price > 0 && !seen.has(name)) {
               seen.add(name);
@@ -274,13 +268,7 @@ async function extractProductsFromHtml(html: string, seen: Set<string>): Promise
               seen.add(name);
               const idMatch = url.match(/(\d+)-/);
               const itemId = idMatch ? idMatch[1] : '';
-              const slug = name.toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .substring(0, 60);
-              const imageUrl = itemId ? `${BASE_URL}/${itemId}-large_default/${slug}.jpg` : '';
+              const imageUrl = itemId ? `${BASE_URL}/${itemId}-large_default.jpg` : '';
               products.push({ name, price: 0, imageUrl, brand: name.split(' ')[0] || 'Univers Paradiscount' });
             }
           }
