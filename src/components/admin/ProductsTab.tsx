@@ -591,7 +591,7 @@ export function ProductsTab() {
                             <Pencil size={18} />
                           </button>
                           <button 
-                            className={`action-btn ${product.isEssential ? 'text-warning' : 'text-muted'}`}
+                            className="action-btn"
                             title={product.isEssential ? "Retirer des Essentiels" : "Ajouter aux Essentiels"}
                             onClick={() => {
                               api.fetchWithAuth(`/products/${product.id}/essential`, { method: 'PATCH', body: JSON.stringify({ isEssential: !product.isEssential }) })
@@ -601,8 +601,9 @@ export function ProductsTab() {
                                 })
                                 .catch(() => setToast({ message: 'Erreur', type: 'error' }));
                             }}
+                            style={{ color: product.isEssential ? '#f59e0b' : '#9ca3af' }}
                           >
-                            <Star size={18} />
+                            <Star size={18} fill={product.isEssential ? '#f59e0b' : 'none'} />
                           </button>
                           <button 
                             className="action-btn" 
