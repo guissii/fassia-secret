@@ -10,9 +10,11 @@ const API_URL = typeof window === 'undefined'
   ? 'http://localhost:5000'
   : (process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com');
 
-async function getProducts(category: string, limit = 10) {
+async function getProducts(category: string, step?: number, limit = 10) {
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=${limit}&category=${category}&isVisible=true`, {
+    let url = `${API_URL}/api/products?limit=${limit}&category=${category}&isVisible=true`;
+    if (step) url += `&makeupStep=${step}`;
+    const res = await fetch(url, {
       cache: 'no-store',
     });
     if (!res.ok) return [];
@@ -38,6 +40,7 @@ const STEPS = [
     title: 'Teint',
     visualImage: '/images/banners/teint.webp',
     filterQuery: 'category=Maquillage&q=teint',
+    makeupStep: 1,
     keywords: ['teint', 'fond', 'bb', 'correcteur', 'poudre', 'anticerne'],
   },
   {
@@ -46,6 +49,7 @@ const STEPS = [
     title: 'Yeux',
     visualImage: '/images/banners/yeux.webp',
     filterQuery: 'category=Maquillage&q=yeux',
+    makeupStep: 2,
     keywords: ['yeux', 'mascara', 'eyeliner', 'fard', 'palette', 'crayon'],
   },
   {
@@ -54,6 +58,7 @@ const STEPS = [
     title: 'Lèvres',
     visualImage: '/images/banners/levres.webp',
     filterQuery: 'category=Maquillage&q=lèvres',
+    makeupStep: 3,
     keywords: ['lèvres', 'rouge', 'gloss', 'baume', 'crayon'],
   },
   {
@@ -62,6 +67,7 @@ const STEPS = [
     title: 'Démaquillage',
     visualImage: '/images/banners/demaquilage.webp',
     filterQuery: 'category=K-Beauty&q=démaquillant',
+    makeupStep: 4,
     keywords: ['démaquillant', 'micellaire', 'nettoyant', 'demaquillage'],
   },
   {
@@ -70,6 +76,7 @@ const STEPS = [
     title: 'Parfums Femme',
     visualImage: '/images/banners/PARFUM FEMME.webp',
     filterQuery: 'category=Parfums&q=femme',
+    makeupStep: 5,
     keywords: ['parfum', 'eau de toilette', 'eau de parfum'],
     excludeKeywords: ['homme'],
   },
@@ -79,6 +86,7 @@ const STEPS = [
     title: 'Parfums Homme',
     visualImage: '/images/banners/PARFUMME HOME.webp',
     filterQuery: 'category=Parfums&q=homme',
+    makeupStep: 6,
     keywords: ['parfum', 'eau de toilette', 'eau de parfum', 'homme'],
   },
 ];
@@ -104,27 +112,34 @@ function matchKeywords(product: DBProduct, keywords: string[], excludeKeywords?:
 export default async function MaquillageParfumsPage() {
   const banners: Record<string, string> = {};
 
-  // Récupérer les vrais produits de la catégorie "Maquillage et Parfums"
-  const dbProducts = await getProducts('maquillage-et-parfums', 100);
-  const allDbProducts: DBProduct[] = dbProducts;
-
-  // Distribuer les produits DB dans les sections selon les mots-clés
-  const stepsWithProducts = STEPS.map((step) => {
-    const matched = allDbProducts
-      .filter((p) => matchKeywords(p, step.keywords, step.excludeKeywords))
-      .slice(0, 5)
-      .map((p: DBProduct) => ({
+  // Récupérer produits par makeupStep depuis la DB (comme Korean Beauty)
+  const stepsWithProducts = await Promise.all(
+    STEPS.map(async (step) => {
+      // Essayer d'abord avec makeupStep
+      let dbProducts: DBProduct[] = [];
+      if (step.makeupStep) {
+        dbProducts = await getProducts('maquillage-et-parfums', step.makeupStep, 10);
+      }
+      // Fallback: si aucun produit avec makeupStep, récupérer tous et filtrer par mots-clés
+      if (dbProducts.length === 0) {
+        const allProducts = await getProducts('maquillage-et-parfums', undefined, 100);
+        dbProducts = allProducts.filter((p: DBProduct) =>
+          matchKeywords(p, step.keywords, step.excludeKeywords)
+        );
+      }
+      const dbSlice = dbProducts.map((p: DBProduct) => ({
         id: p.id,
         name: p.nameAr || p.name,
         price: p.price,
         image: p.image,
         description: p.descriptionAr || p.description || '',
       }));
-    return {
-      ...step,
-      products: matched,
-    };
-  });
+      return {
+        ...step,
+        products: dbSlice.slice(0, 5),
+      };
+    })
+  );
 
   return (
     <>
