@@ -60,7 +60,16 @@ export function ProductsTab() {
       
     const matchesCategory = categoryFilter === 'all' || product.categories.some((c: any) => (typeof c === 'string' ? c : c.name) === categoryFilter);
     const matchesArchive = showArchived ? product.isArchived : !product.isArchived;
-    const matchesSection = sectionFilter === 'all' || product.collections.some((c: any) => (typeof c === 'string' ? c : c.name) === sectionFilter);
+    const matchesSection = sectionFilter === 'all' || (
+      sectionFilter === 'promotions' ? (product.oldPrice && product.oldPrice > product.price) :
+      sectionFilter === 'complements-alimentaires' ? product.collections.some((c: any) => (typeof c === 'string' ? c : c.name)?.toLowerCase().includes('complément')) :
+      sectionFilter === 'korean-beauty' ? product.collections.some((c: any) => (typeof c === 'string' ? c : c.name)?.toLowerCase().includes('korean')) :
+      sectionFilter === 'parfums-maquillage' ? product.collections.some((c: any) => {
+        const name = (typeof c === 'string' ? c : c.name)?.toLowerCase() || '';
+        return name.includes('maquillage') || name.includes('parfum');
+      }) :
+      true
+    );
     
     return matchesSearch && matchesCategory && matchesArchive && matchesSection;
   });
@@ -291,10 +300,10 @@ export function ProductsTab() {
               style={{ minWidth: '180px' }}
             >
               <option value="all">📁 Toutes les sections</option>
-              <option value="Korean Beauty">✨ Korean Beauty</option>
-              <option value="Maquillage & Parfums">💄 Maquillage & Parfums</option>
-              <option value="Compléments Alimentaires">🌿 Compléments Alimentaires</option>
-              <option value="Accessoires">🛍️ Accessoires</option>
+              <option value="promotions">🏷️ PROMOTIONS</option>
+              <option value="complements-alimentaires">🌿 COMPLÉMENTS ALIMENTAIRES</option>
+              <option value="korean-beauty">✨ KOREAN BEAUTY</option>
+              <option value="parfums-maquillage">� PARFUMS & MAQUILLAGE</option>
             </select>
           </div>
         </div>
