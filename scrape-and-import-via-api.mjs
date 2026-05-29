@@ -10,17 +10,26 @@ const PUBLIC_IMAGES_DIR = path.join(__dirname, 'public', 'images', 'scraped', 'p
 
 const API_URL = 'http://localhost:5000/api';
 
+// Get admin password from env var or command line arg
+const ADMIN_PASSWORD = process.argv[2] || process.env.ADMIN_PASSWORD || '';
+
 // Admin login to get JWT token
 async function getAdminToken() {
+  if (!ADMIN_PASSWORD) {
+    console.error('\n❌ ERREUR: Mot de passe admin manquant');
+    console.error('Usage: node scrape-and-import-via-api.mjs <MOT_DE_PASSE_ADMIN>');
+    console.error('Ou: ADMIN_PASSWORD=votre_mdp node scrape-and-import-via-api.mjs\n');
+    return null;
+  }
+
   try {
     const res = await axios.post(`${API_URL}/auth/login`, {
       username: 'admin',
-      password: process.env.ADMIN_PASSWORD || 'admin123'
+      password: ADMIN_PASSWORD
     });
     return res.data.token;
   } catch (err) {
-    console.error('Login failed:', err.message);
-    console.log('Trying with default admin credentials...');
+    console.error('Login failed:', err.response?.data?.error || err.message);
     return null;
   }
 }
