@@ -23,7 +23,7 @@ const PILLARS: Pillar[] = [
     label: 'Sommeil',
     timing: 'Soir',
     title: 'Sommeil & Relaxation',
-    description: 'Mélatonine, magnésium glycinate, plantes apaisantes.',
+    description: '',
     image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=melatonine',
     accent: '#a855f7',
@@ -33,7 +33,7 @@ const PILLARS: Pillar[] = [
     label: 'Équilibre',
     timing: 'Matin',
     title: 'Stress & Humeur',
-    description: 'Adaptogènes & focus doux: ashwagandha, rhodiola, L-théanine.',
+    description: '',
     image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=ashwagandha',
     accent: '#FF4FA3',
@@ -43,7 +43,7 @@ const PILLARS: Pillar[] = [
     label: 'Intestin',
     timing: 'Repas',
     title: 'Digestion & Probiotiques',
-    description: 'Confort intestinal, enzymes & microbiote (probiotiques).',
+    description: '',
     image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=probiotiques',
     accent: '#10b981',
@@ -53,7 +53,7 @@ const PILLARS: Pillar[] = [
     label: 'Silhouette',
     timing: 'Avant repas',
     title: 'Poids & Métabolisme',
-    description: 'Berbérine, chrome, ALA: routine métabolique.',
+    description: '',
     image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=berberine',
     accent: '#f59e0b',
@@ -63,7 +63,7 @@ const PILLARS: Pillar[] = [
     label: 'Immunité',
     timing: 'Matin',
     title: 'Immunité & Ruche',
-    description: 'Propolis, vitamine C, zinc: protection quotidienne.',
+    description: '',
     image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=propolis',
     accent: '#f97316',
@@ -73,7 +73,7 @@ const PILLARS: Pillar[] = [
     label: 'Beauty',
     timing: 'Matin',
     title: 'Beauté In & Out',
-    description: 'Collagène, biotine & acide hyaluronique: glow, cheveux, ongles.',
+    description: '',
     image: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=collagene',
     accent: '#ec4899',
@@ -139,7 +139,6 @@ export function SupplementsSection() {
                     <span className="supp-timing">{p.timing}</span>
                   </div>
                   <h3 className="supp-card-title">{p.title}</h3>
-                  <p className="supp-card-desc">{p.description}</p>
                   <span className="supp-cta">
                     Voir plus <ArrowRight size={16} />
                   </span>
