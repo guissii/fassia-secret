@@ -75,7 +75,14 @@ export const getProducts = async (req: Request, res: Response) => {
       prisma.product.count({ where })
     ]);
 
-    const responseData = { products, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    // Map categories array to category string for frontend compatibility
+    const mappedProducts = products.map((p: any) => ({
+      ...p,
+      category: p.categories?.[0]?.name || 'Visage',
+      categorySlug: p.categories?.[0]?.slug || 'visage',
+    }));
+
+    const responseData = { products: mappedProducts, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
     
     // Cache for 5 minutes
     await redis.setex(cacheKey, 300, JSON.stringify(responseData));
