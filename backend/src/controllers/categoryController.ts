@@ -189,6 +189,7 @@ const DEFAULT_CATEGORIES = [
   { name: 'Accessoires', nameAr: 'إكسسوارات', slug: 'accessoires' },
   { name: 'Minceur', nameAr: 'التخسيس', slug: 'minceur' },
   { name: 'Sport', nameAr: 'رياضة', slug: 'sport' },
+  { name: 'Hygiène', nameAr: 'النظافة', slug: 'hygiene' },
   { name: 'Maman & Bébé', nameAr: 'الأم والطفل', slug: 'maman-bebe' },
   { name: 'Premium Hair Care', nameAr: 'العناية الفاخرة بالشعر', slug: 'premium-hair-care' },
   { name: 'Promotions', nameAr: 'تخفيضات', slug: 'promotions' },

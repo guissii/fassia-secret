@@ -144,17 +144,26 @@ export const deleteCollection = async (req: Request, res: Response) => {
   }
 };
 
-// Predefined subcategories from client menu
+// Predefined subcategories from client menu (Collections)
 const MENU_SUBCATEGORIES: Record<string, string[]> = {
-  'corps': ['Corps & bain', 'Hydratation', 'Gommage', 'Rasage & épilation', 'Minceur'],
+  'corps': ['Déodorants', 'Gels Douche', 'Gommage & Exfoliants', 'Hydratation & Nutrition', 'Parfums Femmes', 'Rasage & Épilation', 'Savons', 'Soins des Mains & Pieds', 'Soins des Ongles', 'Soins Minceur & Anti-Cellulite', 'Accessoires de Bain'],
   'visage': ['Crèmes & Soins Hydratants', 'Nettoyants & Démaquillants', 'Protections Solaires', 'Soins des Lèvres', 'Soins Anti-taches & Éclaircissants', 'Soins Anti-âge', 'Soins Anti-Imperfections', 'Soins des Yeux', 'Masques & Gommages'],
   'cheveux': ['Shampoings', 'Après-shampoings', 'Masques & Soins Réparateurs', 'Colorations & Entretien', 'Produits & Accessoires de Coiffure'],
   'hygiene-dentaire': ['Brosses à dents', 'Dentifrices', 'Bains De Bouche & Haleine', 'Soins dentaires'],
   'maquillage': ['Nettoyants & Démaquillants', 'Teint', 'Yeux', 'Lèvres', 'Accessoires Maquillage', 'Trousses de Maquillage'],
   'hygiene-intimite': ['Toilette Intime', 'Serviettes Hygiéniques', 'Tampons', 'Lubrifiants'],
+  'hygiene': ['Gel hydroalcoolique', 'Déodorants', 'Soin intime', 'Protections'],
   'sante': ['Auto-Surveillance', 'Compléments alimentaires', 'Premiers Secours', 'Orthopédie & Soutien'],
-  'hommes': ['Déodorants', 'Soins Hommes', 'Lubrifiants', 'Préservatifs'],
+  'hommes': ['Déodorants', 'Soins visage homme', 'Soins corps homme', 'Rasage', 'Barbe', 'Parfums Homme'],
   'preoccupations': ['Acne & Imperfections', 'Cernes', 'Taches', 'Rosacee & Rougeurs', 'Peau seche', 'Anti-age', 'Chute de cheveux', 'Immunite'],
+  'complements-alimentaires': ['Cheveux', 'Ongles', 'Immunité', 'Minceur', 'Énergie', 'Sommeil', 'Vitamines & Mineraux', 'Collagene', 'Omega 3', 'Detox & Drainage'],
+  'k-beauty': ['Nettoyants', 'Essence', 'Sérum', 'Masque', 'Crème hydratante', 'SPF'],
+  'dermo-corner': ['La Roche-Posay', 'Vichy', 'CeraVe', 'Bioderma', 'SVR', 'Eucerin'],
+  'accessoires': ['Accessoires visage', 'Accessoires cheveux', 'Trousses', 'Brosses', 'Eponges'],
+  'minceur': ['Brule-graisses', 'Draineurs', 'Collagene', 'Sport & recuperation'],
+  'sport': ['Proteines', 'Energie', 'Hydratation', 'Recuperation'],
+  'maman-bebe': ['Bebe', 'Maman', 'Solaire bebe', 'Change & toilette', 'Accessoires'],
+  'premium-hair-care': ['Shampoing premium', 'Masque premium', 'Huiles & serums', 'Anti-chute'],
 };
 
 function generateSlug(name: string): string {

@@ -182,6 +182,19 @@ export function CategoriesTab() {
             Importer catégories
           </button>
           <button
+            className="admin-btn-outline"
+            onClick={async () => {
+              try {
+                const res = await api.fetchWithAuth('/collections/seed', { method: 'POST' });
+                setToast({ message: res.message, type: 'success' });
+              } catch (error: any) {
+                setToast({ message: error.message || 'Erreur import collections', type: 'error' });
+              }
+            }}
+          >
+            Importer collections
+          </button>
+          <button
             className="admin-btn-primary"
             onClick={() => { setSelectedCategory(null); setIsModalOpen(true); }}
           >
