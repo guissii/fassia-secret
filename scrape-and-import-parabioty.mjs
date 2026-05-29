@@ -4,8 +4,14 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+import sharp from 'sharp';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load .env from backend directory for DATABASE_URL
+dotenv.config({ path: path.join(__dirname, 'backend', '.env') });
+
 const prisma = new PrismaClient();
 
 const PUBLIC_IMAGES_DIR = path.join(__dirname, 'public', 'images', 'scraped', 'parabioty');
@@ -40,14 +46,31 @@ async function fetchHTML(url) {
 
 async function downloadImage(imageUrl, outputPath) {
   if (!imageUrl) return false;
-  const fullUrl = imageUrl.startsWith('http') ? imageUrl : `https://www.parabioty.com${imageUrl}`;
+
+  // Fix URL construction
+  let fullUrl;
+  if (imageUrl.startsWith('http')) {
+    fullUrl = imageUrl;
+  } else if (imageUrl.startsWith('//')) {
+    fullUrl = `https:${imageUrl}`;
+  } else if (imageUrl.startsWith('/')) {
+    fullUrl = `https://www.parabioty.com${imageUrl}`;
+  } else {
+    fullUrl = `https://www.parabioty.com/${imageUrl}`;
+  }
+
   try {
     const res = await axios.get(encodeURI(fullUrl), {
       responseType: 'arraybuffer',
       timeout: 30000,
       headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
     });
-    fs.writeFileSync(outputPath, Buffer.from(res.data));
+
+    // Convert to WEBP
+    await sharp(Buffer.from(res.data))
+      .webp({ quality: 85 })
+      .toFile(outputPath);
+
     return true;
   } catch (err) {
     console.error(`Image download failed: ${err.message}`);
@@ -250,7 +273,7 @@ async function main() {
       let imageRelPath = '';
       if (details.imageUrl) {
         const safeName = scrapedTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
-        imageFilename = `${safeName}_${i}.jpg`;
+        imageFilename = `${safeName}_${i}.webp`;
         const imagePath = path.join(PUBLIC_IMAGES_DIR, imageFilename);
         console.log(`  -> Downloading image...`);
         const ok = await downloadImage(details.imageUrl, imagePath);
