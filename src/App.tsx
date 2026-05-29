@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { EssentialsSection } from './components/EssentialsSection';
-import { MakeupParfumsSection } from './components/MakeupParfumsSection';
 import { AffichesSection } from './components/AffichesSection';
 
 import Link from 'next/link';
@@ -22,6 +21,7 @@ function App({ bestSellers }: { bestSellers: any[] }) {
   const bestSellersBanner = LOCAL_BANNERS.bestSellers;
   const [essentials, setEssentials] = useState<any[]>([]);
   const [loadingEssentials, setLoadingEssentials] = useState(true);
+  const [makeupParfums, setMakeupParfums] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/products?isEssential=true&random=true&limit=10')
@@ -31,6 +31,20 @@ function App({ bestSellers }: { bestSellers: any[] }) {
         setLoadingEssentials(false);
       })
       .catch(() => setLoadingEssentials(false));
+  }, []);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/products?category=Maquillage&limit=5').then(r => r.json()),
+      fetch('/api/products?category=Parfums&limit=5').then(r => r.json()),
+    ])
+      .then(([maquillageData, parfumsData]) => {
+        const maquillage = maquillageData.products || [];
+        const parfums = parfumsData.products || [];
+        const combined = [...maquillage, ...parfums].slice(0, 10);
+        setMakeupParfums(combined);
+      })
+      .catch(() => setMakeupParfums([]));
   }, []);
 
   return (
@@ -44,7 +58,16 @@ function App({ bestSellers }: { bestSellers: any[] }) {
       ) : (
         <EssentialsSection products={essentials} />
       )}
-      <MakeupParfumsSection />
+
+      {makeupParfums.length > 0 && (
+        <CollectionCarousel
+          title="MAQUILLAGE & PARFUMS"
+          imageSrc=""
+          products={makeupParfums}
+          linkHref="/boutique?category=Maquillage"
+          linkTitle="Découvrir le maquillage et les parfums"
+        />
+      )}
 
       <IngredientsSection />
 
