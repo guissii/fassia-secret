@@ -57,10 +57,11 @@ export const getCollectionProducts = async (req: Request, res: Response) => {
       return res.json(JSON.parse(cachedData));
     }
 
+    const slugStr = Array.isArray(slug) ? slug[0] : slug;
     const [products, total] = await prisma.$transaction([
       prisma.product.findMany({
         where: {
-          collections: { some: { slug } },
+          collections: { some: { slug: slugStr } },
           isVisible: true,
           isArchived: false,
         },
@@ -74,7 +75,7 @@ export const getCollectionProducts = async (req: Request, res: Response) => {
       }),
       prisma.product.count({
         where: {
-          collections: { some: { slug } },
+          collections: { some: { slug: slugStr } },
           isVisible: true,
           isArchived: false,
         },
