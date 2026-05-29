@@ -7,21 +7,21 @@ export function Categories() {
     {
       id: 1,
       title: 'Soins du Visage',
-      image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=800&auto=format&fit=crop&q=80',
+      image: '/categories/soin-du-visage.webp',
       className: 'category-large',
       href: '/boutique?category=Visage',
     },
     {
       id: 2,
       title: 'Soins des Cheveux',
-      image: 'https://images.unsplash.com/photo-1522337360788-8b13ffd7b1a1?w=800&auto=format&fit=crop&q=80',
+      image: '/categories/soin-cheveux.webp',
       className: 'category-small',
       href: '/boutique?category=Cheveux',
     },
     {
       id: 3,
       title: 'Compléments Alimentaires',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80',
+      image: '/categories/complements-alimentaires.webp',
       className: 'category-small category-supplements',
       href: '/complements-alimentaires',
     },
@@ -43,7 +43,7 @@ export function Categories() {
               <div
                 className="bento-bg"
                 style={{
-                  backgroundImage: `url('${cat.image.startsWith('http') ? cat.image : publicAssetUrl(cat.image)}')`,
+                  backgroundImage: `url('${cat.image}')`,
                 }}
               />
               <div className="bento-gradient" aria-hidden="true" />
