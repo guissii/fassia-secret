@@ -1,13 +1,18 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import ComplementsClientPage from '../../../src/ComplementsClientPage';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
+// Côté serveur: localhost direct, côté client: URL publique
+const API_URL = typeof window === 'undefined'
+  ? 'http://localhost:5000'
+  : (process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com');
 
 async function getComplements() {
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=50&category=Complements`, {
-      next: { revalidate: 300 },
+    const res = await fetch(`${API_URL}/api/products?limit=50&category=complements-alimentaires`, {
+      cache: 'no-store',
     });
     if (!res.ok) return [];
     const data = await res.json();

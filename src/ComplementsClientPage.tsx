@@ -110,7 +110,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
 
   useEffect(() => {
     if (initialProducts.length === 0) {
-      fetch('/api/products?category=Compl%C3%A9ments&limit=100')
+      fetch('/api/products?category=complements-alimentaires&limit=100')
         .then((res) => res.json())
         .then((data) => {
           if (data.products) setSupplements(data.products);
@@ -119,7 +119,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
     }
 
     setHeroImage(LOCAL_BANNERS.complements);
-  }, []);
+  }, [initialProducts]);
 
   return (
     <>
@@ -135,10 +135,10 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
                 Sommeil, stress, digestion, immunité, beauté… Une sélection chic, lisible, et directement shoppable.
               </p>
               <div className="supp-page-hero-actions">
-                <Link href="/boutique?category=Compléments" className="supp-page-hero-cta">
+                <Link href="/boutique?category=complements-alimentaires" className="supp-page-hero-cta">
                   Voir le catalogue <ArrowRight size={16} />
                 </Link>
-                <Link href="/boutique?category=Compléments&new=1" className="supp-page-hero-cta ghost">
+                <Link href="/boutique?category=complements-alimentaires&new=1" className="supp-page-hero-cta ghost">
                   Nouveautés <ArrowRight size={16} />
                 </Link>
               </div>
@@ -160,7 +160,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
 
         {FOCUSES.map((f) => {
           const products = supplements.filter((p) => matchesQuery(p, f.q));
-          const href = `/boutique?category=Compléments&q=${encodeURIComponent(f.q)}`;
+          const href = `/boutique?category=complements-alimentaires&q=${encodeURIComponent(f.q)}`;
 
           return (
             <section key={f.key} id={f.key} className="supp-need-section pb-3xl" aria-label={f.title}>
@@ -204,7 +204,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
 
         <section className="supp-page-all pb-3xl" aria-label="Tous les compléments">
           <div className="container">
-            <Link href="/boutique?category=Compléments" className="supp-page-all-cta" aria-label="Voir tous les produits compléments">
+            <Link href="/boutique?category=complements-alimentaires" className="supp-page-all-cta" aria-label="Voir tous les produits compléments">
               Voir tous les produits <ArrowRight size={18} />
             </Link>
           </div>
