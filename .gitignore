@@ -6,7 +6,6 @@ dist
 dist-ssr
 .next
 out
-backend/dist
 
 # Environment
 .env
