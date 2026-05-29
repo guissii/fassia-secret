@@ -27,6 +27,14 @@ export function ProductsTab() {
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [lastSelectedId, setLastSelectedId] = useState<number | null>(null);
   const [selectAllMode, setSelectAllMode] = useState<'none' | 'visible' | 'filtered'>('none');
+
+  const MAX_ESSENTIALS = 10;
+  const essentialCount = products.filter(p => p.isEssential).length;
+  const selectedEssentialCount = Array.from(selectedIds).filter(id => {
+    const p = products.find(prod => prod.id === id);
+    return p && !p.isEssential;
+  }).length;
+  const canAddEssential = essentialCount + selectedEssentialCount <= MAX_ESSENTIALS;
   
   // UI State
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
@@ -418,6 +426,9 @@ export function ProductsTab() {
                   Sélectionner les {filteredProducts.length} produits filtrés
                 </button>
               )}
+              <span style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#92400e', background: '#fef3c7', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid #f59e0b' }}>
+                ★ Essentiels : {essentialCount}/{MAX_ESSENTIALS}
+              </span>
             </span>
             <button className="admin-btn-outline text-sm" onClick={() => handleBulkVisibility(true)} title="Publier">
               <Eye size={14} /> Publier
@@ -428,7 +439,18 @@ export function ProductsTab() {
             <button className="admin-btn-outline text-sm" onClick={() => handleBulkArchive(true)} title="Archiver">
               <Archive size={14} /> Archiver
             </button>
-            <button className="admin-btn-outline text-sm" onClick={() => handleBulkEssential(true)} title="Ajouter aux Essentiels" style={{ background: '#fef3c7', borderColor: '#f59e0b', color: '#92400e' }}>
+            <button 
+              className="admin-btn-outline text-sm" 
+              onClick={() => canAddEssential ? handleBulkEssential(true) : setToast({ message: `Maximum ${MAX_ESSENTIALS} produits essentiels atteint`, type: 'error' })} 
+              title={canAddEssential ? "Ajouter aux Essentiels" : `Limite ${MAX_ESSENTIALS} atteinte`}
+              style={{ 
+                background: canAddEssential ? '#fef3c7' : '#f3f4f6', 
+                borderColor: canAddEssential ? '#f59e0b' : '#d1d5db', 
+                color: canAddEssential ? '#92400e' : '#9ca3af',
+                cursor: canAddEssential ? 'pointer' : 'not-allowed'
+              }}
+              disabled={!canAddEssential}
+            >
               <Star size={14} /> Essentiel
             </button>
             <button 
