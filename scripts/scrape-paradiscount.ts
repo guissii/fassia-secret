@@ -128,167 +128,170 @@ function detectCollections(name: string): string[] {
   return collections;
 }
 
-async function scrapeProductList(): Promise<ScrapedProduct[]> {
-  const products: ScrapedProduct[] = [];
-  const seen = new Set<string>();
-
-  for (let page = 1; page <= MAX_PAGES && products.length < TARGET_COUNT; page++) {
-    const url = `${BASE_URL}${COLLECTION_PATH}?page=${page}`;
-    console.log(`📄 Page ${page}: ${url}`);
-    const html = await fetchHtml(url);
-    if (!html) break;
-
-    const $ = cheerio.load(html);
-
-    // Method 1: Extract from dataLayer JSON
-    let found = 0;
-    const scripts = $('script').toArray();
-    for (const scriptEl of scripts) {
-      const text = $(scriptEl).text();
-      if (text.includes('cdcDatalayer') && text.includes('"ecommerce"')) {
-        try {
-          // Extract the dataLayer object - greedy match to end of script
-          const match = text.match(/cdcDatalayer\s*=\s*(\{[\s\S]*?\});\s*(?:<\/script>|$)/);
-          if (match) {
-            const data = JSON.parse(match[1]);
-            const items = data?.ecommerce?.items || [];
-            console.log(`   📦 dataLayer has ${items.length} items`);
-            for (const item of items) {
-              const name = cleanName(item.item_name || '');
-              const price = parseFloat(item.price) || 0;
-              const brand = item.item_brand || name.split(' ')[0] || 'Univers Paradiscount';
-
-              // Build image URL from item_id
-              const itemId = item.item_id?.replace('-0', '') || '';
-              const imageUrl = `${BASE_URL}/${itemId}-large_default/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
-
-              if (name && price > 0 && !seen.has(name)) {
-                seen.add(name);
-                products.push({ name, price, imageUrl, brand });
-                found++;
-              }
-            }
-          }
-        } catch (e) {
-          console.log(`   ⚠️ dataLayer parse error: ${(e as Error).message}`);
-        }
-      }
-    }
-
-    // Method 2: Fallback to Schema.org JSON-LD
-    if (found === 0) {
-      $('script[type="application/ld+json"]').each((_, el) => {
-        try {
-          const json = JSON.parse($(el).text());
-          if (json['@type'] === 'ItemList' && Array.isArray(json.itemListElement)) {
-            for (const item of json.itemListElement) {
-              const name = cleanName(item.name || '');
-              const url = item.url || '';
-              if (name && !seen.has(name)) {
-                seen.add(name);
-                // Extract item ID from URL to build image URL
-                const idMatch = url.match(/(\d+)-/);
-                const itemId = idMatch ? idMatch[1] : '';
-                const imageUrl = itemId ? `${BASE_URL}/${itemId}-large_default/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg` : '';
-                products.push({
-                  name,
-                  price: 0, // Will be fetched from product page
-                  imageUrl,
-                  brand: name.split(' ')[0] || 'Univers Paradiscount',
-                });
-                found++;
-              }
-            }
-          }
-        } catch (e) {
-          // ignore
-        }
-      });
-    }
-
-    console.log(`   Found ${found} products from JSON data`);
-    if (found === 0) break;
-    await new Promise(r => setTimeout(r, 800));
-  }
-
-  return products.slice(0, TARGET_COUNT);
-}
-
 async function main() {
   ensureDir(IMAGES_DIR);
   console.log('🚀 Scraping Univers Paradiscount Vitamines...\n');
 
-  const products = await scrapeProductList();
-  console.log(`\n📦 ${products.length} products scraped\n`);
-
+  const seen = new Set<string>();
   let created = 0;
-  for (let i = 0; i < products.length; i++) {
-    const p = products[i];
-    console.log(`[${i+1}/${products.length}] ${p.name}`);
+  let page = 1;
 
-    // Skip duplicates
-    const existing = await prisma.product.findFirst({
-      where: { name: { equals: p.name, mode: 'insensitive' } }
-    });
-    if (existing) {
-      console.log('   ⏭️ Already exists');
-      continue;
-    }
+  while (created < TARGET_COUNT && page <= MAX_PAGES) {
+    const url = `${BASE_URL}${COLLECTION_PATH}?page=${page}`;
+    console.log(`📄 Page ${page}: ${url}`);
+    const html = await fetchHtml(url);
+    if (!html) { page++; continue; }
 
-    // Download image
-    const imagePath = await downloadImage(p.imageUrl, `paradiscount-${Date.now()}-${i}`);
-    if (!imagePath) {
-      console.log('   ❌ Image download failed');
-      continue;
-    }
+    const products = await extractProductsFromHtml(html, seen);
+    console.log(`   📦 ${products.length} products on this page\n`);
 
-    // Detect metadata
-    const focus = detectSupplementFocus(p.name);
-    const collectionNames = detectCollections(p.name);
+    if (products.length === 0) break;
 
-    // Get or create collections
-    const collections = [];
-    for (const collName of collectionNames) {
-      let coll = await prisma.collection.findFirst({ where: { name: collName } });
-      if (!coll) {
-        coll = await prisma.collection.create({
-          data: {
-            name: collName,
-            slug: collName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            page: 'complements-alimentaires',
-            description: `Collection ${collName}`,
-            order: 0,
-          }
-        });
+    for (let i = 0; i < products.length && created < TARGET_COUNT; i++) {
+      const p = products[i];
+      console.log(`[${created + 1}/${TARGET_COUNT}] ${p.name}`);
+
+      // Skip duplicates
+      const existing = await prisma.product.findFirst({
+        where: { name: { equals: p.name, mode: 'insensitive' } }
+      });
+      if (existing) {
+        console.log('   ⏭️ Already exists');
+        continue;
       }
-      collections.push({ id: coll.id });
+
+      // Download image
+      const imagePath = await downloadImage(p.imageUrl, `paradiscount-${Date.now()}-${created}`);
+      if (!imagePath) {
+        console.log('   ❌ Image download failed, trying next product...');
+        continue;
+      }
+
+      // Detect metadata
+      const focus = detectSupplementFocus(p.name);
+      const collectionNames = detectCollections(p.name);
+
+      // Get or create collections
+      const collections = [];
+      for (const collName of collectionNames) {
+        let coll = await prisma.collection.findFirst({ where: { name: collName } });
+        if (!coll) {
+          coll = await prisma.collection.create({
+            data: {
+              name: collName,
+              slug: collName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              page: 'complements-alimentaires',
+              description: `Collection ${collName}`,
+              order: 0,
+            }
+          });
+        }
+        collections.push({ id: coll.id });
+      }
+
+      // Create product
+      await prisma.product.create({
+        data: {
+          brand: p.brand,
+          name: p.name,
+          description: `Complément alimentaire : ${p.name}`,
+          price: p.price,
+          oldPrice: p.oldPrice || null,
+          image: imagePath,
+          stock: 10,
+          isVisible: true,
+          salesCount: 0,
+          tags: [],
+          concerns: [],
+          supplementFocus: focus,
+          collections: { connect: collections },
+        }
+      });
+
+      console.log(`   ✅ Created (focus: ${focus || 'none'}, collections: ${collectionNames.join(', ')})`);
+      created++;
     }
 
-    // Create product
-    await prisma.product.create({
-      data: {
-        brand: p.brand,
-        name: p.name,
-        description: `Complément alimentaire : ${p.name}`,
-        price: p.price,
-        oldPrice: p.oldPrice || null,
-        image: imagePath,
-        stock: 10,
-        isVisible: true,
-        salesCount: 0,
-        tags: [],
-        concerns: [],
-        supplementFocus: focus,
-        collections: { connect: collections },
-      }
-    });
-
-    console.log(`   ✅ Created (focus: ${focus || 'none'}, collections: ${collectionNames.join(', ')})`);
-    created++;
+    page++;
+    if (created < TARGET_COUNT) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
   }
 
   console.log(`\n🎉 Done! ${created} products created.`);
   await prisma.$disconnect();
+}
+
+// Extract products from a single page HTML
+async function extractProductsFromHtml(html: string, seen: Set<string>): Promise<ScrapedProduct[]> {
+  const $ = cheerio.load(html);
+  const products: ScrapedProduct[] = [];
+
+  const scripts = $('script').toArray();
+  for (const scriptEl of scripts) {
+    const text = $(scriptEl).text();
+    if (text.includes('cdcDatalayer') && text.includes('"ecommerce"')) {
+      try {
+        const match = text.match(/cdcDatalayer\s*=\s*(\{[\s\S]*?\});\s*(?:<\/script>|$)/);
+        if (match) {
+          const data = JSON.parse(match[1]);
+          const items = data?.ecommerce?.items || [];
+          for (const item of items) {
+            const name = cleanName(item.item_name || '');
+            const price = parseFloat(item.price) || 0;
+            const brand = item.item_brand || name.split(' ')[0] || 'Univers Paradiscount';
+            const itemId = item.item_id?.replace('-0', '') || '';
+            const slug = name.toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^a-z0-9\s-]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/-+/g, '-')
+              .substring(0, 60);
+            const imageUrl = `${BASE_URL}/${itemId}-large_default/${slug}.jpg`;
+
+            if (name && price > 0 && !seen.has(name)) {
+              seen.add(name);
+              products.push({ name, price, imageUrl, brand });
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  // Fallback to Schema.org JSON-LD
+  if (products.length === 0) {
+    $('script[type="application/ld+json"]').each((_, el) => {
+      try {
+        const json = JSON.parse($(el).text());
+        if (json['@type'] === 'ItemList' && Array.isArray(json.itemListElement)) {
+          for (const item of json.itemListElement) {
+            const name = cleanName(item.name || '');
+            const url = item.url || '';
+            if (name && !seen.has(name)) {
+              seen.add(name);
+              const idMatch = url.match(/(\d+)-/);
+              const itemId = idMatch ? idMatch[1] : '';
+              const slug = name.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substring(0, 60);
+              const imageUrl = itemId ? `${BASE_URL}/${itemId}-large_default/${slug}.jpg` : '';
+              products.push({ name, price: 0, imageUrl, brand: name.split(' ')[0] || 'Univers Paradiscount' });
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    });
+  }
+
+  return products;
 }
 
 main().catch(async (err) => {
