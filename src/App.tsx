@@ -1,7 +1,6 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Hero } from './components/Hero';
 import { EssentialsSection } from './components/EssentialsSection';
 import { MakeupParfumsSection } from './components/MakeupParfumsSection';
 import { AffichesSection } from './components/AffichesSection';
@@ -24,8 +23,6 @@ function App({ bestSellers, essentials }: { bestSellers: any[], essentials: any[
   return (
     <>
       <AffichesSection />
-
-      <Hero />
 
       <EssentialsSection products={essentials} />
       <MakeupParfumsSection />
