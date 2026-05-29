@@ -327,7 +327,7 @@ async function main() {
         const category = await prisma.category.upsert({
           where: { slug: catSlug },
           update: {},
-          create: { name: catName, slug: catSlug, description: `Catégorie ${catName}` },
+          create: { name: catName, nameAr: catName, slug: catSlug, description: `Catégorie ${catName}` },
         });
         categoryIds.push(category.id);
       }
@@ -339,7 +339,7 @@ async function main() {
         const collection = await prisma.collection.upsert({
           where: { slug: collSlug },
           update: {},
-          create: { name: collName, slug: collSlug, description: `Collection ${collName}` },
+          create: { name: collName, nameAr: collName, slug: collSlug, description: `Collection ${collName}` },
         });
         collectionIds.push(collection.id);
       }
@@ -349,7 +349,7 @@ async function main() {
         const kbColl = await prisma.collection.upsert({
           where: { slug: 'korean-beauty' },
           update: {},
-          create: { name: 'Korean Beauty', slug: 'korean-beauty', description: 'Routine Korean Beauty' },
+          create: { name: 'Korean Beauty', nameAr: 'Korean Beauty', slug: 'korean-beauty', description: 'Routine Korean Beauty' },
         });
         if (!collectionIds.includes(kbColl.id)) {
           collectionIds.push(kbColl.id);
