@@ -8,7 +8,7 @@ import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import * as path from 'path';
 import sharp from 'sharp';
-import https from 'https';
+import axios from 'axios';
 
 const prisma = new PrismaClient();
 
@@ -17,6 +17,16 @@ const COLLECTION_PATH = '/376-vitamines-et-formes';
 const MAX_PAGES = 5;
 const TARGET_COUNT = 10;
 const IMAGES_DIR = path.join(process.cwd(), 'public', 'products-paradiscount');
+
+const axiosInstance = axios.create({
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+  },
+  timeout: 15000,
+});
 
 // Mapping supplementFocus par mots-clés dans le nom
 const FOCUS_MAP: Record<string, string[]> = {
@@ -56,40 +66,38 @@ function ensureDir(dir: string) {
 }
 
 async function fetchHtml(url: string): Promise<string | null> {
-  return new Promise((resolve) => {
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' } }, (res) => {
-      if (res.statusCode !== 200) { resolve(null); return; }
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve(data));
-    }).on('error', () => resolve(null));
-  });
+  try {
+    const response = await axiosInstance.get(url);
+    return response.data as string;
+  } catch (e) {
+    console.log(`   ❌ fetchHtml error: ${(e as any).message || 'unknown'}`);
+    return null;
+  }
 }
 
 async function downloadImage(imageUrl: string, filename: string): Promise<string | null> {
-  return new Promise((resolve) => {
+  try {
     const url = imageUrl.startsWith('http') ? imageUrl : `${BASE_URL}${imageUrl}`;
     const ext = path.extname(url.split('?')[0]) || '.jpg';
     const outputPath = path.join(IMAGES_DIR, `${filename}${ext}`);
     const webpPath = path.join(IMAGES_DIR, `${filename}.webp`);
 
-    const file = fs.createWriteStream(outputPath);
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-      if (res.statusCode !== 200) { file.destroy(); resolve(null); return; }
-      res.pipe(file);
-      file.on('finish', async () => {
-        file.close();
-        try {
-          await sharp(outputPath).webp({ quality: 85 }).toFile(webpPath);
-          fs.unlinkSync(outputPath);
-          console.log(`  ✅ ${filename}.webp`);
-          resolve(`/products-paradiscount/${filename}.webp`);
-        } catch {
-          resolve(null);
-        }
-      });
-    }).on('error', () => { file.destroy(); resolve(null); });
-  });
+    const response = await axiosInstance.get(url, { responseType: 'stream' });
+    const writer = fs.createWriteStream(outputPath);
+    (response.data as NodeJS.ReadableStream).pipe(writer);
+
+    await new Promise<void>((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+
+    await sharp(outputPath).webp({ quality: 85 }).toFile(webpPath);
+    fs.unlinkSync(outputPath);
+    console.log(`  ✅ ${filename}.webp`);
+    return `/products-paradiscount/${filename}.webp`;
+  } catch {
+    return null;
+  }
 }
 
 function cleanName(rawName: string): string {
