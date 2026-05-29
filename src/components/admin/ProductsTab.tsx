@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, Tag, Filter, X, Trash } from 'lucide-react';
+import './ProductsTab.css';
 import { api, AdminProduct, delay } from './mockData';
 import { ProductFormModal } from './ProductFormModal';
 import { Toast, ToastType, ConfirmModal } from './shared';
@@ -24,6 +25,8 @@ export function ProductsTab() {
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [lastSelectedId, setLastSelectedId] = useState<number | null>(null);
+  const [selectAllMode, setSelectAllMode] = useState<'none' | 'visible' | 'filtered'>('none');
   
   // UI State
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
@@ -79,24 +82,85 @@ export function ProductsTab() {
   const hasMore = visibleCount < filteredProducts.length;
 
   // Bulk selection handlers
-  const toggleSelect = (id: number) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const toggleSelect = (id: number, event?: React.MouseEvent) => {
+    const isShiftClick = event?.shiftKey;
+    
+    if (isShiftClick && lastSelectedId !== null) {
+      // Range selection
+      const ids = visibleProducts.map(p => p.id);
+      const startIdx = ids.indexOf(lastSelectedId);
+      const endIdx = ids.indexOf(id);
+      if (startIdx !== -1 && endIdx !== -1) {
+        const [min, max] = [Math.min(startIdx, endIdx), Math.max(startIdx, endIdx)];
+        const rangeIds = ids.slice(min, max + 1);
+        setSelectedIds(prev => {
+          const next = new Set(prev);
+          rangeIds.forEach(rid => next.add(rid));
+          return next;
+        });
+      }
+    } else {
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
+    setLastSelectedId(id);
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === visibleProducts.length && visibleProducts.length > 0) {
+    if (selectAllMode === 'visible') {
+      // Upgrade to filtered (all)
+      setSelectedIds(new Set(filteredProducts.map(p => p.id)));
+      setSelectAllMode('filtered');
+    } else if (selectAllMode === 'filtered') {
+      // Clear
       setSelectedIds(new Set());
+      setSelectAllMode('none');
     } else {
+      // Select visible
       setSelectedIds(new Set(visibleProducts.map(p => p.id)));
+      setSelectAllMode('visible');
     }
   };
 
-  const clearSelection = () => setSelectedIds(new Set());
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setSelectAllMode('none');
+    setLastSelectedId(null);
+  };
+
+  const handleBulkVisibility = async (visible: boolean) => {
+    if (selectedIds.size === 0) return;
+    try {
+      setToast({ message: `${visible ? 'Publication' : 'Masquage'} de ${selectedIds.size} produit(s)...`, type: 'info' });
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        await api.fetchWithAuth(`/products/${id}/visibility`, { method: 'PATCH', body: JSON.stringify({ isVisible: visible }) });
+      }
+      setProducts(prev => prev.map(p => selectedIds.has(p.id) ? { ...p, isVisible: visible } : p));
+      setToast({ message: `${ids.length} produit(s) ${visible ? 'publié(s)' : 'masqué(s)'}`, type: 'success' });
+    } catch {
+      setToast({ message: "Erreur lors de la modification de la visibilité", type: 'error' });
+    }
+  };
+
+  const handleBulkArchive = async (archive: boolean) => {
+    if (selectedIds.size === 0) return;
+    try {
+      setToast({ message: `${archive ? 'Archivage' : 'Désarchivage'} de ${selectedIds.size} produit(s)...`, type: 'info' });
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        await api.fetchWithAuth(`/products/${id}/archive`, { method: 'PATCH', body: JSON.stringify({ isArchived: archive }) });
+      }
+      setProducts(prev => prev.map(p => selectedIds.has(p.id) ? { ...p, isArchived: archive } : p));
+      setToast({ message: `${ids.length} produit(s) ${archive ? 'archivé(s)' : 'désarchivé(s)'}`, type: 'success' });
+    } catch {
+      setToast({ message: "Erreur lors de l'archivage", type: 'error' });
+    }
+  };
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
@@ -316,17 +380,42 @@ export function ProductsTab() {
           <div className="admin-bulk-bar" style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '1rem', 
-            padding: '0.75rem 1.5rem', 
-            background: '#fef3f2', 
-            borderBottom: '1px solid #fecaca',
-            color: '#991b1b'
+            gap: '0.5rem', 
+            padding: '0.5rem 1rem', 
+            background: '#f0fdf4', 
+            borderBottom: '1px solid #bbf7d0',
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
           }}>
-            <span className="text-sm font-medium">{selectedIds.size} produit(s) sélectionné(s)</span>
+            <span className="text-sm font-medium" style={{ color: '#166534', marginRight: 'auto' }}>
+              {selectedIds.size} produit(s) sélectionné(s)
+              {selectAllMode === 'filtered' && ` (tous les ${filteredProducts.length} filtrés)`}
+              {selectAllMode === 'visible' && filteredProducts.length > visibleProducts.length && (
+                <button 
+                  className="text-xs" 
+                  onClick={() => {
+                    setSelectedIds(new Set(filteredProducts.map(p => p.id)));
+                    setSelectAllMode('filtered');
+                  }}
+                  style={{ color: '#166534', textDecoration: 'underline', marginLeft: '0.5rem', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  Sélectionner les {filteredProducts.length} produits filtrés
+                </button>
+              )}
+            </span>
+            <button className="admin-btn-outline text-sm" onClick={() => handleBulkVisibility(true)} title="Publier">
+              <Eye size={14} /> Publier
+            </button>
+            <button className="admin-btn-outline text-sm" onClick={() => handleBulkVisibility(false)} title="Masquer">
+              <EyeOff size={14} /> Masquer
+            </button>
+            <button className="admin-btn-outline text-sm" onClick={() => handleBulkArchive(true)} title="Archiver">
+              <Archive size={14} /> Archiver
+            </button>
             <button 
               className="admin-btn-outline text-sm" 
               onClick={clearSelection}
-              style={{ marginLeft: 'auto' }}
             >
               <X size={14} /> Annuler
             </button>
@@ -334,7 +423,7 @@ export function ProductsTab() {
               className="admin-btn-danger text-sm" 
               onClick={() => setConfirmBulkDelete(true)}
             >
-              <Trash size={14} /> Supprimer la sélection
+              <Trash size={14} /> Supprimer
             </button>
           </div>
         )}
@@ -376,8 +465,18 @@ export function ProductsTab() {
                   const isSelected = selectedIds.has(product.id);
                   
                   return (
-                    <tr key={product.id} className={!product.isVisible ? 'opacity-60 hover-bg' : 'hover-bg'} style={isSelected ? { background: '#fef3f2' } : {}}>
-                      <td>
+                    <tr 
+                  key={product.id} 
+                  className={`${!product.isVisible ? 'opacity-60 hover-bg' : 'hover-bg'} ${isSelected ? 'row-selected' : ''}`}
+                  onClick={(e) => {
+                    // Only toggle if clicking on the row itself (not buttons/links)
+                    const target = e.target as HTMLElement;
+                    if (target.closest('button') || target.closest('a') || target.closest('input[type="checkbox"]')) return;
+                    toggleSelect(product.id, e);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                      <td onClick={(e) => e.stopPropagation()}>
                         <input 
                           type="checkbox" 
                           checked={isSelected}

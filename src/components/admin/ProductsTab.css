@@ -1,0 +1,49 @@
+/* ProductsTab.css - Styles for bulk selection */
+
+/* Selected row highlight */
+.admin-table tbody tr.row-selected {
+  background: #fef3f2 !important;
+  box-shadow: inset 3px 0 0 #e11d48;
+}
+
+.admin-table tbody tr.row-selected:hover {
+  background: #fee2e2 !important;
+}
+
+/* Checkbox styling */
+.admin-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #dc508c;
+}
+
+/* Sticky bulk bar */
+.admin-bulk-bar {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Row hover effect for clickable rows */
+.admin-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* Make the table container scrollable if needed */
+.admin-table-container {
+  overflow-x: auto;
+}
