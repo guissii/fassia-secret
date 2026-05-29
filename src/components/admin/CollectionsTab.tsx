@@ -110,12 +110,28 @@ export function CollectionsTab() {
           <h2>Collections</h2>
           <p className="admin-subtitle">Gérez vos collections et sous-catégories</p>
         </div>
-        <button
-          className="admin-btn-primary"
-          onClick={() => { setSelectedCollection(null); setIsModalOpen(true); }}
-        >
-          <Plus size={18} /> Nouvelle collection
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button
+            className="admin-btn-outline"
+            onClick={async () => {
+              try {
+                const res = await api.fetchWithAuth('/collections/seed', { method: 'POST' });
+                setToast({ message: res.message, type: 'success' });
+                loadCollections();
+              } catch (error: any) {
+                setToast({ message: error.message || 'Erreur import', type: 'error' });
+              }
+            }}
+          >
+            Importer sous-catégories
+          </button>
+          <button
+            className="admin-btn-primary"
+            onClick={() => { setSelectedCollection(null); setIsModalOpen(true); }}
+          >
+            <Plus size={18} /> Nouvelle collection
+          </button>
+        </div>
       </div>
 
       <div className="admin-card">

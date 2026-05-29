@@ -143,3 +143,70 @@ export const deleteCollection = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete collection' });
   }
 };
+
+// Predefined subcategories from client menu
+const MENU_SUBCATEGORIES: Record<string, string[]> = {
+  'corps': ['Corps & bain', 'Hydratation', 'Gommage', 'Rasage & épilation', 'Minceur'],
+  'visage': ['Crèmes & Soins Hydratants', 'Nettoyants & Démaquillants', 'Protections Solaires', 'Soins des Lèvres', 'Soins Anti-taches & Éclaircissants', 'Soins Anti-âge', 'Soins Anti-Imperfections', 'Soins des Yeux', 'Masques & Gommages'],
+  'cheveux': ['Shampoings', 'Après-shampoings', 'Masques & Soins Réparateurs', 'Colorations & Entretien', 'Produits & Accessoires de Coiffure'],
+  'hygiene-dentaire': ['Brosses à dents', 'Dentifrices', 'Bains De Bouche & Haleine', 'Soins dentaires'],
+  'maquillage': ['Nettoyants & Démaquillants', 'Teint', 'Yeux', 'Lèvres', 'Accessoires Maquillage', 'Trousses de Maquillage'],
+  'hygiene-intimite': ['Toilette Intime', 'Serviettes Hygiéniques', 'Tampons', 'Lubrifiants'],
+  'sante': ['Auto-Surveillance', 'Compléments alimentaires', 'Premiers Secours', 'Orthopédie & Soutien'],
+  'hommes': ['Déodorants', 'Soins Hommes', 'Lubrifiants', 'Préservatifs'],
+  'preoccupations': ['Acne & Imperfections', 'Cernes', 'Taches', 'Rosacee & Rougeurs', 'Peau seche', 'Anti-age', 'Chute de cheveux', 'Immunite'],
+};
+
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+export const seedCollections = async (req: Request, res: Response) => {
+  try {
+    const created: any[] = [];
+    const skipped: any[] = [];
+
+    for (const [page, items] of Object.entries(MENU_SUBCATEGORIES)) {
+      for (let i = 0; i < items.length; i++) {
+        const name = items[i];
+        const slug = generateSlug(name);
+        try {
+          const existing = await prisma.collection.findUnique({ where: { slug } });
+          if (existing) {
+            skipped.push({ name, slug, reason: 'Already exists' });
+            continue;
+          }
+          const coll = await prisma.collection.create({
+            data: {
+              name,
+              slug,
+              description: `Collection pour ${page}`,
+              page,
+              order: i,
+            },
+          });
+          created.push(coll);
+        } catch (err: any) {
+          skipped.push({ name, slug, reason: err.message });
+        }
+      }
+    }
+
+    await invalidateCollectionCache();
+
+    res.json({
+      success: true,
+      message: `${created.length} collections créées, ${skipped.length} ignorées`,
+      created,
+      skipped,
+    });
+  } catch (error: any) {
+    console.error('Error seeding collections:', error);
+    res.status(500).json({ error: 'Failed to seed collections' });
+  }
+};
