@@ -137,13 +137,14 @@ async function scrapeProductList(): Promise<ScrapedProduct[]> {
     const scripts = $('script').toArray();
     for (const scriptEl of scripts) {
       const text = $(scriptEl).text();
-      if (text.includes('"ecommerce"') && text.includes('"items"')) {
+      if (text.includes('cdcDatalayer') && text.includes('"ecommerce"')) {
         try {
-          // Extract the dataLayer object
-          const match = text.match(/cdcDatalayer\s*=\s*(\{.*?\});/s);
+          // Extract the dataLayer object - greedy match to end of script
+          const match = text.match(/cdcDatalayer\s*=\s*(\{[\s\S]*?\});\s*(?:<\/script>|$)/);
           if (match) {
             const data = JSON.parse(match[1]);
             const items = data?.ecommerce?.items || [];
+            console.log(`   📦 dataLayer has ${items.length} items`);
             for (const item of items) {
               const name = cleanName(item.item_name || '');
               const price = parseFloat(item.price) || 0;
@@ -161,7 +162,7 @@ async function scrapeProductList(): Promise<ScrapedProduct[]> {
             }
           }
         } catch (e) {
-          // ignore parse errors
+          console.log(`   ⚠️ dataLayer parse error: ${(e as Error).message}`);
         }
       }
     }
