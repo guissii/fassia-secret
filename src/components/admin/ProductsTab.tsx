@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, Tag, Filter, X, Trash, Star } from 'lucide-react';
+import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, X, Trash, Star } from 'lucide-react';
 import './ProductsTab.css';
-import { api, AdminProduct, delay } from './mockData';
+import { api, AdminProduct } from './mockData';
 import { ProductFormModal } from './ProductFormModal';
 import { Toast, ToastType, ConfirmModal } from './shared';
 import { publicAssetUrl } from '../../lib/publicUrl';
@@ -267,25 +267,11 @@ export function ProductsTab() {
     }
   };
 
-  const handleBulkTags = async (mode: 'clear' | 'auto') => {
-    setToast({ message: "Opération en cours...", type: 'info' });
-    await delay(800);
-    
-    if (mode === 'clear') {
-      setProducts(prev => prev.map(p => ({ ...p, tags: [] })));
-      setToast({ message: "Tags retirés de tous les produits", type: 'success' });
-    } else {
-      // Randomly assign tags to some products
-      setProducts(prev => prev.map(p => {
-        if (Math.random() > 0.8) {
-          const possibleTags = ['Exclusif', 'Meilleure vente', 'Nouveau'];
-          const randomTag = possibleTags[Math.floor(Math.random() * possibleTags.length)];
-          return { ...p, tags: [...(p.tags || []), randomTag] };
-        }
-        return p;
-      }));
-      setToast({ message: "Tags assignés automatiquement", type: 'success' });
-    }
+  const getPromoBadge = (price: number, oldPrice?: number | null) => {
+    if (!oldPrice || oldPrice <= price) return null;
+    const pct = Math.round(((oldPrice - price) / oldPrice) * 100);
+    if (pct <= 0) return null;
+    return `-${pct}%`;
   };
 
   const formatMAD = (amount: number) => {
@@ -329,17 +315,6 @@ export function ProductsTab() {
           <p className="admin-subtitle">Gérez vos produits, stocks et prix</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <div className="dropdown-container">
-            <button className="admin-btn-outline">
-              <Tag size={18} />
-              Tags en masse
-            </button>
-            <div className="dropdown-menu-custom">
-              <button onClick={() => handleBulkTags('auto')}>Auto-assigner (Exclusif, etc.)</button>
-              <button onClick={() => handleBulkTags('clear')} className="text-danger">Effacer tous les tags</button>
-            </div>
-          </div>
-          
           <button 
             className="admin-btn-primary" 
             onClick={() => { setSelectedProduct(null); setIsModalOpen(true); }}
@@ -544,15 +519,14 @@ export function ProductsTab() {
                                 KB Étape {product.koreanBeautyStep}
                               </span>
                             )}
-                            {product.tags && product.tags.length > 0 && (
-                              <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.25rem' }}>
-                                {product.tags.map(tag => (
-                                  <span key={tag} className="admin-badge badge-neutral" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
+                            {(() => {
+                              const badge = getPromoBadge(product.price, product.oldPrice);
+                              return badge ? (
+                                <span className="admin-badge" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', marginTop: '0.25rem', background: '#dcfce7', color: '#166534', border: '1px solid #22c55e' }}>
+                                  {badge}
+                                </span>
+                              ) : null;
+                            })()}
                             {product.isEssential && (
                               <span className="admin-badge" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', marginTop: '0.25rem', background: '#fef3c7', color: '#92400e', border: '1px solid #f59e0b' }}>
                                 ★ Essentiel
