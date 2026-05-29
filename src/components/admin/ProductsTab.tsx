@@ -17,6 +17,10 @@ export function ProductsTab() {
   const [sectionFilter, setSectionFilter] = useState('all');
   const [collections, setCollections] = useState<string[]>([]);
   
+  // Pagination
+  const PAGE_SIZE = 20;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
@@ -64,6 +68,15 @@ export function ProductsTab() {
     
     return matchesSearch && matchesCategory && matchesArchive && matchesSection;
   });
+  
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+    setSelectedIds(new Set());
+  }, [searchQuery, categoryFilter, sectionFilter, showArchived]);
+  
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredProducts.length;
 
   // Bulk selection handlers
   const toggleSelect = (id: number) => {
@@ -76,10 +89,10 @@ export function ProductsTab() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === filteredProducts.length && filteredProducts.length > 0) {
+    if (selectedIds.size === visibleProducts.length && visibleProducts.length > 0) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filteredProducts.map(p => p.id)));
+      setSelectedIds(new Set(visibleProducts.map(p => p.id)));
     }
   };
 
@@ -333,7 +346,7 @@ export function ProductsTab() {
                 <th style={{ width: '40px' }}>
                   <input 
                     type="checkbox" 
-                    checked={filteredProducts.length > 0 && selectedIds.size === filteredProducts.length}
+                    checked={visibleProducts.length > 0 && selectedIds.size === visibleProducts.length}
                     onChange={toggleSelectAll}
                   />
                 </th>
@@ -352,7 +365,7 @@ export function ProductsTab() {
               ) : filteredProducts.length === 0 ? (
                 <tr><td colSpan={8} className="text-center py-lg text-muted">Aucun produit trouvé.</td></tr>
               ) : (
-                filteredProducts.map(product => {
+                visibleProducts.map(product => {
                   const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') 
                     ? product.image 
                     : publicAssetUrl(product.image);
@@ -456,10 +469,18 @@ export function ProductsTab() {
             </tbody>
           </table>
           
-          <div className="admin-table-footer">
+          <div className="admin-table-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <span className="text-sm text-muted">
-              Affichage de {filteredProducts.length} produit(s)
+              Affichage de {visibleProducts.length} sur {filteredProducts.length} produit(s)
             </span>
+            {hasMore && (
+              <button 
+                className="admin-btn-primary text-sm"
+                onClick={() => setVisibleCount(prev => prev + PAGE_SIZE)}
+              >
+                Charger plus ({Math.min(PAGE_SIZE, filteredProducts.length - visibleCount)})
+              </button>
+            )}
           </div>
         </div>
       </div>
