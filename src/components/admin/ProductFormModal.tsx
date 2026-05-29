@@ -139,6 +139,7 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
           salesCount: 0,
           tags: [],
           image: '',
+          supplementFocus: null,
         });
       }
       loadCategories();
@@ -397,6 +398,29 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 </select>
                 <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0 0' }}>
                   Si le produit appartient à Korean Beauty, choisissez son étape
+                </p>
+              </div>
+
+              {/* Focus Compléments Alimentaires */}
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>Focus Compléments Alimentaires</label>
+                <select
+                  name="supplementFocus"
+                  className="admin-input"
+                  value={formData.supplementFocus || ''}
+                  onChange={handleChange}
+                  style={{ width: '100%' }}
+                >
+                  <option value="">-- Non applicable --</option>
+                  <option value="sleep">😴 Sommeil & Relaxation</option>
+                  <option value="stress">🧘 Stress & Humeur</option>
+                  <option value="digest">🥗 Digestion & Probiotiques</option>
+                  <option value="metabolic">⚖️ Poids & Métabolisme</option>
+                  <option value="immunity">🛡️ Immunité & Ruche</option>
+                  <option value="beauty">✨ Beauté In & Out</option>
+                </select>
+                <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0 0' }}>
+                  Si le produit est un complément alimentaire, choisissez son focus
                 </p>
               </div>
 
