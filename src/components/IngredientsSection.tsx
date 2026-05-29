@@ -17,10 +17,6 @@ type Ingredient = {
   searchQuery: string;
 };
 
-const imageUrl = (prompt: string) => {
-  return '/logo.png';
-};
-
 const INGREDIENTS: Ingredient[] = [
   {
     id: 1,
@@ -28,7 +24,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Niacinamide',
     subtitle: 'Vitamine B3',
     description: 'Atténue les taches pigmentaires, resserre les pores et unifie le teint pour une peau nette et lumineuse.',
-    image: imageUrl('Photographie de produit cosmétique minimaliste: flacon compte-gouttes et gouttes transparentes, thème niacinamide vitamine B3, laboratoire, fond clair doux, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80',
     icon: 'sparkles',
     accent: '#e10074',
     searchQuery: 'Niacinamide',
@@ -39,7 +35,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Acide Hyaluronique',
     subtitle: 'Hydratant intense',
     description: 'Régénère la peau en profondeur, effet repulpant immédiat et barrière anti-déshydratation longue durée.',
-    image: imageUrl('Photographie macro de gouttes d eau et sérum hydratant, thème acide hyaluronique, reflets bleus, laboratoire, fond propre, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1608248597279-f99d160bfbc8?w=600&auto=format&fit=crop&q=80',
     icon: 'droplet',
     accent: '#0ea5e9',
     searchQuery: 'Acide Hyaluronique',
@@ -50,7 +46,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Acide Salicylique',
     subtitle: 'BHA purifiant',
     description: 'Purifie les pores en profondeur, réduit les points noirs et prévient les éruptions pour une peau claire.',
-    image: imageUrl('Photographie de flacon sérum et texture gel, thème acide salicylique BHA, ambiance clinique, accents verts, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&auto=format&fit=crop&q=80',
     icon: 'flask',
     accent: '#10b981',
     searchQuery: 'Acide Salicylique',
@@ -61,7 +57,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Céramides',
     subtitle: 'Réparation lipidique',
     description: 'Renforce la barrière naturelle, réduit la sécheresse extrême et protège contre les agressions extérieures.',
-    image: imageUrl('Photographie de crème riche et texture onctueuse, thème céramides barrière cutanée, tons neutres, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop&q=80',
     icon: 'leaf',
     accent: '#84cc16',
     searchQuery: 'Céramides',
@@ -72,7 +68,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'SPF 50+',
     subtitle: 'Écran solaire',
     description: 'Protection large spectre indispensable contre les UVA/UVB pour prévenir le vieillissement et les taches.',
-    image: imageUrl('Photographie de crème solaire avec rayons de soleil doux et reflets dorés, thème SPF 50+, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024f?w=600&auto=format&fit=crop&q=80',
     icon: 'sun',
     accent: '#f59e0b',
     searchQuery: 'SPF',
@@ -83,7 +79,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Rétinol',
     subtitle: 'Vitamine A',
     description: 'Affine le grain de peau, lisse les ridules et stimule le renouvellement cellulaire pour un teint jeune.',
-    image: imageUrl('Photographie de sérum ambré en flacon, thème rétinol vitamine A, ambiance laboratoire, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&auto=format&fit=crop&q=80',
     icon: 'sparkles',
     accent: '#a855f7',
     searchQuery: 'Rétinol',
@@ -94,7 +90,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Vitamine C',
     subtitle: "Booster d'éclat",
     description: 'Illumine le teint terne, combat les radicaux libres et unifie la peau pour un glow naturel visible.',
-    image: imageUrl('Photographie de sérum vitaminé avec agrumes subtils, thème vitamine C, tons orange lumineux, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&auto=format&fit=crop&q=80',
     icon: 'sun',
     accent: '#f97316',
     searchQuery: 'Vitamine C',
@@ -105,7 +101,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'AHA / BHA',
     subtitle: 'Exfoliants chimiques',
     description: 'Exfolie en douceur les cellules mortes pour révéler une peau plus lisse, plus nette et visiblement éclatante.',
-    image: imageUrl('Photographie de texture exfoliante et laboratoire, thème AHA BHA peeling doux, accents rose, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80',
     icon: 'flask',
     accent: '#ec4899',
     searchQuery: 'AHA BHA',
@@ -116,7 +112,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Panthénol',
     subtitle: 'Provitamine B5',
     description: 'Apaise les irritations, soutient la réparation cutanée et améliore le confort des peaux sensibles au quotidien.',
-    image: imageUrl('Photographie de crème apaisante et texture douce, thème panthénol provitamine B5, ambiance clinique, fond clair, style premium e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=600&auto=format&fit=crop&q=80',
     icon: 'droplet',
     accent: '#06b6d4',
     searchQuery: 'Panthénol',
@@ -127,7 +123,7 @@ const INGREDIENTS: Ingredient[] = [
     title: 'Centella Asiatica',
     subtitle: 'Cica apaisante',
     description: 'Calme les rougeurs, aide à renforcer la barrière cutanée et favorise une peau plus équilibrée et résistante.',
-    image: imageUrl('Photographie premium de feuilles de centella asiatica et sérum, tons verts doux, fond clair, style e-commerce, haute définition'),
+    image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa0c2?w=600&auto=format&fit=crop&q=80',
     icon: 'leaf',
     accent: '#22c55e',
     searchQuery: 'Centella',

@@ -17,10 +17,6 @@ type Pillar = {
   accent: string;
 };
 
-const imageUrl = (prompt: string) => {
-  return '/logo.png';
-};
-
 const PILLARS: Pillar[] = [
   {
     id: 'sleep',
@@ -28,9 +24,7 @@ const PILLARS: Pillar[] = [
     timing: 'Soir',
     title: 'Sommeil & Relaxation',
     description: 'Mélatonine, magnésium glycinate, plantes apaisantes.',
-    image: imageUrl(
-      'Photographie premium e-commerce compléments alimentaires, gélules blanches et flacon ambré, ambiance rose nude minimal luxe, lumière studio douce, haute définition'
-    ),
+    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=melatonine',
     accent: '#a855f7',
   },
@@ -40,9 +34,7 @@ const PILLARS: Pillar[] = [
     timing: 'Matin',
     title: 'Stress & Humeur',
     description: 'Adaptogènes & focus doux: ashwagandha, rhodiola, L-théanine.',
-    image: imageUrl(
-      'Photographie premium e-commerce compléments, flacon verre et poudres fines, ambiance beige rosé, style laboratoire chic, haute définition'
-    ),
+    image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=ashwagandha',
     accent: '#FF4FA3',
   },
@@ -52,9 +44,7 @@ const PILLARS: Pillar[] = [
     timing: 'Repas',
     title: 'Digestion & Probiotiques',
     description: 'Confort intestinal, enzymes & microbiote (probiotiques).',
-    image: imageUrl(
-      'Photographie premium e-commerce compléments, probiotiques et gélules, ambiance blanche clinique, accents doux vert menthe, haute définition'
-    ),
+    image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=probiotiques',
     accent: '#10b981',
   },
@@ -64,9 +54,7 @@ const PILLARS: Pillar[] = [
     timing: 'Avant repas',
     title: 'Poids & Métabolisme',
     description: 'Berbérine, chrome, ALA: routine métabolique.',
-    image: imageUrl(
-      'Photographie premium e-commerce compléments, flacon et gélules, ambiance clair, reflets dorés, style minimal luxe, haute définition'
-    ),
+    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=berberine',
     accent: '#f59e0b',
   },
@@ -76,9 +64,7 @@ const PILLARS: Pillar[] = [
     timing: 'Matin',
     title: 'Immunité & Ruche',
     description: 'Propolis, vitamine C, zinc: protection quotidienne.',
-    image: imageUrl(
-      'Photographie premium e-commerce compléments, propolis et flacon, ambiance miel doré, fond beige clair, haute définition'
-    ),
+    image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=propolis',
     accent: '#f97316',
   },
@@ -88,9 +74,7 @@ const PILLARS: Pillar[] = [
     timing: 'Matin',
     title: 'Beauté In & Out',
     description: 'Collagène, biotine & acide hyaluronique: glow, cheveux, ongles.',
-    image: imageUrl(
-      'Photographie premium e-commerce compléments beauté, collagène et gélules, ambiance rose nude, style luxe minimal, haute définition'
-    ),
+    image: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=600&auto=format&fit=crop&q=80',
     filterQuery: 'category=Compléments&q=collagene',
     accent: '#ec4899',
   },

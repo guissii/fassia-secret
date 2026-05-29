@@ -11,14 +11,14 @@ interface Affiche {
 
 const AFFICHES: Affiche[] = [
   {
-    image: '/affiches/affiche-1.webp',
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&auto=format&fit=crop&q=80',
     href: '/boutique',
-    alt: 'Affiche promotionnelle 1',
+    alt: 'Bannière promotionnelle beauté',
   },
   {
-    image: '/affiches/affiche-2.webp',
+    image: 'https://images.unsplash.com/photo-1522335789203-aabd20c3698c?w=1200&auto=format&fit=crop&q=80',
     href: '/boutique',
-    alt: 'Affiche promotionnelle 2',
+    alt: 'Bannière collection cosmétiques',
   },
 ];
 
