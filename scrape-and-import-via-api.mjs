@@ -10,34 +10,13 @@ const PUBLIC_IMAGES_DIR = path.join(__dirname, 'public', 'images', 'scraped', 'p
 
 const API_URL = 'http://localhost:5000/api';
 
-// Get admin password from env var or command line arg
-const ADMIN_PASSWORD = process.argv[2] || process.env.ADMIN_PASSWORD || '';
-
-// Admin login to get JWT token
-async function getAdminToken() {
-  if (!ADMIN_PASSWORD) {
-    console.error('\n❌ ERREUR: Mot de passe admin manquant');
-    console.error('Usage: node scrape-and-import-via-api.mjs <MOT_DE_PASSE_ADMIN>');
-    console.error('Ou: ADMIN_PASSWORD=votre_mdp node scrape-and-import-via-api.mjs\n');
-    return null;
-  }
-
-  try {
-    const res = await axios.post(`${API_URL}/auth/login`, {
-      username: 'admin',
-      password: ADMIN_PASSWORD
-    });
-    return res.data.token;
-  } catch (err) {
-    console.error('Login failed:', err.response?.data?.error || err.message);
-    return null;
-  }
-}
+// Auth is bypassed on backend, no token needed
+const authHeaders = {};
 
 // Fetch existing categories and collections, create missing ones
-async function prepareCategoriesAndCollections(token) {
-  const catRes = await axios.get(`${API_URL}/categories`, { headers: { Authorization: `Bearer ${token}` } });
-  const collRes = await axios.get(`${API_URL}/collections`, { headers: { Authorization: `Bearer ${token}` } });
+async function prepareCategoriesAndCollections() {
+  const catRes = await axios.get(`${API_URL}/categories`);
+  const collRes = await axios.get(`${API_URL}/collections`);
 
   const existingCategories = catRes.data.categories || [];
   const existingCollections = collRes.data.collections || [];
@@ -55,7 +34,7 @@ async function prepareCategoriesAndCollections(token) {
           nameAr: '',
           slug,
           description: `Catégorie ${catName}`
-        }, { headers: { Authorization: `Bearer ${token}` } });
+        });
         catMap.set(catName, res.data.category.id);
         console.log(`  Created category: ${catName}`);
       } catch (err) {
@@ -74,7 +53,7 @@ async function prepareCategoriesAndCollections(token) {
           slug,
           page: 'general',
           order: 0
-        }, { headers: { Authorization: `Bearer ${token}` } });
+        });
         collMap.set(collName, res.data.collection.id);
         console.log(`  Created collection: ${collName}`);
       } catch (err) {
@@ -195,13 +174,10 @@ function parsePrice(priceText) {
   return match ? parseFloat(match[1]) : 0;
 }
 
-async function importProduct(product, token) {
+async function importProduct(product) {
   try {
     const res = await axios.post(`${API_URL}/products`, product, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { 'Content-Type': 'application/json' }
     });
     console.log(`  -> Created: ${product.name} (ID: ${res.data.product?.id})`);
     return res.data;
@@ -214,18 +190,9 @@ async function importProduct(product, token) {
 async function main() {
   fs.mkdirSync(PUBLIC_IMAGES_DIR, { recursive: true });
 
-  // Get admin token
-  console.log('Getting admin token...');
-  const token = await getAdminToken();
-  if (!token) {
-    console.error('Failed to get admin token. Make sure backend is running and admin credentials are correct.');
-    process.exit(1);
-  }
-  console.log('Admin token acquired!\n');
-
   // Prepare categories and collections
   console.log('Preparing categories and collections...');
-  const { catMap, collMap } = await prepareCategoriesAndCollections(token);
+  const { catMap, collMap } = await prepareCategoriesAndCollections();
   console.log(`  Categories ready: ${catMap.size}`);
   console.log(`  Collections ready: ${collMap.size}\n`);
 
@@ -285,7 +252,7 @@ async function main() {
       };
 
       // Import via API
-      const result = await importProduct(payload, token);
+      const result = await importProduct(payload);
       if (result) imported++;
       else failed++;
 
