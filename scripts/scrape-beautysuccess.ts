@@ -89,11 +89,26 @@ async function fetchHtml(url: string): Promise<string | null> {
   }
 }
 
+async function fetchProductImage(productUrl: string): Promise<string | null> {
+  try {
+    const html = await fetchHtml(productUrl);
+    if (!html) return null;
+    const $ = cheerio.load(html);
+    // Magento product image: meta og:image or gallery image
+    const metaImage = $('meta[property="og:image"]').attr('content');
+    if (metaImage) return metaImage;
+    const galleryImage = $('.fotorama__stage img, .product.media img, .gallery-placeholder img').first().attr('src');
+    if (galleryImage) return galleryImage;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function downloadImage(imageUrl: string, filename: string): Promise<string | null> {
   try {
     const url = imageUrl.startsWith('http') ? imageUrl : `${BASE_URL}${imageUrl}`;
-    const ext = '.jpg';
-    const outputPath = path.join(IMAGES_DIR, `${filename}${ext}`);
+    const outputPath = path.join(IMAGES_DIR, `${filename}.jpg`);
     const webpPath = path.join(IMAGES_DIR, `${filename}.webp`);
 
     const response = await axiosInstance.get(url, { responseType: 'stream' });
@@ -105,9 +120,17 @@ async function downloadImage(imageUrl: string, filename: string): Promise<string
       writer.on('error', reject);
     });
 
+    // Verify it's a real image (not HTML error page)
+    const stats = fs.statSync(outputPath);
+    if (stats.size < 1000) {
+      fs.unlinkSync(outputPath);
+      console.log(`   ⚠️ Image too small (${stats.size} bytes), probably error page`);
+      return null;
+    }
+
     await sharp(outputPath).webp({ quality: 85 }).toFile(webpPath);
     fs.unlinkSync(outputPath);
-    console.log(`  ✅ ${filename}.webp`);
+    console.log(`  ✅ ${filename}.webp (${stats.size} bytes)`);
     return `/products-beautysuccess/${filename}.webp`;
   } catch {
     return null;
@@ -142,17 +165,10 @@ function extractProductsFromHtml(html: string, seen: Set<string>): ScrapedProduc
             const name = cleanName(item.item_name || '');
             const price = parseFloat(item.price) || 0;
             const url = item.item_url || '';
-            const itemId = item.item_id || '';
-
-            // Build image URL from item_id (Magento format: cache path + first chars)
-            const idClean = itemId.replace(/\D/g, '');
-            const imageUrl = idClean
-              ? `${BASE_URL}/media/catalog/product/cache/f421fe0f052247c7b48ffd84b7f05cfe/${idClean.substring(0, 1)}/${idClean.substring(1, 2)}/${idClean}.jpg`
-              : '';
 
             if (name && price > 0 && !seen.has(name)) {
               seen.add(name);
-              products.push({ name, price, imageUrl, brand: item.item_brand || name.split(' ')[0] || 'Beauty Success', url });
+              products.push({ name, price, imageUrl: '', brand: item.item_brand || name.split(' ')[0] || 'Beauty Success', url });
             }
           }
         }
@@ -197,8 +213,25 @@ async function main() {
         continue;
       }
 
+      // Fetch real image URL from product page
+      let imageUrl = p.imageUrl;
+      if (!imageUrl && p.url) {
+        const productUrl = p.url.startsWith('http') ? p.url : `${BASE_URL}${p.url}`;
+        console.log(`   🔍 Fetching image from product page...`);
+        const fetchedImage = await fetchProductImage(productUrl);
+        if (fetchedImage) {
+          imageUrl = fetchedImage;
+          console.log(`   🖼️ Found image: ${imageUrl}`);
+        }
+      }
+
+      if (!imageUrl) {
+        console.log('   ❌ No image URL found, trying next product...');
+        continue;
+      }
+
       // Download image
-      const imagePath = await downloadImage(p.imageUrl, `bs-${Date.now()}-${created}`);
+      const imagePath = await downloadImage(imageUrl, `bs-${Date.now()}-${created}`);
       if (!imagePath) {
         console.log('   ❌ Image download failed, trying next product...');
         continue;
