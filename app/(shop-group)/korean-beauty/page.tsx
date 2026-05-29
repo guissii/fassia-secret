@@ -6,7 +6,10 @@ import Link from 'next/link';
 import './page.css';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
+// Côté serveur: localhost direct, côté client: URL publique
+const API_URL = typeof window === 'undefined' 
+  ? 'http://localhost:5000' 
+  : (process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com');
 
 async function getKBeautyProducts(step?: number) {
   try {
@@ -14,12 +17,13 @@ async function getKBeautyProducts(step?: number) {
       ? `${API_URL}/api/products?limit=10&category=k-beauty&koreanBeautyStep=${step}`
       : `${API_URL}/api/products?limit=100&category=k-beauty`;
     const res = await fetch(url, {
-      next: { revalidate: 300 },
+      cache: 'no-store',
     });
     if (!res.ok) return [];
     const data = await res.json();
     return data.products || [];
-  } catch {
+  } catch (e) {
+    console.error('getKBeautyProducts error:', e);
     return [];
   }
 }
