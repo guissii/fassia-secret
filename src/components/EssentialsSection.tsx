@@ -10,7 +10,7 @@ export function EssentialsSection({ products }: { products: any[] }) {
       title="ESSENTIELS"
       imageSrc={bannerUrl}
       products={products}
-      linkHref="/essentiels"
+      linkHref="/boutique"
       linkTitle="Découvrir tous nos essentiels"
     />
   );

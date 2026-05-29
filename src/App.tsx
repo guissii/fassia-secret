@@ -18,15 +18,13 @@ const Categories = dynamic(() => import('./components/Categories').then(mod => m
 const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
 const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSection').then(mod => mod.KoreanRoutineSection));
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
 function App({ bestSellers }: { bestSellers: any[] }) {
   const bestSellersBanner = LOCAL_BANNERS.bestSellers;
   const [essentials, setEssentials] = useState<any[]>([]);
   const [loadingEssentials, setLoadingEssentials] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/products?isEssential=true&random=true&limit=10`)
+    fetch('/api/products?isEssential=true&random=true&limit=10')
       .then(r => r.json())
       .then(data => {
         setEssentials(data.products || []);
