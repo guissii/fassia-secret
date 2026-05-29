@@ -10,8 +10,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
 async function getKBeautyProducts(step?: number) {
   try {
     const url = step
-      ? `${API_URL}/api/products?limit=10&category=K-Beauty&koreanBeautyStep=${step}`
-      : `${API_URL}/api/products?limit=100&category=K-Beauty`;
+      ? `${API_URL}/api/products?limit=10&category=k-beauty&koreanBeautyStep=${step}`
+      : `${API_URL}/api/products?limit=100&category=k-beauty`;
     const res = await fetch(url, {
       next: { revalidate: 300 },
     });
