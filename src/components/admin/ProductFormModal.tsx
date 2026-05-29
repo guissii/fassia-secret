@@ -453,21 +453,6 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 </p>
               </div>
 
-              <div className="form-group">
-                <label>Tags & Badges (ex: Nouveau, -20%)</label>
-                <div className="tags-input-container">
-                  <div className="tags-list">
-                    {formData.tags?.map(tag => (
-                      <span key={tag} className="tag-chip">{tag}<button type="button" onClick={() => handleRemoveTag(tag)}><X size={12} /></button></span>
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    <input type="text" className="admin-input" placeholder="Ajouter un tag..." value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddTag())} />
-                    <button type="button" className="admin-btn-outline" onClick={handleAddTag}><Plus size={16} /></button>
-                  </div>
-                </div>
-              </div>
-
               <div className="form-group toggle-group" style={{ marginTop: '1rem' }}>
                 <label className="toggle-label">
                   <div>
@@ -502,7 +487,9 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                       price: formData.price || 0,
                       oldPrice: formData.oldPrice,
                       description: previewDesc,
-                      badge: formData.tags && formData.tags.length > 0 ? formData.tags[0] : undefined
+                      badge: formData.oldPrice && formData.price && formData.oldPrice > formData.price
+                        ? `-${Math.round(((formData.oldPrice - formData.price) / formData.oldPrice) * 100)}%`
+                        : undefined
                     }}
                     label={formData.categories && formData.categories.length > 0 ? formData.categories[0] : 'CATÉGORIE'}
                   />

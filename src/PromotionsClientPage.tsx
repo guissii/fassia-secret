@@ -56,14 +56,11 @@ export default function PromotionsClientPage() {
   const [promos, setPromos] = useState<PromoProduct[]>([]);
 
   useEffect(() => {
-    fetch('/api/products?limit=100')
+    fetch('/api/products/promotions')
       .then((res) => res.json())
       .then((data) => {
         if (data.products) {
-          const promoProducts = data.products.filter(
-            (p: any) => typeof p.oldPrice === 'number' && p.oldPrice > p.price
-          );
-          setPromos(promoProducts);
+          setPromos(data.products);
         }
       })
       .catch(console.error);
