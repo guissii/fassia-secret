@@ -338,9 +338,9 @@ export const importScrapedProducts = async (req: Request, res: Response) => {
         const description = (p.description_fr || p.name_fr || '').trim();
         const imagePath = p.image ? `/products/${p.image}` : '';
 
-        // Check duplicate by name
+        // Check duplicate by name (case-insensitive via toLowerCase)
         const existing = await prisma.product.findFirst({
-          where: { name: { equals: productName, mode: 'insensitive' } },
+          where: { name: { contains: productName, mode: 'insensitive' } },
         });
 
         if (existing) {
