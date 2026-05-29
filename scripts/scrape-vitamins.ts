@@ -186,6 +186,7 @@ async function fetchHtml(url: string): Promise<string | null> {
 
 async function scrapeProductList(): Promise<{ name: string; url: string; image_url: string; price: string }[]> {
   const products: any[] = [];
+  const seenUrls = new Set<string>();
   let page = 1;
   
   while (products.length < TARGET_COUNT) {
@@ -196,56 +197,41 @@ async function scrapeProductList(): Promise<{ name: string; url: string; image_u
     
     const $ = cheerio.load(html);
     
-    // Try multiple selectors for hmizatchezsara.com
-    let items = $('.product-item, .product, .grid__item, .product-card, [data-product]');
+    // Find all product links, extract name from img[alt]
+    const allLinks = $('a[href*="/products/"]');
+    console.log(`   Found ${allLinks.length} product links`);
     
-    // Debug: if no products found, log available classes
-    if (items.length === 0) {
-      console.log('   Trying alternative selectors...');
-      // Look for common product container patterns
-      const allLinks = $('a[href*="/products/"]');
-      console.log(`   Found ${allLinks.length} product links`);
+    let added = 0;
+    allLinks.each((_, el) => {
+      const $el = $(el);
+      const href = $el.attr('href') || '';
       
-      if (allLinks.length > 0) {
-        allLinks.each((_, el) => {
-          const $el = $(el);
-          const name = $el.find('h3, .product-title, .title, [class*="title"]').first().text().trim() || 
-                       $el.attr('title') || '';
-          const href = $el.attr('href') || '';
-          const img = $el.find('img').attr('src') || $el.find('img').attr('data-src') || '';
-          const priceText = $el.find('.price, .product-price, .money, [class*="price"]').first().text().trim() || '';
-          
-          if (name && href) {
-            products.push({
-              name,
-              url: href.startsWith('http') ? href : `https://hmizatchezsara.com${href}`,
-              image_url: img.startsWith('http') ? img : `https:${img}`,
-              price: priceText,
-            });
-          }
+      // Skip duplicates
+      if (!href || seenUrls.has(href)) return;
+      
+      // Get name from img alt attribute (primary source on hmizatchezsara)
+      const img = $el.find('img');
+      const name = img.attr('alt') || $el.attr('title') || $el.text().trim() || '';
+      const imgSrc = img.attr('src') || img.attr('data-src') || '';
+      const priceText = $el.closest('.product-item').find('.price, .product-price, .money').first().text().trim() ||
+                        $el.parent().find('.price, .product-price, .money').first().text().trim() || '';
+      
+      if (name && href) {
+        seenUrls.add(href);
+        products.push({
+          name,
+          url: href.startsWith('http') ? href : `https://hmizatchezsara.com${href}`,
+          image_url: imgSrc.startsWith('http') ? imgSrc : `https:${imgSrc}`,
+          price: priceText,
         });
+        added++;
       }
-    } else {
-      items.each((_, el) => {
-        const $el = $(el);
-        const name = $el.find('h3, .product-title, .title').first().text().trim() || '';
-        const href = $el.find('a').first().attr('href') || '';
-        const img = $el.find('img').first().attr('src') || $el.find('img').first().attr('data-src') || '';
-        const priceText = $el.find('.price, .product-price, .money').first().text().trim() || '';
-        
-        if (name && href) {
-          products.push({
-            name,
-            url: href.startsWith('http') ? href : `https://hmizatchezsara.com${href}`,
-            image_url: img.startsWith('http') ? img : `https:${img}`,
-            price: priceText,
-          });
-        }
-      });
-    }
+    });
     
-    if (products.length === 0) {
-      console.log('   No products found on this page.');
+    console.log(`   Added ${added} unique products this page`);
+    
+    if (added === 0) {
+      console.log('   No new products found on this page.');
       break;
     }
     
