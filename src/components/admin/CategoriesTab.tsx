@@ -166,12 +166,28 @@ export function CategoriesTab() {
           <h2>Catégories</h2>
           <p className="admin-subtitle">Organisez vos produits par catégorie</p>
         </div>
-        <button
-          className="admin-btn-primary"
-          onClick={() => { setSelectedCategory(null); setIsModalOpen(true); }}
-        >
-          <Plus size={18} /> Nouvelle catégorie
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button
+            className="admin-btn-outline"
+            onClick={async () => {
+              try {
+                const res = await api.fetchWithAuth('/categories/seed', { method: 'POST' });
+                setToast({ message: res.message, type: 'success' });
+                loadCategories();
+              } catch (error: any) {
+                setToast({ message: error.message || 'Erreur import', type: 'error' });
+              }
+            }}
+          >
+            Importer catégories
+          </button>
+          <button
+            className="admin-btn-primary"
+            onClick={() => { setSelectedCategory(null); setIsModalOpen(true); }}
+          >
+            <Plus size={18} /> Nouvelle catégorie
+          </button>
+        </div>
       </div>
 
       <div className="admin-card">

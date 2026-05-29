@@ -171,3 +171,67 @@ export const deleteCategory = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete category' });
   }
 };
+
+// Predefined main categories from client menu
+const DEFAULT_CATEGORIES = [
+  { name: 'Corps', nameAr: 'الجسم', slug: 'corps' },
+  { name: 'Visage', nameAr: 'الوجه', slug: 'visage' },
+  { name: 'Cheveux', nameAr: 'الشعر', slug: 'cheveux' },
+  { name: 'Hygiène Dentaire', nameAr: 'العناية بالأسنان', slug: 'hygiene-dentaire' },
+  { name: 'Maquillage', nameAr: 'المكياج', slug: 'maquillage' },
+  { name: 'Hygiène & Intimité', nameAr: 'النظافة والحماية', slug: 'hygiene-intimite' },
+  { name: 'Santé', nameAr: 'الصحة', slug: 'sante' },
+  { name: 'Hommes', nameAr: 'الرجال', slug: 'hommes' },
+  { name: 'Préoccupations', nameAr: 'المشاكل', slug: 'preoccupations' },
+  { name: 'Compléments Alimentaires', nameAr: 'المكملات الغذائية', slug: 'complements-alimentaires' },
+  { name: 'K-Beauty', nameAr: 'كي بيوتي', slug: 'k-beauty' },
+  { name: 'Dermo-Corner', nameAr: 'درمو كورنر', slug: 'dermo-corner' },
+  { name: 'Accessoires', nameAr: 'إكسسوارات', slug: 'accessoires' },
+  { name: 'Minceur', nameAr: 'التخسيس', slug: 'minceur' },
+  { name: 'Sport', nameAr: 'رياضة', slug: 'sport' },
+  { name: 'Maman & Bébé', nameAr: 'الأم والطفل', slug: 'maman-bebe' },
+  { name: 'Premium Hair Care', nameAr: 'العناية الفاخرة بالشعر', slug: 'premium-hair-care' },
+  { name: 'Promotions', nameAr: 'تخفيضات', slug: 'promotions' },
+];
+
+export const seedCategories = async (req: Request, res: Response) => {
+  try {
+    const created: any[] = [];
+    const skipped: any[] = [];
+
+    for (const cat of DEFAULT_CATEGORIES) {
+      try {
+        const existing = await prisma.category.findUnique({ where: { slug: cat.slug } });
+        if (existing) {
+          skipped.push({ name: cat.name, slug: cat.slug, reason: 'Already exists' });
+          continue;
+        }
+        const newCat = await prisma.category.create({
+          data: {
+            name: cat.name,
+            nameAr: cat.nameAr,
+            slug: cat.slug,
+            description: `Catégorie ${cat.name}`,
+            page: 'general',
+            order: 0,
+          },
+        });
+        created.push(newCat);
+      } catch (err: any) {
+        skipped.push({ name: cat.name, slug: cat.slug, reason: err.message });
+      }
+    }
+
+    await invalidateCategoryCache();
+
+    res.json({
+      success: true,
+      message: `${created.length} catégories créées, ${skipped.length} ignorées`,
+      created,
+      skipped,
+    });
+  } catch (error: any) {
+    console.error('Error seeding categories:', error);
+    res.status(500).json({ error: 'Failed to seed categories' });
+  }
+};

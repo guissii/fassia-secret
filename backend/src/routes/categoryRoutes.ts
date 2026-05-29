@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCategories, getCategoryProducts, createCategory, updateCategory, deleteCategory } from '../controllers/categoryController';
+import { getCategories, getCategoryProducts, createCategory, updateCategory, deleteCategory, seedCategories } from '../controllers/categoryController';
 import { authenticateAdmin } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { categorySchema } from '../validators';
@@ -11,6 +11,7 @@ router.get('/', getCategories);
 router.get('/:slug/products', getCategoryProducts);
 
 // Protected routes for admin
+router.post('/seed', authenticateAdmin, seedCategories);
 router.post('/', authenticateAdmin, validate(categorySchema), createCategory);
 router.put('/:id', authenticateAdmin, updateCategory);
 router.delete('/:id', authenticateAdmin, deleteCategory);
