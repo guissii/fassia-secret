@@ -35,8 +35,8 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
         </div>
 
         <div className="essentials-carousel">
-          <div className="essentials-hero-pair">
-            {imageSrc ? (
+          {imageSrc ? (
+            <div className="essentials-hero-pair">
               <div className="essentials-visual-tile">
                 <Image
                   src={publicAssetUrl(imageSrc)}
@@ -46,18 +46,18 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />
               </div>
-            ) : null}
-            {displayProducts.slice(0, imageSrc ? 1 : 2).map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                label={p.brand}
-                onNavigate={() => router.push(productHref(p))}
-              />
-            ))}
-          </div>
+              {displayProducts.slice(0, 1).map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  label={p.brand}
+                  onNavigate={() => router.push(productHref(p))}
+                />
+              ))}
+            </div>
+          ) : null}
 
-          {displayProducts.slice(imageSrc ? 1 : 2).map((p) => (
+          {displayProducts.slice(imageSrc ? 1 : 0).map((p) => (
             <ProductCard
               key={p.id}
               product={p}
