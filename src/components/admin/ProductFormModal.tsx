@@ -4,6 +4,8 @@ import { AdminProduct, Category, api } from './mockData';
 import { publicAssetUrl } from '../../lib/publicUrl';
 import { ProductCard } from '../ProductCard';
 import { ImageCropperModal } from './ImageCropperModal';
+import { HierarchicalCategoryPicker, CategorySelection } from './HierarchicalCategoryPicker';
+import { CATEGORY_COLLECTIONS_DATA } from './categoryCollectionsData';
 
 /* ── Reusable Multi-Select Chip Picker ── */
 interface ChipPickerProps {
@@ -88,6 +90,53 @@ function ChipPicker({ label, required, options, selected, onChange, placeholder 
       )}
     </div>
   );
+}
+
+// Convert flat categories/collections arrays to hierarchical selection format
+function toHierarchicalSelection(
+  categories: string[],
+  collections: string[]
+): CategorySelection[] {
+  const result: CategorySelection[] = [];
+  
+  // Map category names to their data
+  for (const catName of categories) {
+    const catData = CATEGORY_COLLECTIONS_DATA.find(
+      c => c.category === catName || c.slug === catName.toLowerCase().replace(/\s+/g, '-')
+    );
+    
+    if (catData) {
+      // Find collections that belong to this category AND are in the selected collections
+      const catCollections = collections.filter(coll => 
+        catData.collections.includes(coll)
+      );
+      
+      result.push({
+        categorySlug: catData.slug,
+        categoryName: catData.category,
+        collections: catCollections
+      });
+    }
+  }
+  
+  return result;
+}
+
+// Convert hierarchical selection back to flat arrays
+function fromHierarchicalSelection(
+  selection: CategorySelection[]
+): { categories: string[]; collections: string[] } {
+  const categories: string[] = [];
+  const collections: string[] = [];
+  
+  for (const sel of selection) {
+    categories.push(sel.categoryName);
+    collections.push(...sel.collections);
+  }
+  
+  // Also add any collections from selected categories that might not be explicitly selected
+  // but are needed for proper categorization
+  return { categories, collections };
 }
 
 interface ProductFormModalProps {
@@ -357,21 +406,18 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
               </div>
 
               <div className="form-section-title">Organisation</div>
-              <div className="form-row">
-                <ChipPicker
-                  label="Catégories"
-                  required
-                  options={categories}
-                  selected={formData.categories || []}
-                  onChange={cats => setFormData(prev => ({ ...prev, categories: cats }))}
-                  placeholder="Rechercher une catégorie..."
-                />
-                <ChipPicker
-                  label="Collections / Sections"
-                  options={collections}
-                  selected={formData.collections || []}
-                  onChange={cols => setFormData(prev => ({ ...prev, collections: cols }))}
-                  placeholder="Rechercher une collection..."
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label>Catégories et Collections *</label>
+                <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0.5rem 0' }}>
+                  Sélectionnez une ou plusieurs catégories, puis les collections associées pour chaque catégorie
+                </p>
+                <HierarchicalCategoryPicker
+                  selected={toHierarchicalSelection(formData.categories || [], formData.collections || [])}
+                  onChange={(selection) => {
+                    const { categories, collections } = fromHierarchicalSelection(selection);
+                    setFormData(prev => ({ ...prev, categories, collections }));
+                  }}
+                  placeholder="Rechercher catégories et collections..."
                 />
               </div>
 
