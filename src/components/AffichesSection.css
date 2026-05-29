@@ -16,10 +16,10 @@
 .affiche-card {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 16px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   flex-shrink: 0;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1 / 1;
   height: auto;
 }
 
@@ -66,14 +66,18 @@
   }
 
   .affiche-card {
-    width: 85vw;
-    max-width: 340px;
-    scroll-snap-align: start;
+    width: 82vw;
+    max-width: 320px;
+    scroll-snap-align: center;
     flex-shrink: 0;
+    border-radius: 20px;
+    aspect-ratio: 1 / 1;
   }
 
   .affiche-image {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
   }
 }
