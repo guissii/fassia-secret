@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { EssentialsSection } from './components/EssentialsSection';
 import { MakeupParfumsSection } from './components/MakeupParfumsSection';
@@ -17,14 +17,34 @@ const Categories = dynamic(() => import('./components/Categories').then(mod => m
 const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
 const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSection').then(mod => mod.KoreanRoutineSection));
 
-function App({ bestSellers, essentials }: { bestSellers: any[], essentials: any[] }) {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+function App({ bestSellers }: { bestSellers: any[] }) {
   const bestSellersBanner = LOCAL_BANNERS.bestSellers;
+  const [essentials, setEssentials] = useState<any[]>([]);
+  const [loadingEssentials, setLoadingEssentials] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/products?isEssential=true&random=true&limit=10`)
+      .then(r => r.json())
+      .then(data => {
+        setEssentials(data.products || []);
+        setLoadingEssentials(false);
+      })
+      .catch(() => setLoadingEssentials(false));
+  }, []);
 
   return (
     <>
       <AffichesSection />
 
-      <EssentialsSection products={essentials} />
+      {loadingEssentials ? (
+        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: '#999' }}>Chargement des essentiels...</span>
+        </div>
+      ) : (
+        <EssentialsSection products={essentials} />
+      )}
       <MakeupParfumsSection />
 
       <IngredientsSection />
