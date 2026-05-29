@@ -195,29 +195,59 @@ async function scrapeProductList(): Promise<{ name: string; url: string; image_u
     if (!html) break;
     
     const $ = cheerio.load(html);
-    const items = $('.product-item');
     
+    // Try multiple selectors for hmizatchezsara.com
+    let items = $('.product-item, .product, .grid__item, .product-card, [data-product]');
+    
+    // Debug: if no products found, log available classes
     if (items.length === 0) {
-      console.log('   No more products found.');
-      break;
-    }
-    
-    items.each((_, el) => {
-      const $el = $(el);
-      const name = $el.find('.product-title').text().trim() || $el.find('h3').text().trim() || '';
-      const href = $el.find('a').attr('href') || '';
-      const img = $el.find('img').attr('src') || $el.find('img').attr('data-src') || '';
-      const priceText = $el.find('.price').text().trim() || $el.find('.product-price').text().trim() || '';
+      console.log('   Trying alternative selectors...');
+      // Look for common product container patterns
+      const allLinks = $('a[href*="/products/"]');
+      console.log(`   Found ${allLinks.length} product links`);
       
-      if (name && href) {
-        products.push({
-          name,
-          url: href.startsWith('http') ? href : `https://hmizatchezsara.com${href}`,
-          image_url: img.startsWith('http') ? img : `https:${img}`,
-          price: priceText,
+      if (allLinks.length > 0) {
+        allLinks.each((_, el) => {
+          const $el = $(el);
+          const name = $el.find('h3, .product-title, .title, [class*="title"]').first().text().trim() || 
+                       $el.attr('title') || '';
+          const href = $el.attr('href') || '';
+          const img = $el.find('img').attr('src') || $el.find('img').attr('data-src') || '';
+          const priceText = $el.find('.price, .product-price, .money, [class*="price"]').first().text().trim() || '';
+          
+          if (name && href) {
+            products.push({
+              name,
+              url: href.startsWith('http') ? href : `https://hmizatchezsara.com${href}`,
+              image_url: img.startsWith('http') ? img : `https:${img}`,
+              price: priceText,
+            });
+          }
         });
       }
-    });
+    } else {
+      items.each((_, el) => {
+        const $el = $(el);
+        const name = $el.find('h3, .product-title, .title').first().text().trim() || '';
+        const href = $el.find('a').first().attr('href') || '';
+        const img = $el.find('img').first().attr('src') || $el.find('img').first().attr('data-src') || '';
+        const priceText = $el.find('.price, .product-price, .money').first().text().trim() || '';
+        
+        if (name && href) {
+          products.push({
+            name,
+            url: href.startsWith('http') ? href : `https://hmizatchezsara.com${href}`,
+            image_url: img.startsWith('http') ? img : `https:${img}`,
+            price: priceText,
+          });
+        }
+      });
+    }
+    
+    if (products.length === 0) {
+      console.log('   No products found on this page.');
+      break;
+    }
     
     page++;
     await new Promise(r => setTimeout(r, 500));
