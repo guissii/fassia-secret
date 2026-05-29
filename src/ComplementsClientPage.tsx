@@ -130,7 +130,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
           </div>
         </section>
 
-        <section className="supp-page-focus py-3xl" aria-label="Objectifs">
+        <section className="supp-page-focus py-lg" aria-label="Objectifs">
           <div className="container">
             <div className="supp-focus-chips" aria-label="Aller à un besoin">
               {FOCUSES.map((f) => (
@@ -147,7 +147,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
           const href = `/boutique?category=complements-alimentaires&q=${encodeURIComponent(f.q)}`;
 
           return (
-            <section key={f.key} id={f.key} className="supp-need-section pb-3xl" aria-label={f.title}>
+            <section key={f.key} id={f.key} className="supp-need-section pb-lg" aria-label={f.title}>
               <div className="container">
                 <div className="supp-need-header">
                   <div className="supp-need-left">
@@ -186,7 +186,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
           );
         })}
 
-        <section className="supp-page-all pb-3xl" aria-label="Tous les compléments">
+        <section className="supp-page-all pb-lg" aria-label="Tous les compléments">
           <div className="container">
             <Link href="/boutique?category=complements-alimentaires" className="supp-page-all-cta" aria-label="Voir tous les produits compléments">
               Voir tous les produits <ArrowRight size={18} />
