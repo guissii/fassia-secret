@@ -73,7 +73,9 @@ export function ProductsTab() {
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesCategory = categoryFilter === 'all' || product.categories.some((c: any) => (typeof c === 'string' ? c : c.name) === categoryFilter);
+    const matchesCategory = categoryFilter === 'all' || 
+      product.categories.some((c: any) => (typeof c === 'string' ? c : c.name) === categoryFilter) ||
+      product.collections.some((c: any) => (typeof c === 'string' ? c : c.name) === categoryFilter);
     const matchesArchive = showArchived ? product.isArchived : !product.isArchived;
     const matchesSection = sectionFilter === 'all' || product.collections.some((c: any) => (typeof c === 'string' ? c : c.name) === sectionFilter);
     
@@ -377,11 +379,19 @@ export function ProductsTab() {
               className="admin-select"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
+              style={{ minWidth: '200px' }}
             >
               <option value="all">Toutes les catégories</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              <optgroup label="Catégories principales">
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Collections / Sous-catégories">
+                {collections.map(coll => (
+                  <option key={coll} value={coll}>📁 {coll}</option>
+                ))}
+              </optgroup>
             </select>
 
             <select 
@@ -390,7 +400,7 @@ export function ProductsTab() {
               onChange={(e) => { setSectionFilter(e.target.value); setSelectedIds(new Set()); }}
               style={{ minWidth: '180px' }}
             >
-              <option value="all">📁 Toutes les collections</option>
+              <option value="all">📁 Filtrer par collection</option>
               {collections.map(coll => (
                 <option key={coll} value={coll}>{coll}</option>
               ))}
