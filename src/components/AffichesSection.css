@@ -16,7 +16,7 @@
 .affiche-card {
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 0;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   flex-shrink: 0;
   aspect-ratio: 1 / 1;
@@ -38,7 +38,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 0;
   display: block;
 }
 
@@ -70,7 +70,7 @@
     max-width: 320px;
     scroll-snap-align: center;
     flex-shrink: 0;
-    border-radius: 20px;
+    border-radius: 0;
     aspect-ratio: 1 / 1;
   }
 
@@ -78,6 +78,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 20px;
+    border-radius: 0;
   }
 }
