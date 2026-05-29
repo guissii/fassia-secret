@@ -1,15 +1,19 @@
+export const dynamic = 'force-dynamic';
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
 import './page.css';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com';
+// Côté serveur: localhost direct, côté client: URL publique
+const API_URL = typeof window === 'undefined'
+  ? 'http://localhost:5000'
+  : (process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com');
 
 async function getProducts(category: string, limit = 10) {
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=${limit}&category=${category}`, {
-      next: { revalidate: 300 },
+    const res = await fetch(`${API_URL}/api/products?limit=${limit}&category=${category}&isVisible=true`, {
+      cache: 'no-store',
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -100,13 +104,9 @@ function matchKeywords(product: DBProduct, keywords: string[], excludeKeywords?:
 export default async function MaquillageParfumsPage() {
   const banners: Record<string, string> = {};
 
-  // Récupérer les vrais produits des catégories Maquillage et Parfums
-  const [makeupProducts, parfumsProducts] = await Promise.all([
-    getProducts('Maquillage', 50),
-    getProducts('Parfums', 50),
-  ]);
-
-  const allDbProducts: DBProduct[] = [...makeupProducts, ...parfumsProducts];
+  // Récupérer les vrais produits de la catégorie "Maquillage et Parfums"
+  const dbProducts = await getProducts('maquillage-et-parfums', 100);
+  const allDbProducts: DBProduct[] = dbProducts;
 
   // Distribuer les produits DB dans les sections selon les mots-clés
   const stepsWithProducts = STEPS.map((step) => {
