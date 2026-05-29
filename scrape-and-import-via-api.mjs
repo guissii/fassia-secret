@@ -8,7 +8,7 @@ import sharp from 'sharp';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_IMAGES_DIR = path.join(__dirname, 'public', 'images', 'scraped', 'parabioty');
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://127.0.0.1:5000/api';
 
 // Auth is bypassed on backend, no token needed
 const authHeaders = {};
