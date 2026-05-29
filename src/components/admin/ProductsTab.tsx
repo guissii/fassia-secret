@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, Tag } from 'lucide-react';
+import { Search, Plus, Archive, Eye, EyeOff, Pencil, Trash2, Tag, Filter, X, Trash } from 'lucide-react';
 import { api, AdminProduct, delay } from './mockData';
 import { ProductFormModal } from './ProductFormModal';
 import { Toast, ToastType, ConfirmModal } from './shared';
@@ -14,6 +14,12 @@ export function ProductsTab() {
   const [showArchived, setShowArchived] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [categories, setCategories] = useState<string[]>([]);
+  const [sectionFilter, setSectionFilter] = useState('all');
+  const [collections, setCollections] = useState<string[]>([]);
+  
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   
   // UI State
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
@@ -26,13 +32,16 @@ export function ProductsTab() {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const data = await api.getProducts();
+      const [data, colls] = await Promise.all([api.getProducts(), api.getCollections()]);
       setProducts(data);
       
       // Extract unique categories for filter
       const allCategories = data.flatMap((p: AdminProduct) => (p.categories || []).map((c: any) => typeof c === 'string' ? c : c.name));
       const uniqueCats = Array.from(new Set(allCategories)).filter(Boolean) as string[];
       setCategories(uniqueCats);
+      
+      // Extract collection names for section filter
+      setCollections(colls.map((c: any) => c.name));
     } catch (e) {
       setToast({ message: "Erreur de chargement", type: 'error' });
     } finally {
@@ -51,9 +60,51 @@ export function ProductsTab() {
       
     const matchesCategory = categoryFilter === 'all' || product.categories.some((c: any) => (typeof c === 'string' ? c : c.name) === categoryFilter);
     const matchesArchive = showArchived ? product.isArchived : !product.isArchived;
+    const matchesSection = sectionFilter === 'all' || product.collections.some((c: any) => (typeof c === 'string' ? c : c.name) === sectionFilter);
     
-    return matchesSearch && matchesCategory && matchesArchive;
+    return matchesSearch && matchesCategory && matchesArchive && matchesSection;
   });
+
+  // Bulk selection handlers
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProducts.length && filteredProducts.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map(p => p.id)));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    
+    try {
+      setToast({ message: `Suppression de ${selectedIds.size} produit(s)...`, type: 'info' });
+      
+      // Delete one by one since bulk delete endpoint may not exist
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        await api.fetchWithAuth(`/products/${id}`, { method: 'DELETE' });
+      }
+      
+      setProducts(prev => prev.filter(p => !selectedIds.has(p.id)));
+      setSelectedIds(new Set());
+      setConfirmBulkDelete(false);
+      setToast({ message: `${ids.length} produit(s) supprimé(s)`, type: 'success' });
+    } catch (error) {
+      setToast({ message: "Erreur lors de la suppression par lot", type: 'error' });
+    }
+  };
 
   const toggleVisibility = async (id: number) => {
     try {
@@ -153,6 +204,16 @@ export function ProductsTab() {
         onCancel={() => setConfirmDeleteId(null)}
       />
 
+      <ConfirmModal 
+        isOpen={confirmBulkDelete}
+        title="Supprimer la sélection"
+        message={`Êtes-vous sûr de vouloir supprimer ${selectedIds.size} produit(s) ? Cette action est irréversible.`}
+        confirmLabel="Supprimer tout"
+        isDestructive={true}
+        onConfirm={handleBulkDelete}
+        onCancel={() => setConfirmBulkDelete(false)}
+      />
+
       <ProductFormModal 
         product={selectedProduct}
         isOpen={isModalOpen}
@@ -222,26 +283,75 @@ export function ProductsTab() {
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
+
+            <select 
+              className="admin-select"
+              value={sectionFilter}
+              onChange={(e) => { setSectionFilter(e.target.value); setSelectedIds(new Set()); }}
+              style={{ minWidth: '180px' }}
+            >
+              <option value="all">📁 Toutes les sections</option>
+              <option value="Korean Beauty">✨ Korean Beauty</option>
+              <option value="Maquillage & Parfums">💄 Maquillage & Parfums</option>
+              <option value="Compléments Alimentaires">🌿 Compléments Alimentaires</option>
+              <option value="Accessoires">🛍️ Accessoires</option>
+            </select>
           </div>
         </div>
+
+        {/* Bulk Actions Bar */}
+        {selectedIds.size > 0 && (
+          <div className="admin-bulk-bar" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '1rem', 
+            padding: '0.75rem 1.5rem', 
+            background: '#fef3f2', 
+            borderBottom: '1px solid #fecaca',
+            color: '#991b1b'
+          }}>
+            <span className="text-sm font-medium">{selectedIds.size} produit(s) sélectionné(s)</span>
+            <button 
+              className="admin-btn-outline text-sm" 
+              onClick={clearSelection}
+              style={{ marginLeft: 'auto' }}
+            >
+              <X size={14} /> Annuler
+            </button>
+            <button 
+              className="admin-btn-danger text-sm" 
+              onClick={() => setConfirmBulkDelete(true)}
+            >
+              <Trash size={14} /> Supprimer la sélection
+            </button>
+          </div>
+        )}
 
         <div className="admin-table-container">
           <table className="admin-table">
             <thead>
               <tr>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={filteredProducts.length > 0 && selectedIds.size === filteredProducts.length}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
                 <th>Produit</th>
                 <th>Prix</th>
                 <th>Stock</th>
                 <th>Catégorie</th>
+                <th>Collections</th>
                 <th>Visibilité</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center py-lg">Chargement...</td></tr>
+                <tr><td colSpan={8} className="text-center py-lg">Chargement...</td></tr>
               ) : filteredProducts.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-lg text-muted">Aucun produit trouvé.</td></tr>
+                <tr><td colSpan={8} className="text-center py-lg text-muted">Aucun produit trouvé.</td></tr>
               ) : (
                 filteredProducts.map(product => {
                   const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') 
@@ -251,14 +361,28 @@ export function ProductsTab() {
                   const isLowStock = product.stock < 10 && product.stock > 0;
                   const isOutOfStock = product.stock === 0;
 
+                  const isSelected = selectedIds.has(product.id);
+                  
                   return (
-                    <tr key={product.id} className={!product.isVisible ? 'opacity-60 hover-bg' : 'hover-bg'}>
+                    <tr key={product.id} className={!product.isVisible ? 'opacity-60 hover-bg' : 'hover-bg'} style={isSelected ? { background: '#fef3f2' } : {}}>
+                      <td>
+                        <input 
+                          type="checkbox" 
+                          checked={isSelected}
+                          onChange={() => toggleSelect(product.id)}
+                        />
+                      </td>
                       <td>
                         <div className="admin-product-cell">
                           <img src={imageSrc} alt={product.name} className="admin-product-thumb" />
                           <div className="admin-product-info">
                             <span className="admin-product-name">{product.name}</span>
                             <span className="admin-product-brand">{product.brand}</span>
+                            {product.koreanBeautyStep && (
+                              <span className="admin-badge badge-neutral" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', marginTop: '0.25rem' }}>
+                                KB Étape {product.koreanBeautyStep}
+                              </span>
+                            )}
                             {product.tags && product.tags.length > 0 && (
                               <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.25rem' }}>
                                 {product.tags.map(tag => (
@@ -285,6 +409,11 @@ export function ProductsTab() {
                       <td>
                         {product.categories && product.categories.length > 0
                           ? product.categories.map((c: any) => typeof c === 'string' ? c : c.name).join(', ')
+                          : <span className="text-muted">—</span>}
+                      </td>
+                      <td>
+                        {product.collections && product.collections.length > 0
+                          ? product.collections.map((c: any) => typeof c === 'string' ? c : c.name).join(', ')
                           : <span className="text-muted">—</span>}
                       </td>
                       <td>
