@@ -48,6 +48,7 @@ export interface AdminProduct {
   tags: string[];
   koreanBeautyStep?: number | null;
   supplementFocus?: string | null;
+  makeupStep?: number | null;
 }
 
 export interface Category {

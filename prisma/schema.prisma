@@ -47,6 +47,7 @@ model Product {
   concerns    String[]
   koreanBeautyStep Int?      // 1-10 pour les étapes Korean Beauty
   supplementFocus String?    // Focus Compléments Alimentaires: sleep, stress, digest, metabolic, immunity, beauty
+  makeupStep  Int?           // 1-11 pour les étapes Maquillage
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   orderItems  OrderItem[]

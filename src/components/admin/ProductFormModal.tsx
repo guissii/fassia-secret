@@ -140,6 +140,7 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
           tags: [],
           image: '',
           supplementFocus: null,
+          makeupStep: null,
         });
       }
       loadCategories();
@@ -421,6 +422,34 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 </select>
                 <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0 0' }}>
                   Si le produit est un complément alimentaire, choisissez son focus
+                </p>
+              </div>
+
+              {/* Étape Maquillage */}
+              <div className="form-group" style={{ marginTop: '1rem' }}>
+                <label>Étape Maquillage (1-11)</label>
+                <select
+                  name="makeupStep"
+                  className="admin-input"
+                  value={formData.makeupStep || ''}
+                  onChange={handleChange}
+                  style={{ width: '100%' }}
+                >
+                  <option value="">-- Non applicable --</option>
+                  <option value="1">01. Base & Primer</option>
+                  <option value="2">02. Fond de Teint</option>
+                  <option value="3">03. Correcteur</option>
+                  <option value="4">04. Poudre</option>
+                  <option value="5">05. Blush & Bronzer</option>
+                  <option value="6">06. Sourcils</option>
+                  <option value="7">07. Fard à Paupières</option>
+                  <option value="8">08. Eyeliner</option>
+                  <option value="9">09. Mascara</option>
+                  <option value="10">10. Rouge à Lèvres</option>
+                  <option value="11">11. Fixateur & Spray</option>
+                </select>
+                <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0 0' }}>
+                  Si le produit est un maquillage, choisissez son étape
                 </p>
               </div>
 
