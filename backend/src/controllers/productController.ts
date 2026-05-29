@@ -39,7 +39,7 @@ export const getProducts = async (req: Request, res: Response) => {
     const where: Record<string, any> = {};
     
     if (categorySlug) {
-      where.categories = { some: { slug: categorySlug } };
+      where.categories = { some: { slug: { equals: categorySlug, mode: 'insensitive' } } };
     }
 
     if (collectionSlug) {

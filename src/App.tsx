@@ -35,14 +35,22 @@ function App({ bestSellers }: { bestSellers: any[] }) {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/products?category=Maquillage&limit=5').then(r => r.json()),
-      fetch('/api/products?category=Parfums&limit=5').then(r => r.json()),
+      fetch('/api/products?category=Maquillage&isVisible=true&limit=5').then(r => r.json()),
+      fetch('/api/products?category=Parfums&isVisible=true&limit=5').then(r => r.json()),
     ])
       .then(([maquillageData, parfumsData]) => {
         const maquillage = maquillageData.products || [];
         const parfums = parfumsData.products || [];
-        const combined = [...maquillage, ...parfums].slice(0, 10);
-        setMakeupParfums(combined);
+        const combined = [...maquillage, ...parfums];
+
+        // Fallback: si aucun produit trouve, essayer la categorie combinee
+        if (combined.length === 0) {
+          fetch('/api/products?category=maquillage-et-parfums&isVisible=true&limit=10')
+            .then(r => r.json())
+            .then(data => setMakeupParfums(data.products || []));
+        } else {
+          setMakeupParfums(combined.slice(0, 10));
+        }
       })
       .catch(() => setMakeupParfums([]));
   }, []);
