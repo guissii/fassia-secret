@@ -17,10 +17,14 @@ async function fetchProducts(category?: string) {
 }
 
 export default async function Page() {
-  const [bestSellers, essentials] = await Promise.all([
+  const [bestSellers, koreanBeauty, complements] = await Promise.all([
     fetchProducts(),
-    fetchProducts('K-Beauty')
+    fetchProducts('korean-beauty'),
+    fetchProducts('complements-alimentaires')
   ]);
+
+  // Mélanger les produits Korean Beauty + Compléments pour les essentiels
+  const essentials = [...koreanBeauty.slice(0, 3), ...complements.slice(0, 3)];
 
   return <App bestSellers={bestSellers} essentials={essentials} />;
 }
