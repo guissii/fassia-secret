@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import App from '../../src/App';
 
 async function fetchEssentials(limit: number) {
