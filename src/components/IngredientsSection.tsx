@@ -117,17 +117,6 @@ const INGREDIENTS: Ingredient[] = [
     accent: '#06b6d4',
     searchQuery: 'Panthénol',
   },
-  {
-    id: 10,
-    tag: 'CALMANT & BARRIÈRE',
-    title: 'Centella Asiatica',
-    subtitle: 'Cica apaisante',
-    description: 'Calme les rougeurs, aide à renforcer la barrière cutanée et favorise une peau plus équilibrée et résistante.',
-    image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=600&auto=format&fit=crop&q=80',
-    icon: 'leaf',
-    accent: '#22c55e',
-    searchQuery: 'Centella',
-  },
 ];
 
 
