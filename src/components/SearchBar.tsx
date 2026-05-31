@@ -51,7 +51,7 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}&limit=8`, {
+      const res = await fetch(`/api/products/search?q=${encodeURIComponent(q.trim())}&limit=8`, {
         signal: abortRef.current.signal,
       });
       if (!res.ok) throw new Error('Search failed');

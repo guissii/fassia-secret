@@ -51,7 +51,7 @@ export default function BoutiqueClientPage() {
   useEffect(() => {
     if (query.trim()) {
       setIsSearchLoading(true);
-      fetch(`/api/search?q=${encodeURIComponent(query.trim())}&limit=500`)
+      fetch(`/api/products/search?q=${encodeURIComponent(query.trim())}&limit=500`)
         .then((res) => res.json())
         .then((data) => {
           if (data.products) setAllProducts(data.products);
