@@ -423,11 +423,17 @@
   }
 
   .header-search-slot {
-    justify-content: flex-end;
+    justify-content: center;
+    padding: 12px 8px;
+    margin: 8px 0;
+  }
+
+  .search-bar {
+    margin: 0 4px;
   }
 
   .mobile-search-btn {
-    display: inline-flex;
+    display: none;
   }
 
   .mobile-search-overlay {

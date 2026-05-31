@@ -227,8 +227,8 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
           </Link>
           
           <div className="header-search-slot">
-            <Suspense fallback={<div className="header-search hidden-mobile placeholder">Chargement...</div>}>
-              <SearchBar className="header-search hidden-mobile" />
+            <Suspense fallback={<div className="header-search placeholder">Chargement...</div>}>
+              <SearchBar className="header-search" />
             </Suspense>
 
             <button className="mobile-search-btn" type="button" onClick={openMobileSearch} aria-label="Ouvrir la recherche">
