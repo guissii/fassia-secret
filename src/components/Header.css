@@ -975,3 +975,30 @@
   color: #b7005d;
   text-decoration: underline;
 }
+
+/* Mobile dropdown fixes */
+@media (max-width: 768px) {
+  .search-dropdown {
+    max-height: 60vh;
+    border-radius: 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .search-suggestion {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .search-suggestion-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .search-suggestion-name {
+    font-size: 0.92rem;
+  }
+
+  .search-suggestion-price {
+    font-size: 0.88rem;
+  }
+}
