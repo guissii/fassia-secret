@@ -8,9 +8,8 @@
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
--- 2. Add tsvector column if not exists (Prisma db push should have added it)
--- If the column doesn't exist yet:
--- ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "searchVector" tsvector;
+-- 2. Add tsvector column if not exists
+ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "searchVector" tsvector;
 
 -- 3. Create GIN index for fast full-text search
 CREATE INDEX IF NOT EXISTS idx_products_search_vector ON "Product" USING GIN("searchVector");
