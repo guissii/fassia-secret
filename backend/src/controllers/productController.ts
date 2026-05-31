@@ -538,56 +538,92 @@ export const searchProducts = async (req: Request, res: Response) => {
     const orQuery = words.join(' | ');
     const orSafe = orQuery || cleanedQuery || query;
 
-    // Multi-field scoring with ts_rank_cd (cover density, better for descriptions)
-    // Using 12GB RAM / 6 vCPU - we can afford the richer scoring
-    const rawResults: any[] = await prisma.$queryRaw`
-      SELECT id,
-        -- Base FTS rank (OR query = broader)
-        COALESCE(ts_rank_cd("searchVector", to_tsquery('french', unaccent(${orSafe})), 1), 0) * 100
-        + COALESCE(ts_rank_cd("searchVector", plainto_tsquery('french', unaccent(${query})), 1), 0) * 50
-        -- Field-specific boosts
-        + CASE WHEN unaccent(name) ILIKE unaccent(${likePattern}) THEN 1000 ELSE 0 END
-        + CASE WHEN unaccent(name) ILIKE unaccent(${firstWordPattern}) THEN 500 ELSE 0 END
-        + CASE WHEN unaccent(brand) ILIKE unaccent(${likePattern}) THEN 300 ELSE 0 END
-        + CASE WHEN unaccent(brand) ILIKE unaccent(${firstWordPattern}) THEN 150 ELSE 0 END
-        + CASE WHEN unaccent(description) ILIKE unaccent(${likePattern}) THEN 100 ELSE 0 END
-        + CASE WHEN unaccent(description) ILIKE unaccent(${firstWordPattern}) THEN 50 ELSE 0 END
-        + CASE WHEN array_to_string(tags, ' ') ILIKE ${likePattern} THEN 80 ELSE 0 END
-        + CASE WHEN array_to_string(concerns, ' ') ILIKE ${likePattern} THEN 80 ELSE 0 END
-        as score
-      FROM "Product"
-      WHERE (
-        "searchVector" @@ to_tsquery('french', unaccent(${orSafe}))
-        OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
-        OR unaccent(name) ILIKE unaccent(${likePattern})
-        OR unaccent(brand) ILIKE unaccent(${likePattern})
-        OR unaccent(description) ILIKE unaccent(${likePattern})
-        OR array_to_string(tags, ' ') ILIKE ${likePattern}
-        OR array_to_string(concerns, ' ') ILIKE ${likePattern}
-      )
-        AND "isVisible" = true
-        AND "isArchived" = false
-      ORDER BY score DESC
-      LIMIT ${limit} OFFSET ${skip}
-    `;
+    // Short queries (1-2 chars): PostgreSQL FTS doesn't tokenize short words well.
+    // Use ILIKE only for instant prefix matching.
+    const isShortQuery = cleanedQuery.length <= 2;
+
+    const rawResults: any[] = isShortQuery
+      ? await prisma.$queryRaw`
+          SELECT id,
+            CASE WHEN unaccent(name) ILIKE unaccent(${likePattern}) THEN 1000 ELSE 0 END
+            + CASE WHEN unaccent(brand) ILIKE unaccent(${likePattern}) THEN 800 ELSE 0 END
+            + CASE WHEN unaccent(description) ILIKE unaccent(${likePattern}) THEN 500 ELSE 0 END
+            + CASE WHEN array_to_string(tags, ' ') ILIKE ${likePattern} THEN 300 ELSE 0 END
+            + CASE WHEN array_to_string(concerns, ' ') ILIKE ${likePattern} THEN 300 ELSE 0 END
+            as score
+          FROM "Product"
+          WHERE (
+            unaccent(name) ILIKE unaccent(${likePattern})
+            OR unaccent(brand) ILIKE unaccent(${likePattern})
+            OR unaccent(description) ILIKE unaccent(${likePattern})
+            OR array_to_string(tags, ' ') ILIKE ${likePattern}
+            OR array_to_string(concerns, ' ') ILIKE ${likePattern}
+          )
+            AND "isVisible" = true
+            AND "isArchived" = false
+          ORDER BY score DESC
+          LIMIT ${limit} OFFSET ${skip}
+        `
+      : await prisma.$queryRaw`
+          SELECT id,
+            COALESCE(ts_rank_cd("searchVector", to_tsquery('french', unaccent(${orSafe})), 1), 0) * 100
+            + COALESCE(ts_rank_cd("searchVector", plainto_tsquery('french', unaccent(${query})), 1), 0) * 50
+            + CASE WHEN unaccent(name) ILIKE unaccent(${likePattern}) THEN 1000 ELSE 0 END
+            + CASE WHEN unaccent(name) ILIKE unaccent(${firstWordPattern}) THEN 500 ELSE 0 END
+            + CASE WHEN unaccent(brand) ILIKE unaccent(${likePattern}) THEN 300 ELSE 0 END
+            + CASE WHEN unaccent(brand) ILIKE unaccent(${firstWordPattern}) THEN 150 ELSE 0 END
+            + CASE WHEN unaccent(description) ILIKE unaccent(${likePattern}) THEN 100 ELSE 0 END
+            + CASE WHEN unaccent(description) ILIKE unaccent(${firstWordPattern}) THEN 50 ELSE 0 END
+            + CASE WHEN array_to_string(tags, ' ') ILIKE ${likePattern} THEN 80 ELSE 0 END
+            + CASE WHEN array_to_string(concerns, ' ') ILIKE ${likePattern} THEN 80 ELSE 0 END
+            as score
+          FROM "Product"
+          WHERE (
+            "searchVector" @@ to_tsquery('french', unaccent(${orSafe}))
+            OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+            OR unaccent(name) ILIKE unaccent(${likePattern})
+            OR unaccent(brand) ILIKE unaccent(${likePattern})
+            OR unaccent(description) ILIKE unaccent(${likePattern})
+            OR array_to_string(tags, ' ') ILIKE ${likePattern}
+            OR array_to_string(concerns, ' ') ILIKE ${likePattern}
+          )
+            AND "isVisible" = true
+            AND "isArchived" = false
+          ORDER BY score DESC
+          LIMIT ${limit} OFFSET ${skip}
+        `;
 
     const ids = rawResults.map((r: any) => r.id);
 
-    const totalResult: any[] = await prisma.$queryRaw`
-      SELECT COUNT(*)::int as count
-      FROM "Product"
-      WHERE (
-        "searchVector" @@ to_tsquery('french', unaccent(${orSafe}))
-        OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
-        OR unaccent(name) ILIKE unaccent(${likePattern})
-        OR unaccent(brand) ILIKE unaccent(${likePattern})
-        OR unaccent(description) ILIKE unaccent(${likePattern})
-        OR array_to_string(tags, ' ') ILIKE ${likePattern}
-        OR array_to_string(concerns, ' ') ILIKE ${likePattern}
-      )
-        AND "isVisible" = true
-        AND "isArchived" = false
-    `;
+    const totalResult: any[] = isShortQuery
+      ? await prisma.$queryRaw`
+          SELECT COUNT(*)::int as count
+          FROM "Product"
+          WHERE (
+            unaccent(name) ILIKE unaccent(${likePattern})
+            OR unaccent(brand) ILIKE unaccent(${likePattern})
+            OR unaccent(description) ILIKE unaccent(${likePattern})
+            OR array_to_string(tags, ' ') ILIKE ${likePattern}
+            OR array_to_string(concerns, ' ') ILIKE ${likePattern}
+          )
+            AND "isVisible" = true
+            AND "isArchived" = false
+        `
+      : await prisma.$queryRaw`
+          SELECT COUNT(*)::int as count
+          FROM "Product"
+          WHERE (
+            "searchVector" @@ to_tsquery('french', unaccent(${orSafe}))
+            OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+            OR unaccent(name) ILIKE unaccent(${likePattern})
+            OR unaccent(brand) ILIKE unaccent(${likePattern})
+            OR unaccent(description) ILIKE unaccent(${likePattern})
+            OR array_to_string(tags, ' ') ILIKE ${likePattern}
+            OR array_to_string(concerns, ' ') ILIKE ${likePattern}
+          )
+            AND "isVisible" = true
+            AND "isArchived" = false
+        `;
     const total = totalResult[0]?.count || 0;
 
     if (ids.length === 0) {
