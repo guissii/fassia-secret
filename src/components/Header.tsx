@@ -191,6 +191,17 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
         aria-label="Recherche"
       >
         <div className="mobile-search-inner" onClick={(e) => e.stopPropagation()}>
+          <div className="mobile-search-header">
+            <span className="mobile-search-title">Rechercher un produit</span>
+            <button
+              className="mobile-search-close"
+              type="button"
+              onClick={closeMobileSearch}
+              aria-label="Fermer la recherche"
+            >
+              <X size={24} />
+            </button>
+          </div>
           <Suspense fallback={<div className="search-placeholder">Chargement...</div>}>
             <SearchBar inputRef={mobileSearchInputRef} />
           </Suspense>
@@ -227,8 +238,8 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
           </Link>
           
           <div className="header-search-slot">
-            <Suspense fallback={<div className="header-search placeholder">Chargement...</div>}>
-              <SearchBar className="header-search" />
+            <Suspense fallback={<div className="header-search hidden-mobile placeholder">Chargement...</div>}>
+              <SearchBar className="header-search hidden-mobile" />
             </Suspense>
 
             <button className="mobile-search-btn" type="button" onClick={openMobileSearch} aria-label="Ouvrir la recherche">
