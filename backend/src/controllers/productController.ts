@@ -524,23 +524,45 @@ export const searchProducts = async (req: Request, res: Response) => {
       return res.json(JSON.parse(cachedData));
     }
 
-    // Use raw SQL for PostgreSQL Full-Text Search with ranking
+    // Build an AND-based tsquery for more relevant results
+    // e.g. "crème hydratante" → "crème & hydratante" (both words required)
+    const cleanedQuery = query
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')   // remove special chars, keep letters (incl. accents) + digits
+      .replace(/\s+/g, ' ')                  // collapse spaces
+      .trim();
+    const words = cleanedQuery.split(' ').filter(Boolean);
+    const andQuery = words.join(' & ');
+    const safeQuery = andQuery || cleanedQuery || query;
+
+    // Primary search: AND-based FTS with weighted ranking {D,C,B,A}
     const rawResults: any[] = await prisma.$queryRaw`
       SELECT id,
-        ts_rank("searchVector", plainto_tsquery('french', unaccent(${query}))) as rank
+        ts_rank("searchVector", to_tsquery('french', unaccent(${safeQuery})), 1) +
+        ts_rank("searchVector", plainto_tsquery('french', unaccent(${query})), 1) as rank,
+        CASE WHEN unaccent(name) ILIKE unaccent(${`%${cleanedQuery}%`}) THEN 1 ELSE 0 END as name_exact,
+        CASE WHEN unaccent(name) ILIKE unaccent(${`%${words[0] || cleanedQuery}%`}) THEN 1 ELSE 0 END as name_partial
       FROM "Product"
-      WHERE "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+      WHERE (
+        "searchVector" @@ to_tsquery('french', unaccent(${safeQuery}))
+        OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+        OR unaccent(name) ILIKE unaccent(${`%${cleanedQuery}%`})
+      )
         AND "isVisible" = true
         AND "isArchived" = false
-      ORDER BY rank DESC
+      ORDER BY name_exact DESC, name_partial DESC, rank DESC
       LIMIT ${limit} OFFSET ${skip}
     `;
 
     const ids = rawResults.map((r: any) => r.id);
+
     const totalResult: any[] = await prisma.$queryRaw`
       SELECT COUNT(*)::int as count
       FROM "Product"
-      WHERE "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+      WHERE (
+        "searchVector" @@ to_tsquery('french', unaccent(${safeQuery}))
+        OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+        OR unaccent(name) ILIKE unaccent(${`%${cleanedQuery}%`})
+      )
         AND "isVisible" = true
         AND "isArchived" = false
     `;
@@ -558,9 +580,21 @@ export const searchProducts = async (req: Request, res: Response) => {
       },
     });
 
-    // Re-sort by relevance rank
-    const rankMap = new Map(rawResults.map((r: any) => [r.id, r.rank]));
-    products.sort((a: any, b: any) => (rankMap.get(b.id) || 0) - (rankMap.get(a.id) || 0));
+    // Re-sort by composite score: exact name match > partial name match > FTS rank
+    const rankMap = new Map(rawResults.map((r: any) => [r.id, {
+      rank: Number(r.rank) || 0,
+      nameExact: Number(r.name_exact) || 0,
+      namePartial: Number(r.name_partial) || 0,
+    }]));
+    products.sort((a: any, b: any) => {
+      const ra = rankMap.get(a.id);
+      const rb = rankMap.get(b.id);
+      if (!ra || !rb) return 0;
+      // Priority: exact name match > partial name match > FTS rank
+      if (rb.nameExact !== ra.nameExact) return rb.nameExact - ra.nameExact;
+      if (rb.namePartial !== ra.namePartial) return rb.namePartial - ra.namePartial;
+      return rb.rank - ra.rank;
+    });
 
     const mappedProducts = products.map((p: any) => ({
       ...p,
