@@ -514,7 +514,7 @@ export const searchProducts = async (req: Request, res: Response) => {
     if (limit > 100) limit = 100;
     const skip = (page - 1) * limit;
 
-    if (!query || query.length < 2) {
+    if (!query || query.length < 1) {
       return res.json({ products: [], pagination: { total: 0, page, limit, totalPages: 0 } });
     }
 

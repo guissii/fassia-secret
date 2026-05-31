@@ -39,10 +39,10 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const abortRef = useRef<AbortController | null>(null);
 
-  const debouncedQuery = useDebounce(query, 250);
+  const debouncedQuery = useDebounce(query, 150);
 
   const fetchSuggestions = useCallback(async (q: string) => {
-    if (!q.trim() || q.trim().length < 2) {
+    if (!q.trim() || q.trim().length < 1) {
       setSuggestions([]);
       setIsOpen(false);
       return;
