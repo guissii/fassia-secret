@@ -23,17 +23,6 @@ export default function BoutiqueClientPage() {
   });
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
-  const [allProducts, setAllProducts] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch('/api/products?limit=500')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.products) setAllProducts(data.products);
-      })
-      .catch(console.error);
-  }, []);
-
   const query = useMemo(() => searchParams.get('q') ?? '', [searchParams]);
   const selectedCategories = useMemo(() => {
     const raw = searchParams.get('category') ?? '';
@@ -55,6 +44,29 @@ export default function BoutiqueClientPage() {
     const n = Number.parseInt(raw, 10);
     return Number.isFinite(n) && n > 0 ? n : 1;
   }, [searchParams]);
+
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+
+  useEffect(() => {
+    if (query.trim()) {
+      setIsSearchLoading(true);
+      fetch(`/api/search?q=${encodeURIComponent(query.trim())}&limit=500`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.products) setAllProducts(data.products);
+        })
+        .catch(console.error)
+        .finally(() => setIsSearchLoading(false));
+    } else {
+      fetch('/api/products?limit=500')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.products) setAllProducts(data.products);
+        })
+        .catch(console.error);
+    }
+  }, [query]);
 
   const updateSearchParams = (mutate: (sp: URLSearchParams) => void) => {
     const sp = new URLSearchParams(searchParams.toString());
@@ -85,10 +97,9 @@ export default function BoutiqueClientPage() {
       if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
       if (onlyPromos && !(typeof p.oldPrice === 'number' && p.oldPrice > p.price)) return false;
       if (onlyNew && p.badge !== 'Nouveau') return false;
-      if (keywords.length === 0) return true;
-      
-      const searchTarget = [p.name, p.brand, p.category, p.description].join(' ').toLowerCase();
-      return keywords.every(kw => searchTarget.includes(kw));
+      // When query is present, text search is already handled by API
+      if (keywords.length > 0) return true;
+      return true;
     });
 
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);

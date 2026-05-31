@@ -503,3 +503,80 @@ export const getPromotions = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch promotions' });
   }
 };
+
+export const searchProducts = async (req: Request, res: Response) => {
+  try {
+    const query = (req.query.q as string || '').trim();
+    const categorySlug = req.query.category as string;
+    const collectionSlug = req.query.collection as string;
+    const page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 20;
+    if (limit > 100) limit = 100;
+    const skip = (page - 1) * limit;
+
+    if (!query || query.length < 2) {
+      return res.json({ products: [], pagination: { total: 0, page, limit, totalPages: 0 } });
+    }
+
+    const cacheKey = `search:${query}:${categorySlug || 'all'}:${collectionSlug || 'all'}:${page}:${limit}`;
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      return res.json(JSON.parse(cachedData));
+    }
+
+    // Use raw SQL for PostgreSQL Full-Text Search with ranking
+    const rawResults: any[] = await prisma.$queryRaw`
+      SELECT id,
+        ts_rank("searchVector", plainto_tsquery('french', unaccent(${query}))) as rank
+      FROM products
+      WHERE "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+        AND "isVisible" = true
+        AND "isArchived" = false
+      ORDER BY rank DESC
+      LIMIT ${limit} OFFSET ${skip}
+    `;
+
+    const ids = rawResults.map((r: any) => r.id);
+    const totalResult: any[] = await prisma.$queryRaw`
+      SELECT COUNT(*)::int as count
+      FROM products
+      WHERE "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
+        AND "isVisible" = true
+        AND "isArchived" = false
+    `;
+    const total = totalResult[0]?.count || 0;
+
+    if (ids.length === 0) {
+      return res.json({ products: [], pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } });
+    }
+
+    const products = await prisma.product.findMany({
+      where: { id: { in: ids } },
+      include: {
+        categories: { select: { id: true, name: true, slug: true } },
+        collections: { select: { id: true, name: true, slug: true } },
+      },
+    });
+
+    // Re-sort by relevance rank
+    const rankMap = new Map(rawResults.map((r: any) => [r.id, r.rank]));
+    products.sort((a: any, b: any) => (rankMap.get(b.id) || 0) - (rankMap.get(a.id) || 0));
+
+    const mappedProducts = products.map((p: any) => ({
+      ...p,
+      category: p.categories?.[0]?.name || 'Visage',
+      categorySlug: p.categories?.[0]?.slug || 'visage',
+    }));
+
+    const responseData = {
+      products: mappedProducts,
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
+    };
+
+    await redis.setex(cacheKey, 60, JSON.stringify(responseData));
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error searching products:', error);
+    res.status(500).json({ error: 'Failed to search products' });
+  }
+};

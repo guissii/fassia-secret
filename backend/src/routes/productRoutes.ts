@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProducts, createProduct, updateProduct, deleteProduct, toggleVisibility, toggleArchive, toggleEssential, importScrapedProducts } from '../controllers/productController';
+import { getProducts, searchProducts, createProduct, updateProduct, deleteProduct, toggleVisibility, toggleArchive, toggleEssential, importScrapedProducts } from '../controllers/productController';
 import { authenticateAdmin } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { productSchema } from '../validators';
@@ -8,6 +8,7 @@ const router = Router();
 
 // Public route for frontend
 router.get('/', getProducts);
+router.get('/search', searchProducts);
 
 // Protected routes for admin
 router.post('/', authenticateAdmin, validate(productSchema), createProduct);
