@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import './KoreanRoutineSection.css';
+import './KoreanStepsSection.css';
 import { LOCAL_BANNERS } from '../lib/bannersConfig';
+import { KoreanStepsSection } from './KoreanStepsSection';
 
 export function KoreanRoutineSection() {
   const [banner, setBanner] = useState<{ imageUrl: string; linkUrl: string; title: string } | null>(null);
@@ -51,6 +53,9 @@ export function KoreanRoutineSection() {
           </div>
         </div>
       </section>
+      
+      {/* ── 10 Steps Carousel ── */}
+      <KoreanStepsSection />
     </>
   );
 }

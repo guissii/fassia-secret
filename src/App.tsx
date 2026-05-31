@@ -15,7 +15,7 @@ const SupplementsSection = dynamic(() => import('./components/SupplementsSection
 const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel').then(mod => mod.CollectionCarousel));
 const Categories = dynamic(() => import('./components/Categories').then(mod => mod.Categories));
 const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
-const KoreanRoutineSection = dynamic(() => import('./components/KoreanRoutineSection').then(mod => mod.KoreanRoutineSection));
+const KoreanStepsSection = dynamic(() => import('./components/KoreanStepsSection').then(mod => mod.KoreanStepsSection));
 
 function App({ bestSellers }: { bestSellers: any[] }) {
   const bestSellersBanner = LOCAL_BANNERS.bestSellers;
@@ -91,7 +91,7 @@ function App({ bestSellers }: { bestSellers: any[] }) {
 
       <Categories />
 
-      <KoreanRoutineSection />
+      <KoreanStepsSection />
 
       <Brands />
 
