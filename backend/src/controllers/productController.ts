@@ -528,7 +528,7 @@ export const searchProducts = async (req: Request, res: Response) => {
     const rawResults: any[] = await prisma.$queryRaw`
       SELECT id,
         ts_rank("searchVector", plainto_tsquery('french', unaccent(${query}))) as rank
-      FROM products
+      FROM "Product"
       WHERE "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
         AND "isVisible" = true
         AND "isArchived" = false
@@ -539,7 +539,7 @@ export const searchProducts = async (req: Request, res: Response) => {
     const ids = rawResults.map((r: any) => r.id);
     const totalResult: any[] = await prisma.$queryRaw`
       SELECT COUNT(*)::int as count
-      FROM products
+      FROM "Product"
       WHERE "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
         AND "isVisible" = true
         AND "isArchived" = false
