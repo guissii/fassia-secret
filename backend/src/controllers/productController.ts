@@ -524,32 +524,50 @@ export const searchProducts = async (req: Request, res: Response) => {
       return res.json(JSON.parse(cachedData));
     }
 
-    // Build an AND-based tsquery for more relevant results
-    // e.g. "crème hydratante" → "crème & hydratante" (both words required)
+    // Clean query: keep letters (incl. accents), digits, spaces
     const cleanedQuery = query
-      .replace(/[^\p{L}\p{N}\s]/gu, ' ')   // remove special chars, keep letters (incl. accents) + digits
-      .replace(/\s+/g, ' ')                  // collapse spaces
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .replace(/\s+/g, ' ')
       .trim();
     const words = cleanedQuery.split(' ').filter(Boolean);
-    const andQuery = words.join(' & ');
-    const safeQuery = andQuery || cleanedQuery || query;
+    const likePattern = `%${cleanedQuery}%`;
+    const firstWordPattern = `%${words[0] || cleanedQuery}%`;
 
-    // Primary search: AND-based FTS with weighted ranking {D,C,B,A}
+    // Build OR-based tsquery for broader results (souhaitable/générale)
+    // "crème hydratante" → "crème | hydratante" (any word matches)
+    const orQuery = words.join(' | ');
+    const orSafe = orQuery || cleanedQuery || query;
+
+    // Multi-field scoring with ts_rank_cd (cover density, better for descriptions)
+    // Using 12GB RAM / 6 vCPU - we can afford the richer scoring
     const rawResults: any[] = await prisma.$queryRaw`
       SELECT id,
-        ts_rank("searchVector", to_tsquery('french', unaccent(${safeQuery})), 1) +
-        ts_rank("searchVector", plainto_tsquery('french', unaccent(${query})), 1) as rank,
-        CASE WHEN unaccent(name) ILIKE unaccent(${`%${cleanedQuery}%`}) THEN 1 ELSE 0 END as name_exact,
-        CASE WHEN unaccent(name) ILIKE unaccent(${`%${words[0] || cleanedQuery}%`}) THEN 1 ELSE 0 END as name_partial
+        -- Base FTS rank (OR query = broader)
+        COALESCE(ts_rank_cd("searchVector", to_tsquery('french', unaccent(${orSafe})), 1), 0) * 100
+        + COALESCE(ts_rank_cd("searchVector", plainto_tsquery('french', unaccent(${query})), 1), 0) * 50
+        -- Field-specific boosts
+        + CASE WHEN unaccent(name) ILIKE unaccent(${likePattern}) THEN 1000 ELSE 0 END
+        + CASE WHEN unaccent(name) ILIKE unaccent(${firstWordPattern}) THEN 500 ELSE 0 END
+        + CASE WHEN unaccent(brand) ILIKE unaccent(${likePattern}) THEN 300 ELSE 0 END
+        + CASE WHEN unaccent(brand) ILIKE unaccent(${firstWordPattern}) THEN 150 ELSE 0 END
+        + CASE WHEN unaccent(description) ILIKE unaccent(${likePattern}) THEN 100 ELSE 0 END
+        + CASE WHEN unaccent(description) ILIKE unaccent(${firstWordPattern}) THEN 50 ELSE 0 END
+        + CASE WHEN array_to_string(tags, ' ') ILIKE ${likePattern} THEN 80 ELSE 0 END
+        + CASE WHEN array_to_string(concerns, ' ') ILIKE ${likePattern} THEN 80 ELSE 0 END
+        as score
       FROM "Product"
       WHERE (
-        "searchVector" @@ to_tsquery('french', unaccent(${safeQuery}))
+        "searchVector" @@ to_tsquery('french', unaccent(${orSafe}))
         OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
-        OR unaccent(name) ILIKE unaccent(${`%${cleanedQuery}%`})
+        OR unaccent(name) ILIKE unaccent(${likePattern})
+        OR unaccent(brand) ILIKE unaccent(${likePattern})
+        OR unaccent(description) ILIKE unaccent(${likePattern})
+        OR array_to_string(tags, ' ') ILIKE ${likePattern}
+        OR array_to_string(concerns, ' ') ILIKE ${likePattern}
       )
         AND "isVisible" = true
         AND "isArchived" = false
-      ORDER BY name_exact DESC, name_partial DESC, rank DESC
+      ORDER BY score DESC
       LIMIT ${limit} OFFSET ${skip}
     `;
 
@@ -559,9 +577,13 @@ export const searchProducts = async (req: Request, res: Response) => {
       SELECT COUNT(*)::int as count
       FROM "Product"
       WHERE (
-        "searchVector" @@ to_tsquery('french', unaccent(${safeQuery}))
+        "searchVector" @@ to_tsquery('french', unaccent(${orSafe}))
         OR "searchVector" @@ plainto_tsquery('french', unaccent(${query}))
-        OR unaccent(name) ILIKE unaccent(${`%${cleanedQuery}%`})
+        OR unaccent(name) ILIKE unaccent(${likePattern})
+        OR unaccent(brand) ILIKE unaccent(${likePattern})
+        OR unaccent(description) ILIKE unaccent(${likePattern})
+        OR array_to_string(tags, ' ') ILIKE ${likePattern}
+        OR array_to_string(concerns, ' ') ILIKE ${likePattern}
       )
         AND "isVisible" = true
         AND "isArchived" = false
@@ -580,21 +602,9 @@ export const searchProducts = async (req: Request, res: Response) => {
       },
     });
 
-    // Re-sort by composite score: exact name match > partial name match > FTS rank
-    const rankMap = new Map(rawResults.map((r: any) => [r.id, {
-      rank: Number(r.rank) || 0,
-      nameExact: Number(r.name_exact) || 0,
-      namePartial: Number(r.name_partial) || 0,
-    }]));
-    products.sort((a: any, b: any) => {
-      const ra = rankMap.get(a.id);
-      const rb = rankMap.get(b.id);
-      if (!ra || !rb) return 0;
-      // Priority: exact name match > partial name match > FTS rank
-      if (rb.nameExact !== ra.nameExact) return rb.nameExact - ra.nameExact;
-      if (rb.namePartial !== ra.namePartial) return rb.namePartial - ra.namePartial;
-      return rb.rank - ra.rank;
-    });
+    // Sort by computed score from raw query
+    const scoreMap = new Map(rawResults.map((r: any) => [r.id, Number(r.score) || 0]));
+    products.sort((a: any, b: any) => (scoreMap.get(b.id) || 0) - (scoreMap.get(a.id) || 0));
 
     const mappedProducts = products.map((p: any) => ({
       ...p,
