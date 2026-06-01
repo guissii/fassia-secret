@@ -392,16 +392,31 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
               <div className="form-section-title">Tarification & Inventaire</div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Prix actuel (MAD) *</label>
+                  <label>Prix client (MAD) *</label>
                   <input type="number" name="price" className="admin-input" min="0" step="0.01" value={formData.price || ''} onChange={handleChange} required />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Prix barré (MAD)</label>
+                  <label>Ancien prix barré (MAD)</label>
                   <input type="number" name="oldPrice" className="admin-input" min="0" step="0.01" value={formData.oldPrice || ''} onChange={handleChange} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Stock *</label>
                   <input type="number" name="stock" className="admin-input" min="0" value={formData.stock || 0} onChange={handleChange} required />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Prix promo (avec code) (MAD)</label>
+                  <input type="number" name="promoPrice" className="admin-input" min="0" step="0.01" value={formData.promoPrice || ''} onChange={handleChange} />
+                  <p className="text-muted text-sm" style={{ margin: '0.25rem 0 0 0' }}>Prix affiché lorsqu'un code promo valide est appliqué</p>
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Prix grossiste &lt; 10 produits (MAD)</label>
+                  <input type="number" name="wholesalePrice" className="admin-input" min="0" step="0.01" value={formData.wholesalePrice || ''} onChange={handleChange} />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Prix grossiste ≥ 10 produits (MAD)</label>
+                  <input type="number" name="bulkWholesalePrice" className="admin-input" min="0" step="0.01" value={formData.bulkWholesalePrice || ''} onChange={handleChange} />
                 </div>
               </div>
 

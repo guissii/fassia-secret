@@ -11,6 +11,9 @@ export type ProductCardProduct = {
   image: string;
   price: number;
   oldPrice?: number;
+  promoPrice?: number;
+  wholesalePrice?: number;
+  bulkWholesalePrice?: number;
   description?: string;
   badge?: string;
   badgeColor?: string;

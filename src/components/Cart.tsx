@@ -8,6 +8,9 @@ export interface CartItem {
   name: string;
   price: number;
   oldPrice?: number;
+  promoPrice?: number;
+  wholesalePrice?: number;
+  bulkWholesalePrice?: number;
   image: string;
   category: string;
   quantity: number;
@@ -24,26 +27,49 @@ interface CartProps {
 const SHIPPING_THRESHOLD = 500;
 const SHIPPING_COST = 35;
 
+function getEffectivePrice(item: CartItem, promo: import('./CartContext').ActivePromo | null): number {
+  if (!promo) return item.price;
+
+  // If product has a fixed promoPrice, use it
+  if (typeof item.promoPrice === 'number' && item.promoPrice > 0) {
+    return item.promoPrice;
+  }
+
+  // Otherwise apply the promo discount to regular price
+  if (promo.type === 'PERCENTAGE') {
+    return Math.max(0, item.price * (1 - promo.value / 100));
+  }
+  // FIXED
+  return Math.max(0, item.price - promo.value);
+}
+
 export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
-  
+
   const [checkoutMode, setCheckoutMode] = useState(false);
   const [formData, setFormData] = useState({ customerName: '', phone: '', city: '', address: '' });
   const [promoCode, setPromoCode] = useState('');
-  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoError, setPromoError] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
-  const { clearCart } = useCart();
+  const { clearCart, activePromo, setActivePromo } = useCart();
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discountAmount = (subtotal * promoDiscount) / 100;
-  const subtotalAfterDiscount = subtotal - discountAmount;
-  const isFreeShipping = subtotalAfterDiscount >= SHIPPING_THRESHOLD;
+  // Calculate totals using effective prices
+  const lineItems = items.map(item => ({
+    ...item,
+    effectivePrice: getEffectivePrice(item, activePromo),
+  }));
+
+  const subtotal = lineItems.reduce((sum, item) => sum + item.effectivePrice * item.quantity, 0);
+  const originalSubtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountAmount = originalSubtotal - subtotal;
+  const isFreeShipping = subtotal >= SHIPPING_THRESHOLD;
   const shipping = isFreeShipping ? 0 : SHIPPING_COST;
-  const total = subtotalAfterDiscount + shipping;
+  const total = subtotal + shipping;
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const progressPct = Math.min((subtotalAfterDiscount / SHIPPING_THRESHOLD) * 100, 100);
+  const progressPct = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
 
   // Reset states when cart opens/closes
   useEffect(() => {
@@ -62,13 +88,28 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     return () => { document.body.style.overflow = ''; };
   }, [isOpen, orderSuccess]);
 
-  const handleApplyPromo = () => {
-    // Simple mock promo for now
-    if (promoCode.toUpperCase() === 'FASSIA10') {
-      setPromoDiscount(10);
-    } else {
-      alert("Code promo invalide");
-      setPromoDiscount(0);
+  const handleApplyPromo = async () => {
+    const code = promoCode.trim().toUpperCase();
+    if (!code) return;
+    setPromoLoading(true);
+    setPromoError('');
+    try {
+      const res = await fetch('/api/promos/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setActivePromo(data.promo);
+      } else {
+        setActivePromo(null);
+        setPromoError(data.error || 'Code promo invalide');
+      }
+    } catch {
+      setPromoError('Erreur réseau, réessayez');
+    } finally {
+      setPromoLoading(false);
     }
   };
 
@@ -79,7 +120,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       message += `- ${item.quantity}x ${item.name} (${(item.price * item.quantity).toFixed(2)} MAD)\n`;
     });
     message += `\nSous-total : ${subtotal.toFixed(2)} MAD\n`;
-    if (promoDiscount > 0) message += `Remise Promo : -${discountAmount.toFixed(2)} MAD\n`;
+    if (discountAmount > 0) message += `Remise Promo : -${discountAmount.toFixed(2)} MAD\n`;
     message += `Livraison : ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
     message += `*Total : ${total.toFixed(2)} MAD*\n\n`;
     message += "Merci de me confirmer la disponibilité.";
@@ -227,7 +268,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                     </span>
                   ) : (
                     <span>
-                      Plus que <strong>{(SHIPPING_THRESHOLD - subtotalAfterDiscount).toFixed(2)} MAD</strong> pour la livraison gratuite
+                      Plus que <strong>{Math.max(0, SHIPPING_THRESHOLD - subtotal).toFixed(2)} MAD</strong> pour la livraison gratuite
                     </span>
                   )}
                 </div>
@@ -246,9 +287,46 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
             {items.length > 0 && (
               <div className="cart-footer">
                 
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
-                  <input type="text" placeholder="Code Promo" value={promoCode} onChange={e => setPromoCode(e.target.value)} style={{ flex: 1, padding: '10px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
-                  <button type="button" onClick={handleApplyPromo} style={{ padding: '0 15px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, cursor: 'pointer' }}>Appliquer</button>
+                <div style={{ marginBottom: '15px' }}>
+                  {activePromo ? (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Tag size={16} color="#10b981" />
+                        <span style={{ fontWeight: 600, color: '#10b981' }}>Code promo actif : {activePromo.code}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setActivePromo(null); setPromoCode(''); }}
+                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        Retirer
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Code Promo"
+                          value={promoCode}
+                          onChange={e => { setPromoCode(e.target.value); setPromoError(''); }}
+                          disabled={promoLoading}
+                          style={{ flex: 1, padding: '10px', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyPromo}
+                          disabled={promoLoading}
+                          style={{ padding: '0 15px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', opacity: promoLoading ? 0.6 : 1 }}
+                        >
+                          {promoLoading ? '...' : 'Appliquer'}
+                        </button>
+                      </div>
+                      {promoError && (
+                        <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '6px', marginBottom: 0 }}>{promoError}</p>
+                      )}
+                    </>
+                  )}
                 </div>
                 
                 <div className="cart-summary">
@@ -256,9 +334,9 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                     <span>Sous-total</span>
                     <span>{subtotal.toFixed(2)} MAD</span>
                   </div>
-                  {promoDiscount > 0 && (
+                  {activePromo && discountAmount > 0 && (
                     <div className="cart-summary-row" style={{ color: '#10b981' }}>
-                      <span>Remise Promo (-{promoDiscount}%)</span>
+                      <span>Remise Promo ({activePromo.code})</span>
                       <span>-{discountAmount.toFixed(2)} MAD</span>
                     </div>
                   )}

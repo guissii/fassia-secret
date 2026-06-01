@@ -35,6 +35,9 @@ model Product {
   descriptionAr String?
   price       Float
   oldPrice    Float?
+  promoPrice  Float?
+  wholesalePrice Float?
+  bulkWholesalePrice Float?
   image       String
   categories  Category[]
   collections Collection[]

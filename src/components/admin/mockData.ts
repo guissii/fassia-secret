@@ -36,6 +36,9 @@ export interface AdminProduct {
   description: string;
   price: number;
   oldPrice?: number;
+  promoPrice?: number;
+  wholesalePrice?: number;
+  bulkWholesalePrice?: number;
   image: string;
   categories: string[];
   collections: string[];

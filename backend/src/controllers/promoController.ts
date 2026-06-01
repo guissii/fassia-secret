@@ -69,3 +69,45 @@ export const deletePromo = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete promo' });
   }
 };
+
+// Public endpoint to validate a promo code (used in cart)
+export const validatePromo = async (req: Request, res: Response) => {
+  try {
+    const { code } = req.body;
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ valid: false, error: 'Code promo requis' });
+    }
+
+    const promo = await prisma.promo.findUnique({
+      where: { code: code.toUpperCase() },
+    });
+
+    if (!promo) {
+      return res.status(404).json({ valid: false, error: 'Code promo invalide' });
+    }
+
+    if (!promo.isActive) {
+      return res.status(400).json({ valid: false, error: 'Code promo désactivé' });
+    }
+
+    if (promo.expiresAt && new Date(promo.expiresAt) < new Date()) {
+      return res.status(400).json({ valid: false, error: 'Code promo expiré' });
+    }
+
+    if (promo.usageLimit !== null && promo.usageCount >= promo.usageLimit) {
+      return res.status(400).json({ valid: false, error: 'Code promo épuisé' });
+    }
+
+    res.json({
+      valid: true,
+      promo: {
+        code: promo.code,
+        type: promo.type,
+        value: promo.value,
+      },
+    });
+  } catch (error) {
+    console.error('Error validating promo:', error);
+    res.status(500).json({ valid: false, error: 'Erreur de validation' });
+  }
+};

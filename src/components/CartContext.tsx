@@ -3,6 +3,12 @@
 import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import type { CartItem } from './Cart';
 
+export interface ActivePromo {
+  code: string;
+  type: 'FIXED' | 'PERCENTAGE';
+  value: number;
+}
+
 type CartContextType = {
   isCartOpen: boolean;
   setIsCartOpen: (v: boolean) => void;
@@ -12,6 +18,8 @@ type CartContextType = {
   removeItem: (id: number) => void;
   clearCart: () => void;
   totalCartCount: number;
+  activePromo: ActivePromo | null;
+  setActivePromo: (promo: ActivePromo | null) => void;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -19,6 +27,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [activePromo, setActivePromo] = useState<ActivePromo | null>(null);
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -35,6 +44,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
           name: p.name,
           price: p.price,
           oldPrice: typeof p.oldPrice === 'number' ? p.oldPrice : undefined,
+          promoPrice: typeof p.promoPrice === 'number' ? p.promoPrice : undefined,
+          wholesalePrice: typeof p.wholesalePrice === 'number' ? p.wholesalePrice : undefined,
+          bulkWholesalePrice: typeof p.bulkWholesalePrice === 'number' ? p.bulkWholesalePrice : undefined,
           image: p.image,
           category: p.category,
           quantity: 1,
@@ -54,6 +66,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => {
     setCartItems([]);
+    setActivePromo(null);
   }, []);
 
   const contextValue = useMemo(() => ({
@@ -65,7 +78,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeItem,
     clearCart,
     totalCartCount,
-  }), [isCartOpen, cartItems, addToCart, updateQuantity, removeItem, clearCart, totalCartCount]);
+    activePromo,
+    setActivePromo,
+  }), [isCartOpen, cartItems, addToCart, updateQuantity, removeItem, clearCart, totalCartCount, activePromo]);
 
   return (
     <CartContext.Provider value={contextValue}>
