@@ -76,7 +76,7 @@ export interface Collection {
 export interface Promo {
   id: string;
   code: string;
-  type: 'fixed' | 'percentage';
+  type: 'fixed' | 'percentage' | 'CLIENT' | 'WHOLESALE';
   value: number;
   expiresAt: string;
   usageLimit: number | null;

@@ -21,7 +21,7 @@ export const createPromo = async (req: Request, res: Response) => {
       data: {
         code: code.toUpperCase(),
         type,
-        value,
+        value: value ?? 0,
         expiresAt: new Date(expiresAt),
         usageLimit: usageLimit || null,
         isActive: isActive !== false,
@@ -45,7 +45,7 @@ export const updatePromo = async (req: Request, res: Response) => {
       data: {
         code: code.toUpperCase(),
         type,
-        value,
+        value: value ?? 0,
         expiresAt: new Date(expiresAt),
         usageLimit: usageLimit || null,
         isActive: isActive !== false,

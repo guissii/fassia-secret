@@ -24,6 +24,8 @@ enum DeliveryStatus {
 enum PromoType {
   FIXED
   PERCENTAGE
+  CLIENT
+  WHOLESALE
 }
 
 model Product {

@@ -9,42 +9,46 @@ interface Props {
   onSave: (promo: Promo) => void;
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  CLIENT: 'Client (prix promo)',
+  WHOLESALE: 'Grossiste (prix de gros)',
+};
+
 export function PromoFormModal({ promo, isOpen, onClose, onSave }: Props) {
   const [code, setCode] = useState('');
-  const [type, setType] = useState<'fixed' | 'percentage'>('percentage');
-  const [value, setValue] = useState(0);
+  const [type, setType] = useState<'CLIENT' | 'WHOLESALE'>('CLIENT');
   const [expiresAt, setExpiresAt] = useState('');
-  const [usageLimit, setUsageLimit] = useState<number | ''>('');
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
     if (promo) {
       setCode(promo.code);
-      setType(promo.type);
-      setValue(promo.value);
+      setType(promo.type === 'CLIENT' || promo.type === 'WHOLESALE' ? promo.type : 'CLIENT');
       setExpiresAt(promo.expiresAt.slice(0, 16));
-      setUsageLimit(promo.usageLimit ?? '');
+      setIsActive(promo.isActive);
     } else {
-      setCode(''); setType('percentage'); setValue(10);
+      setCode(''); setType('CLIENT');
       const d = new Date(); d.setDate(d.getDate() + 30);
-      setExpiresAt(d.toISOString().slice(0, 16)); setUsageLimit('');
+      setExpiresAt(d.toISOString().slice(0, 16)); setIsActive(true);
     }
   }, [isOpen, promo]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim() || value <= 0) return;
+    if (!code.trim()) return;
     setLoading(true);
     setTimeout(() => {
       onSave({
         id: promo?.id || `pro_${Date.now()}`,
         code: code.trim().toUpperCase(),
-        type, value,
+        type,
+        value: 0,
         expiresAt: new Date(expiresAt).toISOString(),
-        usageLimit: usageLimit === '' ? null : Number(usageLimit),
+        usageLimit: null,
         usageCount: promo?.usageCount || 0,
-        isActive: promo?.isActive ?? true,
+        isActive,
       });
       setLoading(false); onClose();
     }, 600);
@@ -65,27 +69,33 @@ export function PromoFormModal({ promo, isOpen, onClose, onSave }: Props) {
               <label>Code promo *</label>
               <input type="text" className="admin-input" value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="WELCOME10" style={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }} required />
             </div>
-            <div className="form-row">
-              <div className="form-group" style={{ flex: 1 }}>
-                <label>Type</label>
-                <select className="admin-select" value={type} onChange={e => setType(e.target.value as 'fixed' | 'percentage')} style={{ width: '100%' }}>
-                  <option value="percentage">Pourcentage (%)</option>
-                  <option value="fixed">Montant fixe (MAD)</option>
-                </select>
-              </div>
-              <div className="form-group" style={{ flex: 1 }}>
-                <label>Valeur *</label>
-                <input type="number" className="admin-input" value={value} onChange={e => setValue(Number(e.target.value))} min={1} max={type === 'percentage' ? 100 : 99999} required />
-              </div>
+            <div className="form-group">
+              <label>Type de code</label>
+              <select className="admin-select" value={type} onChange={e => setType(e.target.value as 'CLIENT' | 'WHOLESALE')} style={{ width: '100%' }}>
+                <option value="CLIENT">Client — affiche le prix promo du produit</option>
+                <option value="WHOLESALE">Grossiste — affiche le prix de gros du produit</option>
+              </select>
+              <p className="text-muted" style={{ fontSize: '0.8rem', marginTop: 4 }}>
+                {type === 'CLIENT'
+                  ? 'Le client verra le « Prix promo » défini sur chaque produit.'
+                  : 'Le grossiste verra le « Prix grossiste » (< 10 produits) ou « Prix bulk » (≥ 10 produits).'}
+              </p>
             </div>
             <div className="form-group">
               <label>Date d'expiration</label>
               <input type="datetime-local" className="admin-input" value={expiresAt} onChange={e => setExpiresAt(e.target.value)} />
             </div>
-            <div className="form-group">
-              <label>Limite d'utilisation</label>
-              <input type="number" className="admin-input" value={usageLimit} onChange={e => setUsageLimit(e.target.value === '' ? '' : Number(e.target.value))} min={0} placeholder="Illimité" />
-              <span className="text-muted" style={{ fontSize: '0.8rem', marginTop: 4 }}>Vide = illimité</span>
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <input
+                id="promo-active"
+                type="checkbox"
+                checked={isActive}
+                onChange={e => setIsActive(e.target.checked)}
+                style={{ width: 18, height: 18, cursor: 'pointer' }}
+              />
+              <label htmlFor="promo-active" style={{ margin: 0, cursor: 'pointer', fontWeight: 500 }}>
+                Code promo actif
+              </label>
             </div>
           </div>
           <div className="admin-modal-actions">

@@ -99,21 +99,25 @@ export function PromosTab() {
             <thead>
               <tr>
                 <th>Code Promo</th>
-                <th>Valeur</th>
+                <th>Type</th>
                 <th>Expiration</th>
-                <th>Utilisations</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center" style={{ padding: '2rem' }}>Chargement...</td></tr>
+                <tr><td colSpan={5} className="text-center" style={{ padding: '2rem' }}>Chargement...</td></tr>
               ) : promos.length === 0 ? (
-                <tr><td colSpan={6} className="text-center text-muted" style={{ padding: '2rem' }}>Aucune promotion</td></tr>
+                <tr><td colSpan={5} className="text-center text-muted" style={{ padding: '2rem' }}>Aucune promotion</td></tr>
               ) : (
                 promos.map(promo => {
                   const expired = isExpired(promo.expiresAt);
+                  const typeLabel =
+                    promo.type === 'CLIENT' ? 'Client' :
+                    promo.type === 'WHOLESALE' ? 'Grossiste' :
+                    promo.type === 'percentage' ? 'Pourcentage' :
+                    promo.type === 'fixed' ? 'Montant fixe' : promo.type;
                   return (
                     <tr key={promo.id} className={!promo.isActive || expired ? 'opacity-60 hover-bg' : 'hover-bg'}>
                       <td>
@@ -130,18 +134,14 @@ export function PromosTab() {
                           </code>
                         </div>
                       </td>
-                      <td className="font-medium">
-                        {promo.type === 'percentage' ? `${promo.value}%` : `${promo.value} MAD`}
+                      <td>
+                        <span className="admin-badge badge-info" style={{ textTransform: 'none' }}>{typeLabel}</span>
                       </td>
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <span>{new Date(promo.expiresAt).toLocaleDateString('fr-FR')}</span>
                           <span className="text-muted text-xs">{new Date(promo.expiresAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
-                      </td>
-                      <td>
-                        <span className="font-medium">{promo.usageCount}</span>
-                        <span className="text-muted"> / {promo.usageLimit || '∞'}</span>
                       </td>
                       <td>
                         {expired ? (

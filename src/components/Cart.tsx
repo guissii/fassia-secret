@@ -27,19 +27,36 @@ interface CartProps {
 const SHIPPING_THRESHOLD = 500;
 const SHIPPING_COST = 35;
 
-function getEffectivePrice(item: CartItem, promo: import('./CartContext').ActivePromo | null): number {
+function getEffectivePrice(
+  item: CartItem,
+  promo: import('./CartContext').ActivePromo | null,
+  totalItems: number
+): number {
   if (!promo) return item.price;
 
-  // If product has a fixed promoPrice, use it
-  if (typeof item.promoPrice === 'number' && item.promoPrice > 0) {
-    return item.promoPrice;
+  // CLIENT promo: show the product's promoPrice
+  if (promo.type === 'CLIENT') {
+    return typeof item.promoPrice === 'number' && item.promoPrice > 0
+      ? item.promoPrice
+      : item.price;
   }
 
-  // Otherwise apply the promo discount to regular price
+  // WHOLESALE promo: show wholesalePrice (< 10 items) or bulkWholesalePrice (>= 10 items)
+  if (promo.type === 'WHOLESALE') {
+    if (totalItems >= 10) {
+      return typeof item.bulkWholesalePrice === 'number' && item.bulkWholesalePrice > 0
+        ? item.bulkWholesalePrice
+        : item.price;
+    }
+    return typeof item.wholesalePrice === 'number' && item.wholesalePrice > 0
+      ? item.wholesalePrice
+      : item.price;
+  }
+
+  // Legacy: FIXED / PERCENTAGE
   if (promo.type === 'PERCENTAGE') {
     return Math.max(0, item.price * (1 - promo.value / 100));
   }
-  // FIXED
   return Math.max(0, item.price - promo.value);
 }
 
@@ -56,10 +73,12 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const [orderSuccess, setOrderSuccess] = useState(false);
   const { clearCart, activePromo, setActivePromo } = useCart();
 
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
   // Calculate totals using effective prices
   const lineItems = items.map(item => ({
     ...item,
-    effectivePrice: getEffectivePrice(item, activePromo),
+    effectivePrice: getEffectivePrice(item, activePromo, totalItems),
   }));
 
   const subtotal = lineItems.reduce((sum, item) => sum + item.effectivePrice * item.quantity, 0);
@@ -68,7 +87,6 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const isFreeShipping = subtotal >= SHIPPING_THRESHOLD;
   const shipping = isFreeShipping ? 0 : SHIPPING_COST;
   const total = subtotal + shipping;
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const progressPct = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
 
   // Reset states when cart opens/closes

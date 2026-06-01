@@ -5,7 +5,7 @@ import type { CartItem } from './Cart';
 
 export interface ActivePromo {
   code: string;
-  type: 'FIXED' | 'PERCENTAGE';
+  type: 'FIXED' | 'PERCENTAGE' | 'CLIENT' | 'WHOLESALE';
   value: number;
 }
 
