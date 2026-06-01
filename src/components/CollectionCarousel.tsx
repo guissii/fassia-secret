@@ -9,6 +9,7 @@ import { productHref } from '../lib/productSlug';
 import { ProductCard } from './ProductCard';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import { useCart } from './CartContext';
 
 interface CollectionCarouselProps {
   title: string;
@@ -20,6 +21,7 @@ interface CollectionCarouselProps {
 
 export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTitle }: CollectionCarouselProps) {
   const router = useRouter();
+  const { addToCart } = useCart();
   const MAX_PRODUCTS = 10;
   const displayProducts = products.slice(0, MAX_PRODUCTS);
 
@@ -52,6 +54,7 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
                   product={p}
                   label={p.brand}
                   onNavigate={() => router.push(productHref(p))}
+                  onAddToCart={() => addToCart(p)}
                 />
               ))}
             </div>
@@ -63,6 +66,7 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
               product={p}
               label={p.brand}
               onNavigate={() => router.push(productHref(p))}
+              onAddToCart={() => addToCart(p)}
             />
           ))}
           <Link href={linkHref} className="product-card kb-see-more-card" aria-label="Voir plus">

@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProductCard } from './ProductCard';
 import Image from 'next/image';
+import { useCart } from './CartContext';
 
 interface ProductCarouselProps {
   stepId?: string;
@@ -24,6 +25,7 @@ export function ProductCarousel({
   productLabel,
   seeMoreHref,
 }: ProductCarouselProps) {
+  const { addToCart } = useCart();
   const MAX_PRODUCTS = 6;
   const displayProducts = products.slice(0, MAX_PRODUCTS);
   const firstProduct = displayProducts[0];
@@ -43,10 +45,10 @@ export function ProductCarousel({
           </div>
         </div>
 
-        {firstProduct && <ProductCard product={firstProduct} label={productLabel} />}
+        {firstProduct && <ProductCard product={firstProduct} label={productLabel} onAddToCart={() => addToCart(firstProduct)} />}
 
       {rest.map((p) => (
-        <ProductCard key={p.id} product={p} label={productLabel} />
+        <ProductCard key={p.id} product={p} label={productLabel} onAddToCart={() => addToCart(p)} />
       ))}
 
       <Link href={seeMoreHref} className="product-card kb-see-more-card" aria-label={`Voir plus ${title}`}>
