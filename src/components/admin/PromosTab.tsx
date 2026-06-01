@@ -34,28 +34,74 @@ export function PromosTab() {
     loadPromos();
   }, []);
 
-  const handleSavePromo = (promo: Promo) => {
-    const existing = promos.find(p => p.id === promo.id);
-    if (existing) {
-      setPromos(prev => prev.map(p => (p.id === promo.id ? promo : p)));
-      setToast({ message: 'Promotion mise à jour', type: 'success' });
-    } else {
-      setPromos(prev => [...prev, promo]);
-      setToast({ message: 'Promotion créée', type: 'success' });
+  const handleSavePromo = async (promo: Promo) => {
+    try {
+      const existing = promos.find(p => p.id === promo.id);
+      if (existing) {
+        await api.fetchWithAuth(`/promos/${promo.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            code: promo.code,
+            type: promo.type,
+            value: promo.value,
+            expiresAt: promo.expiresAt,
+            usageLimit: promo.usageLimit,
+            isActive: promo.isActive,
+          }),
+        });
+        setPromos(prev => prev.map(p => (p.id === promo.id ? promo : p)));
+        setToast({ message: 'Promotion mise à jour', type: 'success' });
+      } else {
+        const data = await api.fetchWithAuth('/promos', {
+          method: 'POST',
+          body: JSON.stringify({
+            code: promo.code,
+            type: promo.type,
+            value: promo.value,
+            expiresAt: promo.expiresAt,
+            usageLimit: promo.usageLimit,
+            isActive: promo.isActive,
+          }),
+        });
+        setPromos(prev => [...prev, data.promo || promo]);
+        setToast({ message: 'Promotion créée', type: 'success' });
+      }
+    } catch {
+      setToast({ message: 'Erreur lors de l\'enregistrement', type: 'error' });
     }
   };
 
   const toggleStatus = async (id: string) => {
-    setPromos(prev => prev.map(p => (p.id === id ? { ...p, isActive: !p.isActive } : p)));
     const promo = promos.find(p => p.id === id);
-    setToast({ message: `Promotion ${!promo?.isActive ? 'activée' : 'désactivée'}`, type: 'info' });
-    await delay(300);
+    if (!promo) return;
+    try {
+      await api.fetchWithAuth(`/promos/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          code: promo.code,
+          type: promo.type,
+          value: promo.value,
+          expiresAt: promo.expiresAt,
+          usageLimit: promo.usageLimit,
+          isActive: !promo.isActive,
+        }),
+      });
+      setPromos(prev => prev.map(p => (p.id === id ? { ...p, isActive: !p.isActive } : p)));
+      setToast({ message: `Promotion ${!promo.isActive ? 'activée' : 'désactivée'}`, type: 'info' });
+    } catch {
+      setToast({ message: 'Erreur lors de la mise à jour', type: 'error' });
+    }
   };
 
   const handleDeletePromo = async () => {
     if (!deleteTargetId) return;
-    setPromos(prev => prev.filter(p => p.id !== deleteTargetId));
-    setToast({ message: 'Promotion supprimée', type: 'success' });
+    try {
+      await api.fetchWithAuth(`/promos/${deleteTargetId}`, { method: 'DELETE' });
+      setPromos(prev => prev.filter(p => p.id !== deleteTargetId));
+      setToast({ message: 'Promotion supprimée', type: 'success' });
+    } catch {
+      setToast({ message: 'Erreur lors de la suppression', type: 'error' });
+    }
     setDeleteTargetId(null);
   };
 
