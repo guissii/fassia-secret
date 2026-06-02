@@ -297,7 +297,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
             )}
 
             <div className="cart-items-list">
-              {items.length === 0 ? <EmptyCartState /> : items.map(item => (
+              {lineItems.length === 0 ? <EmptyCartState /> : lineItems.map(item => (
                 <CartItemRow key={item.id} item={item} onUpdateQuantity={onUpdateQuantity} onRemove={onRemoveItem} />
               ))}
             </div>
@@ -348,11 +348,26 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                 </div>
                 
                 <div className="cart-summary">
-                  <div className="cart-summary-row">
-                    <span>Sous-total</span>
-                    <span>{subtotal.toFixed(2)} MAD</span>
-                  </div>
-                  {activePromo && discountAmount > 0 && (
+                  {activePromo && (activePromo.type === 'CLIENT' || activePromo.type === 'WHOLESALE') ? (
+                    <>
+                      <div className="cart-summary-row">
+                        <span>Prix standard</span>
+                        <span style={{ textDecoration: 'line-through', color: '#9ca3af' }}>{originalSubtotal.toFixed(2)} MAD</span>
+                      </div>
+                      <div className="cart-summary-row">
+                        <span style={{ color: '#10b981', fontWeight: 600 }}>
+                          {activePromo.type === 'CLIENT' ? 'Prix Promo' : 'Prix Grossiste'} ({activePromo.code})
+                        </span>
+                        <span style={{ color: '#10b981', fontWeight: 600 }}>{subtotal.toFixed(2)} MAD</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="cart-summary-row">
+                      <span>Sous-total</span>
+                      <span>{subtotal.toFixed(2)} MAD</span>
+                    </div>
+                  )}
+                  {activePromo && activePromo.type !== 'CLIENT' && activePromo.type !== 'WHOLESALE' && discountAmount > 0 && (
                     <div className="cart-summary-row" style={{ color: '#10b981' }}>
                       <span>Remise Promo ({activePromo.code})</span>
                       <span>-{discountAmount.toFixed(2)} MAD</span>
@@ -452,9 +467,9 @@ function CartItemRow({
 
           {/* Price */}
           <div className="cart-item-prices">
-            <span className="cart-item-price">{(item.price * item.quantity).toFixed(2)} MAD</span>
-            {item.oldPrice && (
-              <span className="cart-item-old-price">{(item.oldPrice * item.quantity).toFixed(2)} MAD</span>
+            <span className="cart-item-price">{(((item as any).effectivePrice ?? item.price) * item.quantity).toFixed(2)} MAD</span>
+            {(item as any).effectivePrice && (item as any).effectivePrice !== item.price && (
+              <span className="cart-item-old-price">{(item.price * item.quantity).toFixed(2)} MAD</span>
             )}
           </div>
 
