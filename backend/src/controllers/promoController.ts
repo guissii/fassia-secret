@@ -17,10 +17,26 @@ export const createPromo = async (req: Request, res: Response) => {
   try {
     const { code, type, value, expiresAt, usageLimit, isActive } = req.body;
 
+    // Validation
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ error: 'Code promo requis' });
+    }
+    if (!type || typeof type !== 'string') {
+      return res.status(400).json({ error: 'Type requis (CLIENT ou WHOLESALE)' });
+    }
+    if (!expiresAt) {
+      return res.status(400).json({ error: 'Date d\'expiration requise' });
+    }
+
+    const validTypes = ['FIXED', 'PERCENTAGE', 'CLIENT', 'WHOLESALE'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ error: `Type invalide: ${type}. Valeurs acceptées: ${validTypes.join(', ')}` });
+    }
+
     const promo = await prisma.promo.create({
       data: {
         code: code.toUpperCase(),
-        type,
+        type: type as any,
         value: value ?? 0,
         expiresAt: new Date(expiresAt),
         usageLimit: usageLimit || null,
@@ -29,9 +45,12 @@ export const createPromo = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({ promo });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating promo:', error);
-    res.status(500).json({ error: 'Failed to create promo' });
+    // Return actual error message for debugging
+    const message = error?.message || 'Failed to create promo';
+    const code = error?.code;
+    res.status(500).json({ error: message, code });
   }
 };
 
@@ -40,22 +59,43 @@ export const updatePromo = async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const { code, type, value, expiresAt, usageLimit, isActive } = req.body;
 
+    if (!id) {
+      return res.status(400).json({ error: 'ID promo requis' });
+    }
+
+    const updateData: any = {
+      code: code?.toUpperCase(),
+      value: value ?? 0,
+      isActive: isActive !== false,
+    };
+
+    if (type) {
+      const validTypes = ['FIXED', 'PERCENTAGE', 'CLIENT', 'WHOLESALE'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ error: `Type invalide: ${type}` });
+      }
+      updateData.type = type;
+    }
+
+    if (expiresAt) {
+      updateData.expiresAt = new Date(expiresAt);
+    }
+
+    if (usageLimit !== undefined) {
+      updateData.usageLimit = usageLimit || null;
+    }
+
     const promo = await prisma.promo.update({
       where: { id },
-      data: {
-        code: code.toUpperCase(),
-        type,
-        value: value ?? 0,
-        expiresAt: new Date(expiresAt),
-        usageLimit: usageLimit || null,
-        isActive: isActive !== false,
-      },
+      data: updateData,
     });
 
     res.json({ promo });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating promo:', error);
-    res.status(500).json({ error: 'Failed to update promo' });
+    const message = error?.message || 'Failed to update promo';
+    const code = error?.code;
+    res.status(500).json({ error: message, code });
   }
 };
 
