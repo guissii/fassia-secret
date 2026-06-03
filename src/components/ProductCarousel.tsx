@@ -37,7 +37,7 @@ export function ProductCarousel({
           {visualImageComponent ? (
             visualImageComponent
           ) : (
-            <Image src={visualImage || '/logo.png'} alt={title} className="essentials-visual-img" fill sizes="(max-width: 768px) 50vw, 25vw" />
+            <Image src={visualImage || firstProduct?.image || '/logo.png'} alt={title} className="essentials-visual-img" fill sizes="(max-width: 768px) 50vw, 25vw" />
           )}
           <div className="kb-visual-overlay">
             {stepId && <span className="kb-overlay-step">{stepId}</span>}
