@@ -22,7 +22,7 @@ interface CollectionCarouselProps {
 export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTitle }: CollectionCarouselProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const MAX_PRODUCTS = 10;
+  const MAX_PRODUCTS = 20;
   const displayProducts = products.slice(0, MAX_PRODUCTS);
 
   return (

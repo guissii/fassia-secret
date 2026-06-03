@@ -26,7 +26,7 @@ export function ProductCarousel({
   seeMoreHref,
 }: ProductCarouselProps) {
   const { addToCart } = useCart();
-  const MAX_PRODUCTS = 6;
+  const MAX_PRODUCTS = 20;
   const displayProducts = products.slice(0, MAX_PRODUCTS);
   const firstProduct = displayProducts[0];
   const rest = displayProducts.slice(1);

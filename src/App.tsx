@@ -26,7 +26,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
   const [loadingBestSellers, setLoadingBestSellers] = useState(true);
 
   useEffect(() => {
-    fetch('/api/products?isPromo=true&random=true&limit=10')
+    fetch('/api/products?isPromo=true&random=true&limit=20')
       .then(r => r.json())
       .then(data => {
         setPromoProducts(data.products || []);
@@ -36,7 +36,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
   }, []);
 
   useEffect(() => {
-    fetch('/api/products?isEssential=true&limit=6')
+    fetch('/api/products?isEssential=true&random=true&limit=20')
       .then(r => r.json())
       .then(data => {
         setBestSellers(data.products || []);
@@ -47,8 +47,8 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/products?category=Maquillage&isVisible=true&limit=5').then(r => r.json()),
-      fetch('/api/products?category=Parfums&isVisible=true&limit=5').then(r => r.json()),
+      fetch('/api/products?category=Maquillage&isVisible=true&random=true&limit=20').then(r => r.json()),
+      fetch('/api/products?category=Parfums&isVisible=true&random=true&limit=20').then(r => r.json()),
     ])
       .then(([maquillageData, parfumsData]) => {
         const maquillage = maquillageData.products || [];
@@ -57,11 +57,11 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
 
         // Fallback: si aucun produit trouve, essayer la categorie combinee
         if (combined.length === 0) {
-          fetch('/api/products?category=maquillage-et-parfums&isVisible=true&limit=10')
+          fetch('/api/products?category=maquillage-et-parfums&isVisible=true&random=true&limit=20')
             .then(r => r.json())
             .then(data => setMakeupParfums(data.products || []));
         } else {
-          setMakeupParfums(combined.slice(0, 10));
+          setMakeupParfums(combined.slice(0, 20));
         }
       })
       .catch(() => setMakeupParfums([]));

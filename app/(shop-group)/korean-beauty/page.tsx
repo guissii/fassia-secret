@@ -14,8 +14,8 @@ const API_URL = typeof window === 'undefined'
 async function getKBeautyProducts(step?: number) {
   try {
     const url = step
-      ? `${API_URL}/api/products?limit=10&category=k-beauty&koreanBeautyStep=${step}`
-      : `${API_URL}/api/products?limit=100&category=k-beauty`;
+      ? `${API_URL}/api/products?limit=20&random=true&category=k-beauty&koreanBeautyStep=${step}`
+      : `${API_URL}/api/products?limit=100&random=true&category=k-beauty`;
     const res = await fetch(url, {
       cache: 'no-store',
     });
@@ -209,7 +209,7 @@ export default async function KoreanBeautyPage() {
       // Afficher uniquement les produits de la DB (pas de hardcodés)
       return {
         ...step,
-        products: dbSlice.slice(0, 3),
+        products: dbSlice.slice(0, 20),
       };
     })
   );
