@@ -17,11 +17,13 @@ const Categories = dynamic(() => import('./components/Categories').then(mod => m
 const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
 const KoreanStepsSection = dynamic(() => import('./components/KoreanStepsSection').then(mod => mod.KoreanStepsSection));
 
-function App({ bestSellers }: { bestSellers: any[] }) {
+function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
   const bestSellersBanner = LOCAL_BANNERS.bestSellers;
   const [promoProducts, setPromoProducts] = useState<any[]>([]);
   const [loadingPromos, setLoadingPromos] = useState(true);
   const [makeupParfums, setMakeupParfums] = useState<any[]>([]);
+  const [bestSellers, setBestSellers] = useState<any[]>(initialBestSellers);
+  const [loadingBestSellers, setLoadingBestSellers] = useState(true);
 
   useEffect(() => {
     fetch('/api/products?isPromo=true&random=true&limit=10')
@@ -31,6 +33,16 @@ function App({ bestSellers }: { bestSellers: any[] }) {
         setLoadingPromos(false);
       })
       .catch(() => setLoadingPromos(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/products?isEssential=true&limit=6')
+      .then(r => r.json())
+      .then(data => {
+        setBestSellers(data.products || []);
+        setLoadingBestSellers(false);
+      })
+      .catch(() => setLoadingBestSellers(false));
   }, []);
 
   useEffect(() => {
@@ -81,13 +93,19 @@ function App({ bestSellers }: { bestSellers: any[] }) {
 
       <SupplementsSection />
 
-      <CollectionCarousel 
-        title="MEILLEURES VENTES"
-        imageSrc={bestSellersBanner}
-        products={bestSellers}
-        linkHref="/boutique?isEssential=true"
-        linkTitle="Découvrir les meilleures ventes"
-      />
+      {loadingBestSellers ? (
+        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: '#999' }}>Chargement des meilleures ventes...</span>
+        </div>
+      ) : (
+        <CollectionCarousel 
+          title="MEILLEURES VENTES"
+          imageSrc={bestSellersBanner}
+          products={bestSellers}
+          linkHref="/boutique?isEssential=true"
+          linkTitle="Découvrir les meilleures ventes"
+        />
+      )}
 
       <Categories />
 
