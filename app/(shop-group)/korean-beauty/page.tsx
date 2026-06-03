@@ -228,7 +228,9 @@ export default async function KoreanBeautyPage() {
       </section>
 
       {/* 10 Steps — each is an exact copy of the Centella EssentialsSection layout */}
-      {stepsWithProducts.map((step) => (
+      {stepsWithProducts.map((step) => {
+        const visualImageUrl = banners[step.sectionKey] || step.visualImage;
+        return (
           <section className="essentials-section" key={step.id}>
             <div className="container">
               {/* Step Header — like Centella's "NOS ESSENTIELS" title */}
@@ -243,13 +245,15 @@ export default async function KoreanBeautyPage() {
               <ProductCarousel
                 stepId={step.id.toString().padStart(2, '0')}
                 title={step.title}
+                visualImage={visualImageUrl}
                 products={step.products}
                 productLabel="K-BEAUTY"
                 seeMoreHref={`/boutique?${step.filterQuery}`}
               />
             </div>
           </section>
-        ))}
+        );
+      })}
 
       {/* Global CTA */}
       <section className="kb-global-cta">
