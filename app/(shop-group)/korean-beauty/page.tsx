@@ -98,7 +98,7 @@ const STEPS: Step[] = [
     id: 4,
     sectionKey: 'kb-toner',
     title: 'Lotion Tonique',
-    visualImage: '/images/banners/Lotion Tonique.webp',
+    visualImage: '/images/banners/Lotion%20Tonique.webp',
     products: [
       { id: 401, name: 'Heartleaf 77% Soothing Toner', description: 'Lotion apaisante très concentrée', price: 25.00, image: productImg('Packshot produit K-beauty, toner apaisant heartleaf 77%, fond blanc premium, style e-commerce, haute définition') },
       { id: 402, name: 'Centella Toning Water', description: 'Prépare la peau tout en douceur', price: 23.00, image: productImg('Packshot produit K-beauty, toner à la centella, fond beige rosé, style e-commerce, haute définition') },
@@ -122,7 +122,7 @@ const STEPS: Step[] = [
     id: 6,
     sectionKey: 'kb-serum',
     title: 'Sérum & Ampoule',
-    visualImage: '/images/banners/serum et ampule.webp',
+    visualImage: '/images/banners/serum%20et%20ampule.webp',
     products: [
       { id: 601, name: 'Glow Serum Propolis + Niacinamide', description: 'Sérum coup d\'éclat au miel', price: 29.00, image: productImg('Packshot produit K-beauty, sérum propolis niacinamide, fond clair premium, style e-commerce, haute définition') },
       { id: 602, name: 'Dark Spot Correcting Serum', description: 'Corrige les taches brunes', price: 31.00, image: productImg('Packshot produit K-beauty, sérum anti-taches, fond beige rosé, style e-commerce luxe, haute définition') },
@@ -134,7 +134,7 @@ const STEPS: Step[] = [
     id: 7,
     sectionKey: 'kb-sheet-mask',
     title: 'Masque Tissu',
-    visualImage: '/images/banners/masque tissu.webp',
+    visualImage: '/images/banners/masque%20tissu.webp',
     products: [
       { id: 701, name: 'Collagen Impact Essential Mask', description: 'Masque tissu anti-âge au collagène', price: 18.00, image: productImg('Packshot produit K-beauty, sheet mask collagène anti-âge, fond clair premium, style e-commerce, haute définition') },
       { id: 702, name: 'Teatree Care Solution Mask', description: 'Masque à l\'arbre à thé anti-imperfections', price: 15.00, image: productImg('Packshot produit K-beauty, sheet mask tea tree anti-imperfections, fond blanc rose, style e-commerce premium, haute définition') },
@@ -146,7 +146,7 @@ const STEPS: Step[] = [
     id: 8,
     sectionKey: 'kb-eye-cream',
     title: 'Contour des Yeux',
-    visualImage: '/images/banners/contour des yeux.webp',
+    visualImage: '/images/banners/contour%20des%20yeux.webp',
     products: [
       { id: 801, name: 'Revitalize Ginseng Eye Cream', description: 'Contour des yeux anti-rides', price: 48.00, image: productImg('Packshot produit K-beauty, eye cream au ginseng, fond blanc premium, style e-commerce luxe, haute définition') },
       { id: 802, name: 'Snail Peptide Eye Cream', description: 'Combat les cernes et lisse la peau', price: 42.00, image: productImg('Packshot produit K-beauty, eye cream peptide snail, fond beige rosé, style e-commerce, haute définition') },
