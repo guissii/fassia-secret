@@ -527,6 +527,19 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                 </label>
               </div>
 
+              <div className="form-group toggle-group" style={{ marginTop: '0.5rem' }}>
+                <label className="toggle-label">
+                  <div>
+                    <span style={{ fontWeight: 500 }}>En promotion</span>
+                    <p className="text-muted text-sm" style={{ margin: 0 }}>Afficher dans la section Promotions</p>
+                  </div>
+                  <div className="switch-wrapper">
+                    <input type="checkbox" name="isPromo" checked={formData.isPromo === true} onChange={handleChange} />
+                    <span className="slider round"></span>
+                  </div>
+                </label>
+              </div>
+
             </div>
             
             {/* Right Column: Live Preview */}

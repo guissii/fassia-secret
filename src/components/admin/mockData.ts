@@ -47,6 +47,7 @@ export interface AdminProduct {
   isVisible: boolean;
   isArchived: boolean;
   isEssential: boolean;
+  isPromo: boolean;
   salesCount: number;
   stock: number;
   tags: string[];

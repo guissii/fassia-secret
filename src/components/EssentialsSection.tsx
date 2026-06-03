@@ -6,8 +6,8 @@ export function EssentialsSection({ products }: { products: any[] }) {
       title="PROMOTIONS"
       imageSrc=""
       products={products}
-      linkHref="/boutique"
-      linkTitle="Découvrir tous nos essentiels"
+      linkHref="/boutique?isPromo=true"
+      linkTitle="Découvrir toutes les promotions"
     />
   );
 }

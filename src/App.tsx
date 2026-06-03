@@ -19,18 +19,18 @@ const KoreanStepsSection = dynamic(() => import('./components/KoreanStepsSection
 
 function App({ bestSellers }: { bestSellers: any[] }) {
   const bestSellersBanner = LOCAL_BANNERS.bestSellers;
-  const [essentials, setEssentials] = useState<any[]>([]);
-  const [loadingEssentials, setLoadingEssentials] = useState(true);
+  const [promoProducts, setPromoProducts] = useState<any[]>([]);
+  const [loadingPromos, setLoadingPromos] = useState(true);
   const [makeupParfums, setMakeupParfums] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/products?isEssential=true&random=true&limit=10')
+    fetch('/api/products?isPromo=true&random=true&limit=10')
       .then(r => r.json())
       .then(data => {
-        setEssentials(data.products || []);
-        setLoadingEssentials(false);
+        setPromoProducts(data.products || []);
+        setLoadingPromos(false);
       })
-      .catch(() => setLoadingEssentials(false));
+      .catch(() => setLoadingPromos(false));
   }, []);
 
   useEffect(() => {
@@ -59,12 +59,12 @@ function App({ bestSellers }: { bestSellers: any[] }) {
     <>
       <AffichesSection />
 
-      {loadingEssentials ? (
+      {loadingPromos ? (
         <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: '#999' }}>Chargement des essentiels...</span>
+          <span style={{ color: '#999' }}>Chargement des promotions...</span>
         </div>
       ) : (
-        <EssentialsSection products={essentials} />
+        <EssentialsSection products={promoProducts} />
       )}
 
       {makeupParfums.length > 0 && (

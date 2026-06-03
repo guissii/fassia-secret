@@ -21,6 +21,7 @@ export const getProducts = async (req: Request, res: Response) => {
     const collectionSlug = req.query.collection as string;
     const isVisible = req.query.isVisible as string;
     const isEssential = req.query.isEssential as string;
+    const isPromo = req.query.isPromo as string;
     const includeArchived = req.query.includeArchived as string;
     const koreanBeautyStep = req.query.koreanBeautyStep as string;
     const makeupStep = req.query.makeupStep as string;
@@ -30,7 +31,7 @@ export const getProducts = async (req: Request, res: Response) => {
     if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
-    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${page}:${limit}`;
+    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -71,6 +72,10 @@ export const getProducts = async (req: Request, res: Response) => {
 
     if (isEssential !== undefined && isEssential !== '') {
       where.isEssential = isEssential === 'true';
+    }
+
+    if (isPromo !== undefined && isPromo !== '') {
+      where.isPromo = isPromo === 'true';
     }
 
     const orderBy = random === 'true' ? undefined : { createdAt: 'desc' as const };
@@ -118,7 +123,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isPromo, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
 
     // Check for duplicate product name
     const existing = await prisma.product.findFirst({
@@ -151,6 +156,7 @@ export const createProduct = async (req: Request, res: Response) => {
         koreanBeautyStep: koreanBeautyStep ? parseInt(koreanBeautyStep) : null,
         supplementFocus: supplementFocus || null,
         isVisible: isVisible !== false,
+        isPromo: isPromo === true,
         categories: {
           connect: (categoryIds || []).map((id: string) => ({ id }))
         },
@@ -182,7 +188,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
 
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, isPromo, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
 
     // Check for duplicate product name (excluding current product)
     const existing = await prisma.product.findFirst({
@@ -220,6 +226,7 @@ export const updateProduct = async (req: Request, res: Response) => {
         makeupStep: makeupStep ? parseInt(makeupStep) : null,
         isVisible: isVisible !== false,
         isArchived: isArchived === true,
+        isPromo: isPromo === true,
         categories: {
           set: [], // Disconnect all
           connect: (categoryIds || []).map((id: string) => ({ id }))

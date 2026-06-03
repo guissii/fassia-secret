@@ -33,6 +33,7 @@ export default function BoutiqueClientPage() {
       .filter(Boolean);
   }, [searchParams]);
   const onlyPromos = useMemo(() => searchParams.get('promo') === '1', [searchParams]);
+  const isPromoBackend = useMemo(() => searchParams.get('isPromo') === 'true', [searchParams]);
   const onlyNew = useMemo(() => searchParams.get('new') === '1', [searchParams]);
   const sort = useMemo(() => {
     const raw = searchParams.get('sort');
@@ -58,6 +59,13 @@ export default function BoutiqueClientPage() {
         })
         .catch(console.error)
         .finally(() => setIsSearchLoading(false));
+    } else if (isPromoBackend) {
+      fetch('/api/products?isPromo=true&limit=500')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.products) setAllProducts(data.products);
+        })
+        .catch(console.error);
     } else {
       fetch('/api/products?limit=500')
         .then((res) => res.json())
@@ -66,7 +74,7 @@ export default function BoutiqueClientPage() {
         })
         .catch(console.error);
     }
-  }, [query]);
+  }, [query, isPromoBackend]);
 
   const updateSearchParams = (mutate: (sp: URLSearchParams) => void) => {
     const sp = new URLSearchParams(searchParams.toString());
@@ -241,7 +249,7 @@ export default function BoutiqueClientPage() {
           <div className="container">
             <div className="shop-header">
               <div className="shop-title">
-                <h1 className="section-title-premium">Tous les produits</h1>
+                <h1 className="section-title-premium">{isPromoBackend ? 'Promotions' : 'Tous les produits'}</h1>
                 <div className="shop-count">{filteredProducts.length} produits</div>
               </div>
 
