@@ -3,7 +3,7 @@ import { CollectionCarousel } from './CollectionCarousel';
 export function EssentialsSection({ products }: { products: any[] }) {
   return (
     <CollectionCarousel 
-      title="ESSENTIELS"
+      title="PROMOTIONS"
       imageSrc=""
       products={products}
       linkHref="/boutique"
