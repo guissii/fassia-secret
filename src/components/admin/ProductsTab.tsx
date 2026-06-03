@@ -532,6 +532,11 @@ export function ProductsTab() {
                                 ★ Essentiel
                               </span>
                             )}
+                            {isOutOfStock && (
+                              <span className="admin-badge" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', marginTop: '0.25rem', background: '#fee2e2', color: '#991b1b', border: '1px solid #ef4444' }}>
+                                Rupture
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>
