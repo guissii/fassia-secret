@@ -85,7 +85,7 @@ function App({ bestSellers }: { bestSellers: any[] }) {
         title="MEILLEURES VENTES"
         imageSrc={bestSellersBanner}
         products={bestSellers}
-        linkHref="/boutique"
+        linkHref="/boutique?isEssential=true"
         linkTitle="Découvrir les meilleures ventes"
       />
 
