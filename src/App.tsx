@@ -14,7 +14,7 @@ const IngredientsSection = dynamic(() => import('./components/IngredientsSection
 const SupplementsSection = dynamic(() => import('./components/SupplementsSection').then(mod => mod.SupplementsSection));
 const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel').then(mod => mod.CollectionCarousel));
 const Categories = dynamic(() => import('./components/Categories').then(mod => mod.Categories));
-const Brands = dynamic(() => import('./components/Brands').then(mod => mod.Brands));
+const OfficialShopsSection = dynamic(() => import('./components/OfficialShopsSection').then(mod => mod.OfficialShopsSection));
 const KoreanStepsSection = dynamic(() => import('./components/KoreanStepsSection').then(mod => mod.KoreanStepsSection));
 
 function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
@@ -111,7 +111,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
 
       <KoreanStepsSection />
 
-      <Brands />
+      <OfficialShopsSection />
 
       <div className="section-footer text-center mt-2xl">
         <Link href="/boutique" className="see-more-products-cta mt-lg mx-auto" style={{ display: 'inline-flex' }}>

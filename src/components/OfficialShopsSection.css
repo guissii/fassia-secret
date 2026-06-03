@@ -1,0 +1,108 @@
+.official-shops-section {
+  background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+}
+
+.official-shops-tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.official-shops-tab {
+  padding: 0.6rem 1.4rem;
+  border-radius: 9999px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.official-shops-tab:hover {
+  border-color: #f9a8d4;
+  color: #be185d;
+}
+
+.official-shops-tab.active {
+  border-color: #ec4899;
+  background: #fdf2f8;
+  color: #be185d;
+}
+
+.official-shops-carousel-wrapper {
+  position: relative;
+  padding: 0 2.5rem;
+}
+
+.official-shops-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0.5rem 0;
+}
+
+.official-shops-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.official-shops-product {
+  flex: 0 0 220px;
+  min-width: 220px;
+}
+
+.official-shops-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  color: #374151;
+  transition: all 0.2s;
+}
+
+.official-shops-arrow:hover {
+  background: #fdf2f8;
+  border-color: #ec4899;
+  color: #be185d;
+}
+
+.official-shops-arrow-left {
+  left: 0;
+}
+
+.official-shops-arrow-right {
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .official-shops-carousel-wrapper {
+    padding: 0 1.5rem;
+  }
+  
+  .official-shops-product {
+    flex: 0 0 170px;
+    min-width: 170px;
+  }
+  
+  .official-shops-arrow {
+    width: 30px;
+    height: 30px;
+  }
+}
