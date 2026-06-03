@@ -350,7 +350,7 @@ export const toggleEssential = async (req: Request, res: Response) => {
     if (isEssential === true && !product.isEssential) {
       const essentialCount = await prisma.product.count({ where: { isEssential: true } });
       if (essentialCount >= 10) {
-        return res.status(400).json({ error: 'Maximum 10 produits essentiels atteint' });
+        return res.status(400).json({ error: 'Maximum 10 meilleures ventes atteint' });
       }
     }
 

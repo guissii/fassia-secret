@@ -175,15 +175,15 @@ export function ProductsTab() {
   const handleBulkEssential = async (essential: boolean) => {
     if (selectedIds.size === 0) return;
     try {
-      setToast({ message: `${essential ? 'Ajout' : 'Retrait'} de ${selectedIds.size} produit(s) aux Essentiels...`, type: 'info' });
+      setToast({ message: `${essential ? 'Ajout' : 'Retrait'} de ${selectedIds.size} produit(s) aux Meilleures ventes...`, type: 'info' });
       const ids = Array.from(selectedIds);
       for (const id of ids) {
         await api.fetchWithAuth(`/products/${id}/essential`, { method: 'PATCH', body: JSON.stringify({ isEssential: essential }) });
       }
       setProducts(prev => prev.map(p => selectedIds.has(p.id) ? { ...p, isEssential: essential } : p));
-      setToast({ message: `${ids.length} produit(s) ${essential ? 'ajouté(s) aux' : 'retiré(s) des'} Essentiels`, type: 'success' });
+      setToast({ message: `${ids.length} produit(s) ${essential ? 'ajouté(s) aux' : 'retiré(s) des'} Meilleures ventes`, type: 'success' });
     } catch {
-      setToast({ message: "Erreur lors de la modification des Essentiels", type: 'error' });
+      setToast({ message: "Erreur lors de la modification des Meilleures ventes", type: 'error' });
     }
   };
 
@@ -412,7 +412,7 @@ export function ProductsTab() {
                 </button>
               )}
               <span style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#92400e', background: '#fef3c7', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid #f59e0b' }}>
-                ★ Essentiels : {essentialCount}/{MAX_ESSENTIALS}
+                ★ Meilleures ventes : {essentialCount}/{MAX_ESSENTIALS}
               </span>
             </span>
             <button className="admin-btn-outline text-sm" onClick={() => handleBulkVisibility(true)} title="Publier">
@@ -426,8 +426,8 @@ export function ProductsTab() {
             </button>
             <button 
               className="admin-btn-outline text-sm" 
-              onClick={() => canAddEssential ? handleBulkEssential(true) : setToast({ message: `Maximum ${MAX_ESSENTIALS} produits essentiels atteint`, type: 'error' })} 
-              title={canAddEssential ? "Ajouter aux Essentiels" : `Limite ${MAX_ESSENTIALS} atteinte`}
+              onClick={() => canAddEssential ? handleBulkEssential(true) : setToast({ message: `Maximum ${MAX_ESSENTIALS} meilleures ventes atteint`, type: 'error' })} 
+              title={canAddEssential ? "Ajouter aux Meilleures ventes" : `Limite ${MAX_ESSENTIALS} atteinte`}
               style={{ 
                 background: canAddEssential ? '#fef3c7' : '#f3f4f6', 
                 borderColor: canAddEssential ? '#f59e0b' : '#d1d5db', 
@@ -436,7 +436,7 @@ export function ProductsTab() {
               }}
               disabled={!canAddEssential}
             >
-              <Star size={14} /> Essentiel
+              <Star size={14} /> Meilleure vente
             </button>
             <button 
               className="admin-btn-outline text-sm" 
@@ -529,7 +529,7 @@ export function ProductsTab() {
                             })()}
                             {product.isEssential && (
                               <span className="admin-badge" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', marginTop: '0.25rem', background: '#fef3c7', color: '#92400e', border: '1px solid #f59e0b' }}>
-                                ★ Essentiel
+                                ★ Meilleure vente
                               </span>
                             )}
                             {isOutOfStock && (
@@ -581,12 +581,12 @@ export function ProductsTab() {
                           </button>
                           <button 
                             className="action-btn"
-                            title={product.isEssential ? "Retirer des Essentiels" : "Ajouter aux Essentiels"}
+                            title={product.isEssential ? "Retirer des Meilleures ventes" : "Ajouter aux Meilleures ventes"}
                             onClick={() => {
                               api.fetchWithAuth(`/products/${product.id}/essential`, { method: 'PATCH', body: JSON.stringify({ isEssential: !product.isEssential }) })
                                 .then(() => {
                                   setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isEssential: !p.isEssential } : p));
-                                  setToast({ message: product.isEssential ? 'Retiré des Essentiels' : 'Ajouté aux Essentiels', type: 'success' });
+                                  setToast({ message: product.isEssential ? 'Retiré des Meilleures ventes' : 'Ajouté aux Meilleures ventes', type: 'success' });
                                 })
                                 .catch(() => setToast({ message: 'Erreur', type: 'error' }));
                             }}
