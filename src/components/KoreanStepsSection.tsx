@@ -15,16 +15,16 @@ type KoreanStep = {
 };
 
 const KOREAN_STEPS: KoreanStep[] = [
-  { id: 'step1', step: 1, label: 'Huile Démaquillante', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80', accent: '#f59e0b' },
-  { id: 'step2', step: 2, label: 'Nettoyant Moussant', image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&auto=format&fit=crop&q=80', accent: '#06b6d4' },
-  { id: 'step3', step: 3, label: 'Exfoliant', image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop&q=80', accent: '#84cc16' },
-  { id: 'step4', step: 4, label: 'Lotion Tonique', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80', accent: '#0ea5e9' },
-  { id: 'step5', step: 5, label: 'Essence', image: 'https://images.unsplash.com/photo-1619451334792-150fd785ee74?w=600&auto=format&fit=crop&q=80', accent: '#ec4899' },
-  { id: 'step6', step: 6, label: 'Sérum', image: 'https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?w=600&auto=format&fit=crop&q=80', accent: '#a855f7' },
-  { id: 'step7', step: 7, label: 'Masque Tissu', image: 'https://images.unsplash.com/photo-1596755389378-c31d46fdafc0?w=600&auto=format&fit=crop&q=80', accent: '#10b981' },
-  { id: 'step8', step: 8, label: 'Contour des Yeux', image: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71a9?w=600&auto=format&fit=crop&q=80', accent: '#f97316' },
-  { id: 'step9', step: 9, label: 'Crème Hydratante', image: 'https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?w=600&auto=format&fit=crop&q=80', accent: '#e10074' },
-  { id: 'step10', step: 10, label: 'Crème Solaire', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&auto=format&fit=crop&q=80', accent: '#fbbf24' },
+  { id: 'step1', step: 1, label: 'Huile Démaquillante', image: '/images/banners/HUILE%20DEMAQILLANT.webp', accent: '#f59e0b' },
+  { id: 'step2', step: 2, label: 'Nettoyant Moussant', image: '/images/banners/NETTOANT%20MOUSSANT.webp', accent: '#06b6d4' },
+  { id: 'step3', step: 3, label: 'Exfoliant', image: '/images/banners/Exfoliant.webp', accent: '#84cc16' },
+  { id: 'step4', step: 4, label: 'Lotion Tonique', image: '/images/banners/Lotion%20Tonique.webp', accent: '#0ea5e9' },
+  { id: 'step5', step: 5, label: 'Essence', image: '/images/banners/essence.webp', accent: '#ec4899' },
+  { id: 'step6', step: 6, label: 'Sérum & Ampoule', image: '/images/banners/serum%20et%20ampule.webp', accent: '#a855f7' },
+  { id: 'step7', step: 7, label: 'Masque Tissu', image: '/images/banners/masque%20tissu.webp', accent: '#10b981' },
+  { id: 'step8', step: 8, label: 'Contour des Yeux', image: '/images/banners/contour%20des%20yeux.webp', accent: '#f97316' },
+  { id: 'step9', step: 9, label: 'Crème Hydratante', image: '/images/banners/Cr%C3%A8me%20Hydratante.webp', accent: '#e10074' },
+  { id: 'step10', step: 10, label: 'Crème Solaire', image: '/images/banners/creme%20solaire.webp', accent: '#fbbf24' },
 ];
 
 export function KoreanStepsSection() {

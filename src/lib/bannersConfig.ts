@@ -7,7 +7,7 @@ export const LOCAL_BANNERS = {
     }
   ],
   bestSellers: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=800&auto=format&fit=crop&q=80',
-  koreanBeauty: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=800&auto=format&fit=crop&q=80',
+  koreanBeauty: '/images/banners/korean-routine.webp',
   essentials: '',
   complements: '',
 };
