@@ -1,108 +1,76 @@
 .official-shops-section {
   background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+  padding: 3rem 0;
 }
 
-.official-shops-tabs {
+.official-shops-category {
+  margin-bottom: 2.5rem;
+}
+
+.official-shops-category-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.marquee-row {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.marquee-track {
   display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  gap: 1rem;
+  animation: marquee-scroll 30s linear infinite;
+  width: max-content;
 }
 
-.official-shops-tab {
-  padding: 0.6rem 1.4rem;
+.marquee-row:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-brand {
+  flex-shrink: 0;
+  padding: 0.7rem 1.5rem;
   border-radius: 9999px;
   border: 1.5px solid #e5e7eb;
   background: #fff;
   color: #374151;
   font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  text-decoration: none;
   white-space: nowrap;
-}
-
-.official-shops-tab:hover {
-  border-color: #f9a8d4;
-  color: #be185d;
-}
-
-.official-shops-tab.active {
-  border-color: #ec4899;
-  background: #fdf2f8;
-  color: #be185d;
-}
-
-.official-shops-carousel-wrapper {
-  position: relative;
-  padding: 0 2.5rem;
-}
-
-.official-shops-carousel {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 0.5rem 0;
-}
-
-.official-shops-carousel::-webkit-scrollbar {
-  display: none;
-}
-
-.official-shops-product {
-  flex: 0 0 220px;
-  min-width: 220px;
-}
-
-.official-shops-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  color: #374151;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
-.official-shops-arrow:hover {
-  background: #fdf2f8;
+.marquee-brand:hover {
   border-color: #ec4899;
+  background: #fdf2f8;
   color: #be185d;
 }
 
-.official-shops-arrow-left {
-  left: 0;
-}
-
-.official-shops-arrow-right {
-  right: 0;
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @media (max-width: 768px) {
-  .official-shops-carousel-wrapper {
-    padding: 0 1.5rem;
+  .marquee-brand {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
   }
-  
-  .official-shops-product {
-    flex: 0 0 170px;
-    min-width: 170px;
-  }
-  
-  .official-shops-arrow {
-    width: 30px;
-    height: 30px;
+
+  .marquee-track {
+    animation-duration: 20s;
   }
 }
