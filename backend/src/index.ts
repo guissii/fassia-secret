@@ -1,3 +1,5 @@
+import cluster from 'cluster';
+import os from 'os';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -18,47 +20,83 @@ import collectionRoutes from './routes/collectionRoutes';
 
 dotenv.config();
 
-const app = express();
 const PORT = process.env.PORT || 5000;
+const NUM_WORKERS = parseInt(process.env.NODE_WORKERS || '') || os.cpus().length;
 
-// Optimization: Compress HTTP responses (gzip)
-app.use(compression());
+function createApp() {
+  const app = express();
 
-// Security Middlewares
-app.use(helmet()); // Set security HTTP headers
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+  // Optimization: Compress HTTP responses (gzip/brotli)
+  app.use(compression({
+    level: 6,
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    }
+  }));
 
-// Rate limiting: max 200 requests per 15 minutes per IP
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200,
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api', limiter);
+  // Security Middlewares
+  app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  }));
 
-// Standard Middlewares
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+  // Rate limiting: max 1000 requests per 15 minutes per IP (augmenté pour 6 workers)
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Too many requests from this IP, please try again later.'
+  });
+  app.use('/api', limiter);
 
-// Body parser with size limit increased for base64 images
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  // Standard Middlewares
+  app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true
+  }));
 
-app.use(hpp()); // Prevent HTTP Parameter Pollution
-app.use(cookieParser());
+  // Body parser with size limit increased for base64 images
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/banners', bannerRoutes);
-app.use('/api/promos', promoRoutes);
-app.use('/api/server', serverRoutes);
-app.use('/api/collections', collectionRoutes);
+  app.use(hpp());
+  app.use(cookieParser());
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  // Routes
+  app.use('/api/auth', authRoutes);
+  app.use('/api/products', productRoutes);
+  app.use('/api/orders', orderRoutes);
+  app.use('/api/categories', categoryRoutes);
+  app.use('/api/banners', bannerRoutes);
+  app.use('/api/promos', promoRoutes);
+  app.use('/api/server', serverRoutes);
+  app.use('/api/collections', collectionRoutes);
+
+  return app;
+}
+
+// Cluster mode: utilise tous les vCPU disponibles
+if (cluster.isPrimary) {
+  console.log(`Master ${process.pid} is running`);
+  console.log(`Starting ${NUM_WORKERS} workers...`);
+
+  for (let i = 0; i < NUM_WORKERS; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker) => {
+    console.log(`Worker ${worker.process.pid} died. Restarting...`);
+    cluster.fork();
+  });
+} else {
+  const app = createApp();
+  const server = app.listen(PORT, () => {
+    console.log(`Worker ${process.pid} running on port ${PORT}`);
+  });
+
+  // Keep-alive tuning pour haute performance
+  server.keepAliveTimeout = 65 * 1000;
+  server.headersTimeout = 66 * 1000;
+}
