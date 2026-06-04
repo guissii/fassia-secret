@@ -527,10 +527,10 @@
 
   .mobile-categories-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: start;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    place-items: start center;
     gap: 10px;
-    padding: 0 4px;
+    padding: 0 16px;
   }
 
   .mobile-category {
