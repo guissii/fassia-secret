@@ -117,9 +117,11 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
 export const api = {
   getStats: async (): Promise<Stats> => {
     try {
-      const orders = await fetchWithAuth('/orders?limit=10000');
+      const [orders, statsData] = await Promise.all([
+        fetchWithAuth('/orders?limit=10000'),
+        fetch('/api/admin/stats').then(r => r.ok ? r.json() : { totalViews: 0, uniqueVisitors: 0 })
+      ]);
       const orderList = orders.orders || [];
-      const products = await fetchWithAuth('/products?limit=1');
       
       const pendingOrders = orderList.filter((o: any) => o.status === 'PENDING').length;
       const processingOrders = orderList.filter((o: any) => o.status === 'PROCESSING').length;
@@ -130,8 +132,8 @@ export const api = {
       return {
         totalOrders: orderList.length,
         totalRevenue,
-        totalViews: 0,
-        uniqueVisitors: 0,
+        totalViews: statsData.totalViews || 0,
+        uniqueVisitors: statsData.uniqueVisitors || 0,
         pendingOrders,
         processingOrders,
       };

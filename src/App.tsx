@@ -26,6 +26,11 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
   const [loadingBestSellers, setLoadingBestSellers] = useState(true);
 
   useEffect(() => {
+    // Track page view
+    fetch('/api/track-view', { method: 'POST' }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     fetch('/api/products?isPromo=true&random=true&limit=20')
       .then(r => r.json())
       .then(data => {
