@@ -63,6 +63,7 @@ function getEffectivePrice(
 export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const waLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   const [checkoutMode, setCheckoutMode] = useState(false);
   const [formData, setFormData] = useState({ customerName: '', phone: '', city: '', address: '', notes: '' });
@@ -170,7 +171,13 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     message += `Merci de confirmer la disponibilité.`;
 
     const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    // Ouvrir WhatsApp via un <a> caché : plus rapide et jamais bloqué par les navigateurs
+    if (waLinkRef.current) {
+      waLinkRef.current.href = url;
+      waLinkRef.current.click();
+    } else {
+      window.open(url, '_blank');
+    }
 
     // 2. Sauvegarder la commande dans le backend (en arrière-plan)
     try {
@@ -225,6 +232,8 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
   return (
     <>
+      {/* Lien caché pour ouvrir WhatsApp rapidement sans window.open() */}
+      <a ref={waLinkRef} target="_blank" rel="noopener noreferrer" style={{ display: 'none' }} aria-hidden="true" />
       <div className={`cart-backdrop ${isOpen ? 'cart-backdrop--visible' : ''}`} onClick={onClose} aria-hidden="true" />
       <aside className={`cart-drawer ${isOpen ? 'cart-drawer--open' : ''}`} role="dialog" aria-modal="true">
         <div className="cart-header">
