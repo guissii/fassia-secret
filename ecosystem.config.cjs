@@ -3,11 +3,11 @@ module.exports = {
     {
       name: 'fassia-frontend',
       cwd: './',
-      script: './node_modules/.bin/next',
+      script: 'node_modules/.bin/next',
       args: 'start',
       instances: 2,
       exec_mode: 'cluster',
-      max_memory_restart: '2G',
+      max_memory_restart: '2000M',
       env: {
         NODE_ENV: 'production',
         PORT: 3000
@@ -27,13 +27,12 @@ module.exports = {
       name: 'fassia-backend',
       cwd: './backend',
       script: 'dist/index.js',
-      instances: 6,
-      exec_mode: 'cluster',
-      max_memory_restart: '1.5G',
+      instances: 1,
+      exec_mode: 'fork',
+      max_memory_restart: '1500M',
       env: {
         NODE_ENV: 'production',
         PORT: 5000,
-        NODE_WORKERS: 1
       },
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       error_file: './logs/backend-error.log',
