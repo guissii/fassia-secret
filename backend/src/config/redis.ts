@@ -5,6 +5,7 @@ const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 // In-memory fallback cache when Redis is not available
 class MemoryCache {
   private cache = new Map<string, { value: string; expiresAt: number }>();
+  private sets = new Map<string, Set<string>>();
   private readonly MAX_SIZE = 200;
 
   async get(key: string): Promise<string | null> {
@@ -32,12 +33,41 @@ class MemoryCache {
     const keyList = Array.isArray(keys) ? keys : [keys];
     for (const key of keyList) {
       this.cache.delete(key);
+      this.sets.delete(key);
     }
   }
 
   async keys(pattern: string): Promise<string[]> {
     const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
     return Array.from(this.cache.keys()).filter(k => regex.test(k));
+  }
+
+  async incr(key: string): Promise<number> {
+    const current = await this.get(key);
+    const next = (parseInt(current || '0', 10) + 1).toString();
+    this.cache.set(key, { value: next, expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 }); // 1 year
+    return parseInt(next, 10);
+  }
+
+  async sadd(key: string, ...members: string[]): Promise<number> {
+    let set = this.sets.get(key);
+    if (!set) {
+      set = new Set();
+      this.sets.set(key, set);
+    }
+    let added = 0;
+    for (const member of members) {
+      if (!set.has(member)) {
+        set.add(member);
+        added++;
+      }
+    }
+    return added;
+  }
+
+  async scard(key: string): Promise<number> {
+    const set = this.sets.get(key);
+    return set ? set.size : 0;
   }
 }
 
@@ -47,6 +77,9 @@ interface CacheInterface {
   setex(key: string, seconds: number, value: string): Promise<any>;
   del(keys: string | string[]): Promise<any>;
   keys(pattern: string): Promise<string[]>;
+  incr(key: string): Promise<number>;
+  sadd(key: string, ...members: string[]): Promise<number>;
+  scard(key: string): Promise<number>;
 }
 
 let cacheInstance: CacheInterface;
@@ -95,6 +128,9 @@ const cache: CacheInterface = {
   setex: (key, seconds, value) => cacheInstance.setex(key, seconds, value),
   del: (keys) => cacheInstance.del(keys),
   keys: (pattern) => cacheInstance.keys(pattern),
+  incr: (key) => cacheInstance.incr(key),
+  sadd: (key, ...members) => cacheInstance.sadd(key, ...members),
+  scard: (key) => cacheInstance.scard(key),
 };
 
 export default cache;
