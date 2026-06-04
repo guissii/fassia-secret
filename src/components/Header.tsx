@@ -356,14 +356,15 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
               </li>
               );
             })}
-            <li>
+            {/* PROMOS masqué temporairement */}
+            {/* <li>
               <Link
                 href="/promotions"
                 className="nav-link nav-link-promos flex items-center gap-xs"
               >
                 <Tag size={14} className="promos-icon" /> PROMOS
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </nav>

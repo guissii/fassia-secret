@@ -66,11 +66,11 @@ export const mobileDrawerCategories: DrawerCategory[] = [
     { label: "SVR", href: "/boutique?q=SVR" },
     { label: "Eucerin", href: "/boutique?q=Eucerin" },
   ] },
-  { title: "PROMOTIONS !", items: [
-    { label: "Offres du moment", href: "/boutique?promo=1" },
-    { label: "Bons plans", href: "/boutique?promo=1" },
-    { label: "Dernieres promotions", href: "/boutique?promo=1" },
-  ] },
+  // { title: "PROMOTIONS !", items: [
+  //   { label: "Offres du moment", href: "/boutique?promo=1" },
+  //   { label: "Bons plans", href: "/boutique?promo=1" },
+  //   { label: "Dernieres promotions", href: "/boutique?promo=1" },
+  // ] },
   { title: "K-BEAUTY", items: [
     { label: "Nettoyants", href: "/boutique?category=K-Beauty&q=Nettoyant" },
     { label: "Serums", href: "/boutique?category=K-Beauty&q=Serum" },
@@ -204,7 +204,7 @@ export const mobileDrawerCategories: DrawerCategory[] = [
 
 export const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }> }> = [
   { label: 'DERMO-CORNER', Icon: ShieldCheck },
-  { label: 'PROMOTIONS !', Icon: Tag },
+  // { label: 'PROMOTIONS !', Icon: Tag },
   { label: 'K-BEAUTY', Icon: Sparkles },
   { label: 'CORPS', Icon: Droplet },
   { label: 'VISAGE', Icon: Sparkles },
@@ -225,7 +225,7 @@ export const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?
 ];
 
 export const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; href?: string; openKey?: string }> = [
-  { label: 'PROMOTIONS', Icon: Tag, href: '/promotions' },
+  // { label: 'PROMOTIONS', Icon: Tag, href: '/promotions' },
   { label: 'COMPLÉMENTS\nALIMENTAIRES', Icon: Sprout, href: '/complements-alimentaires' },
   { label: 'KOREAN\nBEAUTY', Icon: Sparkles, href: '/korean-beauty' },
   { label: 'PARFUMS\n& MAQUILLAGE', Icon: Brush, href: '/maquillage-parfums' },
