@@ -480,8 +480,8 @@ export function ProductsTab() {
                 <tr><td colSpan={8} className="text-center py-lg text-muted">Aucun produit trouvé.</td></tr>
               ) : (
                 visibleProducts.map(product => {
-                  const imageSrc = product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:') 
-                    ? product.image 
+                  const imageSrc = product.image && (product.image.startsWith('data:') || product.image.startsWith('http') || product.image.startsWith('blob:'))
+                    ? product.image
                     : publicAssetUrl(product.image);
                   
                   const isLowStock = product.stock < 10 && product.stock > 0;

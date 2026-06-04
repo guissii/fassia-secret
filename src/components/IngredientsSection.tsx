@@ -207,7 +207,7 @@ export function IngredientsSection() {
 
           <div className="ing-carousel" ref={carouselRef}>
             {INGREDIENTS.map((item) => {
-              const bgUrl = item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('blob:') ? item.image : publicAssetUrl(item.image);
+              const bgUrl = item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('blob:')) ? item.image : publicAssetUrl(item.image);
               return (
                 <article key={item.id} className="ing-card" aria-label={item.title}>
                   {/* Background */}

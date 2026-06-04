@@ -1,0 +1,16 @@
+s images ne sont pas stockées dans la base de données PostgreSQL.
+
+  Voici comment votre système est structuré pour garantir un chargement ultrarapide :
+
+   1. Stockage physique des fichiers : Les images réelles (les fichiers .webp, .jpg) sont physiquement enregistrées sur le 
+      disque dur de votre serveur, dans le dossier /public/products.
+   2. La base de données (PostgreSQL) : Elle ne stocke que le texte du nom du fichier (par exemple :
+      /products/A_PIEU_Mint_Scalp.webp). C'est juste un point de repère, ce qui rend la base de données très légère et     
+      rapide à interroger.
+   3. Distribution par Nginx (très rapide) : Quand un client visite votre site, son navigateur lit le texte depuis la base 
+      de données, puis demande le fichier au serveur. J'ai justement configuré votre serveur web Nginx plus tôt aujourd'hui
+      pour qu'il s'occupe de livrer ces fichiers instantanément (avec des règles de mise en cache très agressives). Nginx  
+      est conçu exactement pour ça et peut servir des milliers d'images par seconde sans ralentir le site.
+
+  Vos images sont donc déjà gérées de la manière la plus professionnelle et la plus rapide possible ! N'hésitez pas si vous
+  avez d'autres doutes ou si vous voulez vérifier autre chose sur les performances.
