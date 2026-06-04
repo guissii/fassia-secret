@@ -3,8 +3,8 @@ module.exports = {
     {
       name: 'fassia-frontend',
       cwd: './',
-      script: 'node',
-      args: '.next/standalone/server.js',
+      script: 'node_modules/.bin/next',
+      args: 'start',
       instances: 4,
       exec_mode: 'cluster',
       max_memory_restart: '2000M',
