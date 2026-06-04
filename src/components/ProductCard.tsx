@@ -25,9 +25,10 @@ type Props = {
   onNavigate?: () => void;
   onAddToCart?: () => void;
   ctaState?: 'idle' | 'loading' | 'added';
+  priority?: boolean;
 };
 
-export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState = 'idle' }: Props) {
+export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState = 'idle', priority = false }: Props) {
   const formatPriceValue = (value: number) => value.toFixed(2);
   const hasPromo = typeof product.oldPrice === 'number' && product.oldPrice > product.price;
   const promoLabel = product.badge ?? (hasPromo ? 'Promo' : '');
@@ -56,7 +57,7 @@ export function ProductCard({ product, label, onNavigate, onAddToCart, ctaState 
             product.image.startsWith('data:') ? (
               <img src={imageSrc} alt={product.name} className="product-image" loading="lazy" style={{ objectFit: 'cover', width: '100%', height: '100%', pointerEvents: 'none' }} />
             ) : (
-              <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" loading="lazy" style={{ objectFit: 'cover', pointerEvents: 'none' }} />
+              <Image src={imageSrc} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="product-image" priority={priority} loading={priority ? undefined : 'lazy'} style={{ objectFit: 'cover', pointerEvents: 'none' }} />
             )
           ) : (
             <div style={{ width: '100%', height: '100%', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

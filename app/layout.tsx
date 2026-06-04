@@ -51,6 +51,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="fr">
+      <head>
+        <link rel="preconnect" href={siteUrl} />
+        <link rel="dns-prefetch" href={siteUrl} />
+        <link rel="preload" href="/logo.png" as="image" />
+      </head>
       <body style={style}>
         <ClientLayout>{children}</ClientLayout>
       </body>
