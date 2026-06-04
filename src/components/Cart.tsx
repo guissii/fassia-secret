@@ -135,8 +135,45 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     e.preventDefault();
     setIsSubmitting(true);
 
+    // 1. Construire le message WhatsApp et ouvrir IMMÉDIATEMENT (avant tout await)
+    //    pour éviter le blocage popup sur mobile
+    const number = "212774656745";
+    let message = `🛒 *Nouvelle commande Fassia Secret*\n\n`;
+    message += `👤 *Nom:* ${formData.customerName}\n`;
+    message += `📞 *Téléphone:* ${formData.phone}\n`;
+    message += `📍 *Ville:* ${formData.city}\n`;
+    message += `🏠 *Adresse:* ${formData.address}\n`;
+    if (formData.notes) message += `📝 *Notes:* ${formData.notes}\n`;
+    message += `\n`;
+    message += `📦 *Produits:*\n`;
+    items.forEach(item => {
+      const effectivePrice = getEffectivePrice(item, activePromo, totalItems);
+      message += `  • ${item.quantity}x ${item.name} (${(effectivePrice * item.quantity).toFixed(2)} MAD)\n`;
+    });
+    message += `\n`;
+    if (activePromo) {
+      if (activePromo.type === 'CLIENT') {
+        message += `🏷️ *Code Promo Client:* ${activePromo.code}\n`;
+        message += `💰 *Prix standard:* ${originalSubtotal.toFixed(2)} MAD\n`;
+        message += `✅ *Prix promo:* ${subtotal.toFixed(2)} MAD\n`;
+      } else if (activePromo.type === 'WHOLESALE') {
+        message += `🏷️ *Code Promo Grossiste:* ${activePromo.code}\n`;
+        message += `💰 *Prix standard:* ${originalSubtotal.toFixed(2)} MAD\n`;
+        message += `✅ *Prix grossiste:* ${subtotal.toFixed(2)} MAD\n`;
+      } else {
+        message += `🏷️ *Code Promo:* ${activePromo.code}\n`;
+        message += `💰 *Remise:* -${discountAmount.toFixed(2)} MAD\n`;
+      }
+    }
+    message += `🚚 *Livraison:* ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
+    message += `💳 *Total:* ${total.toFixed(2)} MAD\n\n`;
+    message += `Merci de confirmer la disponibilité.`;
+
+    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+
+    // 2. Sauvegarder la commande dans le backend (en arrière-plan)
     try {
-      // 1. Sauvegarder la commande dans le backend
       const payload = {
         customerName: formData.customerName,
         phone: formData.phone,
@@ -153,58 +190,19 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         total: total
       };
 
-      const res = await fetch('/api/orders', {
+      await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
-      if (!res.ok) throw new Error('Order failed');
-
-      // 2. Envoyer le message WhatsApp
-      const number = "212774656745";
-      let message = `🛒 *Nouvelle commande Fassia Secret*\n\n`;
-      message += `👤 *Nom:* ${formData.customerName}\n`;
-      message += `📞 *Téléphone:* ${formData.phone}\n`;
-      message += `📍 *Ville:* ${formData.city}\n`;
-      message += `🏠 *Adresse:* ${formData.address}\n`;
-      if (formData.notes) message += `📝 *Notes:* ${formData.notes}\n`;
-      message += `\n`;
-      message += `📦 *Produits:*\n`;
-      items.forEach(item => {
-        const effectivePrice = getEffectivePrice(item, activePromo, totalItems);
-        message += `  • ${item.quantity}x ${item.name} (${(effectivePrice * item.quantity).toFixed(2)} MAD)\n`;
-      });
-      message += `\n`;
-      if (activePromo) {
-        if (activePromo.type === 'CLIENT') {
-          message += `🏷️ *Code Promo Client:* ${activePromo.code}\n`;
-          message += `💰 *Prix standard:* ${originalSubtotal.toFixed(2)} MAD\n`;
-          message += `✅ *Prix promo:* ${subtotal.toFixed(2)} MAD\n`;
-        } else if (activePromo.type === 'WHOLESALE') {
-          message += `🏷️ *Code Promo Grossiste:* ${activePromo.code}\n`;
-          message += `💰 *Prix standard:* ${originalSubtotal.toFixed(2)} MAD\n`;
-          message += `✅ *Prix grossiste:* ${subtotal.toFixed(2)} MAD\n`;
-        } else {
-          message += `🏷️ *Code Promo:* ${activePromo.code}\n`;
-          message += `💰 *Remise:* -${discountAmount.toFixed(2)} MAD\n`;
-        }
-      }
-      message += `🚚 *Livraison:* ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
-      message += `💳 *Total:* ${total.toFixed(2)} MAD\n\n`;
-      message += `Merci de confirmer la disponibilité.`;
-
-      const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-
-      setOrderSuccess(true);
-      clearCart();
     } catch (err) {
-      alert("Une erreur est survenue lors de la commande. Veuillez réessayer.");
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
+      console.error('Erreur sauvegarde commande:', err);
     }
+
+    // 3. Afficher le succès et vider le panier
+    setOrderSuccess(true);
+    clearCart();
+    setIsSubmitting(false);
   };
 
   useEffect(() => {
