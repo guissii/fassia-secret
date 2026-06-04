@@ -89,8 +89,6 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         />
       )}
 
-      <IngredientsSection />
-
       <SupplementsSection />
 
       {loadingBestSellers ? (
@@ -112,6 +110,8 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       <KoreanStepsSection />
 
       <OfficialShopsSection />
+
+      <IngredientsSection />
 
       <div className="section-footer text-center mt-2xl">
         <Link href="/boutique" className="see-more-products-cta mt-lg mx-auto" style={{ display: 'inline-flex' }}>
