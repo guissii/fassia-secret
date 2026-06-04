@@ -392,17 +392,17 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                   VALIDER MON PANIER <ArrowRight size={16} />
                 </button>
 
-                <button 
-                  type="button" 
-                  onClick={handleWhatsAppCheckout} 
-                  style={{ 
-                    width: '100%', padding: '15px', background: '#25D366', color: '#fff', 
-                    border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.95rem',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    marginBottom: '10px' 
+                <button
+                  type="button"
+                  onClick={handleWhatsAppCheckout}
+                  style={{
+                    width: '100%', padding: '10px', background: '#25D366', color: '#fff',
+                    border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.8rem',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                    marginBottom: '6px'
                   }}
                 >
-                  <MessageCircle size={18} /> COMMANDER PAR WHATSAPP
+                  <MessageCircle size={16} /> COMMANDER PAR WHATSAPP
                 </button>
 
                 <button className="cart-continue-btn" onClick={onClose} type="button">
