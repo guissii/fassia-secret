@@ -258,8 +258,8 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
     setLoading(true);
     
     // Obligatory fields based on user feedback
-    if (!formData.name || !formData.nameAr || formData.price === undefined || !formData.categories || formData.categories.length === 0) {
-      alert("Veuillez remplir les champs obligatoires (Nom FR/AR, Prix, Catégories)");
+    if (!formData.name || formData.price === undefined || !formData.categories || formData.categories.length === 0) {
+      alert("Veuillez remplir les champs obligatoires (Nom FR, Prix, Catégories)");
       setLoading(false);
       return;
     }
@@ -342,8 +342,8 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                   <input type="text" name="name" className="admin-input" value={formData.name || ''} onChange={handleChange} required />
                 </div>
                 <div className="form-group" style={{ flex: 1 }} dir="rtl">
-                  <label style={{ textAlign: 'right', display: 'block' }}>* (AR) اسم المنتج</label>
-                  <input type="text" name="nameAr" className="admin-input" value={formData.nameAr || ''} onChange={handleChange} required dir="rtl" />
+                  <label style={{ textAlign: 'right', display: 'block' }}>(AR) اسم المنتج</label>
+                  <input type="text" name="nameAr" className="admin-input" value={formData.nameAr || ''} onChange={handleChange} dir="rtl" />
                 </div>
               </div>
 
@@ -358,8 +358,8 @@ export function ProductFormModal({ product, isOpen, onClose, onSave }: ProductFo
                   <textarea name="description" className="admin-input" rows={4} value={formData.description || ''} onChange={handleChange} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }} dir="rtl">
-                  <label style={{ textAlign: 'right', display: 'block' }}>* الوصف (AR)</label>
-                  <textarea name="descriptionAr" className="admin-input" rows={4} value={formData.descriptionAr || ''} onChange={handleChange} dir="rtl" required />
+                  <label style={{ textAlign: 'right', display: 'block' }}>الوصف (AR)</label>
+                  <textarea name="descriptionAr" className="admin-input" rows={4} value={formData.descriptionAr || ''} onChange={handleChange} dir="rtl" />
                 </div>
               </div>
 
