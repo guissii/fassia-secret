@@ -146,34 +146,43 @@ export const deleteCollection = async (req: Request, res: Response) => {
 
 // Predefined subcategories from client menu (Collections)
 // Structure finale: Catégorie → Collections (sous-sections)
+// Tous les sous-éléments du menu mobile sont mappés ici.
 const MENU_SUBCATEGORIES: Record<string, string[]> = {
-  'corps': ['Déodorants', 'Gels Douche', 'Gommage', 'Hydratation', 'Parfums Femmes', 'Rasage', 'Savons', 'Soins Mains/Pieds', 'Soins Ongles', 'Minceur', 'Accessoires Bain'],
-  'visage': ['Crèmes Hydratantes', 'Nettoyants', 'Solaires', 'Soins Lèvres', 'Anti-taches', 'Anti-âge', 'Anti-Imperfections', 'Soins Yeux', 'Masques'],
-  'cheveux': ['Shampoings', 'Après-shampoings', 'Masques Réparateurs', 'Colorations', 'Accessoires Coiffure'],
-  'hygiene-dentaire': ['Brosses', 'Dentifrices', 'Bains de bouche', 'Soins dentaires'],
-  'maquillage': ['Nettoyants', 'Teint', 'Yeux', 'Lèvres', 'Accessoires', 'Trousses'],
-  'hygiene-intimite': ['Toilette Intime', 'Serviettes', 'Tampons', 'Lubrifiants'],
-  'hygiene': ['Gel hydroalcoolique', 'Déodorants', 'Soin intime', 'Protections'],
-  'sante': ['Auto-Surveillance', 'Compléments', 'Premiers Secours', 'Orthopédie'],
-  'hommes': ['Déodorants', 'Soins visage/corps', 'Rasage', 'Barbe', 'Parfums'],
-  'preoccupations': ['Acne', 'Cernes', 'Taches', 'Rosacée', 'Peau sèche', 'Anti-âge', 'Chute cheveux', 'Immunité'],
-  'complements-alimentaires': ['Cheveux', 'Ongles', 'Immunité', 'Minceur', 'Énergie', 'Sommeil', 'Vitamines', 'Collagène', 'Omega 3', 'Detox'],
-  'k-beauty': ['Nettoyants', 'Essence', 'Sérum', 'Masque', 'Crème', 'SPF'],
   'dermo-corner': ['La Roche-Posay', 'Vichy', 'CeraVe', 'Bioderma', 'SVR', 'Eucerin'],
-  'accessoires': ['Visage', 'Cheveux', 'Trousses', 'Brosses', 'Éponges'],
-  'minceur': ['Brûle-graisses', 'Draineurs', 'Collagène', 'Sport'],
+  'promotions': ['Offres du moment', 'Bons plans', 'Dernières promotions'],
+  'k-beauty': ['Nettoyants', 'Sérums', 'Crème hydratante', 'Masques', 'SPF'],
+  'corps': ['Corps & bain', 'Hydratation', 'Gommage', 'Rasage & épilation', 'Minceur'],
+  'visage': [
+    'Solaire: Protection solaire', 'Solaire: Auto-bronzant', 'Solaire: Soin après-soleil',
+    'Type: Nettoyant visage', 'Type: Sérum', 'Type: Crème de jour', 'Type: Crème de nuit', 'Type: Contour des yeux', 'Type: Eau micellaire', 'Type: Masque visage',
+    'Besoins: Anti-imperfections', 'Besoins: Anti-âge', 'Besoins: Hydratant & nourrissant', 'Besoins: Anti-taches', 'Besoins: Anti-rougeurs', 'Besoins: Éclat & anti-fatigue', 'Besoins: Peaux sensibles',
+  ],
+  'cheveux': ['Shampoing', 'Après-shampoing', 'Masque cheveux', 'Soins réparateurs', 'Huiles & sérums'],
+  'hygiene-dentaire': ['Dentifrices', 'Brosses à dents', 'Bains de bouche', 'Blanchiment'],
+  'maquillage': ['Teint', 'Yeux', 'Lèvres', 'Démaquillant', 'Accessoires maquillage'],
+  'hygiene-intimite': ['Toilette Intime', 'Serviettes Hygiéniques', 'Tampons', 'Lubrifiants'],
+  'hygiene': ['Gel hydroalcoolique', 'Déodorants', 'Soin intime', 'Protections'],
+  'accessoires': ['Accessoires visage', 'Accessoires cheveux', 'Trousses', 'Brosses', 'Éponges'],
+  'minceur': ['Brûle-graisses', 'Draineurs', 'Collagène', 'Sport & récupération'],
   'sport': ['Protéines', 'Énergie', 'Hydratation', 'Récupération'],
-  'maman-bebe': ['Bébé', 'Maman', 'Solaire', 'Change', 'Accessoires'],
-  'premium-hair-care': ['Shampoing premium', 'Masque premium', 'Huiles', 'Anti-chute'],
+  'maman-bebe': ['Bébé', 'Maman', 'Solaire bébé', 'Change & toilette', 'Accessoires'],
+  'hommes': ['Soins visage homme', 'Soins corps homme', 'Déodorants', 'Rasage', 'Barbe'],
+  'sante': ['Auto-surveillance', 'Premiers secours', 'Orthopédie', 'Bien-être'],
+  'complements-alimentaires': ['Vitamines & Minéraux', 'Collagène', 'Oméga 3', 'Détox & Drainage'],
+  'premium-hair-care': ['Shampoing premium', 'Masque premium', 'Huiles & sérums', 'Anti-chute'],
+  'preoccupations': ['Acné & imperfections', 'Cernes', 'Taches', 'Rosacée & rougeurs', 'Peau sèche', 'Anti-âge', 'Chute de cheveux', 'Immunité'],
 };
 
-function generateSlug(name: string): string {
-  return name
+// Génère un slug unique en préfixant avec la page pour éviter les doublons
+// Ex: "visage" + "Sérum" → "visage-serum"
+function generateSlug(page: string, name: string): string {
+  const base = name
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+  return `${page}-${base}`;
 }
 
 export const seedCollections = async (req: Request, res: Response) => {
@@ -184,7 +193,7 @@ export const seedCollections = async (req: Request, res: Response) => {
     for (const [page, items] of Object.entries(MENU_SUBCATEGORIES)) {
       for (let i = 0; i < items.length; i++) {
         const name = items[i];
-        const slug = generateSlug(name);
+        const slug = generateSlug(page, name);
         try {
           const existing = await prisma.collection.findUnique({ where: { slug } });
           if (existing) {
