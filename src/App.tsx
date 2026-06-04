@@ -24,6 +24,8 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
   const [makeupParfums, setMakeupParfums] = useState<any[]>([]);
   const [bestSellers, setBestSellers] = useState<any[]>(initialBestSellers);
   const [loadingBestSellers, setLoadingBestSellers] = useState(true);
+  const [koreanProducts, setKoreanProducts] = useState<any[]>([]);
+  const [loadingKorean, setLoadingKorean] = useState(true);
 
   useEffect(() => {
     // Track page view
@@ -48,6 +50,16 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         setLoadingBestSellers(false);
       })
       .catch(() => setLoadingBestSellers(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/products?category=K-Beauty&isVisible=true&random=true&limit=40')
+      .then(r => r.json())
+      .then(data => {
+        setKoreanProducts(data.products || []);
+        setLoadingKorean(false);
+      })
+      .catch(() => setLoadingKorean(false));
   }, []);
 
   useEffect(() => {
@@ -82,6 +94,16 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         </div>
       ) : (
         <EssentialsSection products={promoProducts} />
+      )}
+
+      {koreanProducts.length > 0 && (
+        <CollectionCarousel
+          title="K-BEAUTY"
+          imageSrc=""
+          products={koreanProducts}
+          linkHref="/boutique?category=K-Beauty"
+          linkTitle="Découvrir la K-Beauty"
+        />
       )}
 
       {makeupParfums.length > 0 && (
