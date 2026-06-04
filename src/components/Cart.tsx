@@ -259,8 +259,52 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Adresse complète *</label>
                 <textarea required value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={3} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', resize: 'vertical' }} />
               </div>
+
+              {/* Code Promo dans le formulaire */}
+              <div style={{ marginTop: '5px' }}>
+                {activePromo ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Tag size={16} color="#10b981" />
+                      <span style={{ fontWeight: 600, color: '#10b981' }}>Code promo actif : {activePromo.code}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setActivePromo(null); setPromoCode(''); }}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.85rem' }}
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Code Promo</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Entrez votre code promo"
+                        value={promoCode}
+                        onChange={e => { setPromoCode(e.target.value); setPromoError(''); }}
+                        disabled={promoLoading}
+                        style={{ flex: 1, padding: '10px', border: '1px solid #e5e7eb', borderRadius: '6px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyPromo}
+                        disabled={promoLoading}
+                        style={{ padding: '0 15px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', opacity: promoLoading ? 0.6 : 1 }}
+                      >
+                        {promoLoading ? '...' : 'Appliquer'}
+                      </button>
+                    </div>
+                    {promoError && (
+                      <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '6px', marginBottom: 0 }}>{promoError}</p>
+                    )}
+                  </>
+                )}
+              </div>
               
-              <div style={{ marginTop: '20px', padding: '15px', background: '#f9fafb', borderRadius: '8px' }}>
+              <div style={{ marginTop: '10px', padding: '15px', background: '#f9fafb', borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <span>Total à payer</span>
                   <span style={{ fontWeight: 600 }}>{total.toFixed(2)} MAD</span>
@@ -304,48 +348,6 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
             {items.length > 0 && (
               <div className="cart-footer">
-                
-                <div style={{ marginBottom: '15px' }}>
-                  {activePromo ? (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Tag size={16} color="#10b981" />
-                        <span style={{ fontWeight: 600, color: '#10b981' }}>Code promo actif : {activePromo.code}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => { setActivePromo(null); setPromoCode(''); }}
-                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.85rem' }}
-                      >
-                        Retirer
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <input
-                          type="text"
-                          placeholder="Code Promo"
-                          value={promoCode}
-                          onChange={e => { setPromoCode(e.target.value); setPromoError(''); }}
-                          disabled={promoLoading}
-                          style={{ flex: 1, padding: '10px', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={handleApplyPromo}
-                          disabled={promoLoading}
-                          style={{ padding: '0 15px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', opacity: promoLoading ? 0.6 : 1 }}
-                        >
-                          {promoLoading ? '...' : 'Appliquer'}
-                        </button>
-                      </div>
-                      {promoError && (
-                        <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '6px', marginBottom: 0 }}>{promoError}</p>
-                      )}
-                    </>
-                  )}
-                </div>
                 
                 <div className="cart-summary">
                   {activePromo && (activePromo.type === 'CLIENT' || activePromo.type === 'WHOLESALE') ? (
@@ -407,10 +409,6 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                   Continuer mes achats
                 </button>
 
-                <div className="cart-trust-row">
-                  <ShieldCheck size={14} strokeWidth={1.5} />
-                  <span>Paiement à la livraison — Expédition 24/48h</span>
-                </div>
               </div>
             )}
           </>
