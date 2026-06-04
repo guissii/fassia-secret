@@ -65,7 +65,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   const [checkoutMode, setCheckoutMode] = useState(false);
-  const [formData, setFormData] = useState({ customerName: '', phone: '', city: '', address: '' });
+  const [formData, setFormData] = useState({ customerName: '', phone: '', city: '', address: '', notes: '' });
   const [promoCode, setPromoCode] = useState('');
   const [promoError, setPromoError] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
@@ -131,32 +131,18 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     }
   };
 
-  const handleWhatsAppCheckout = () => {
-    const number = "212774656745";
-    let message = "Bonjour, je souhaite passer la commande suivante sur Fassia Secret :\n\n";
-    items.forEach(item => {
-      message += `- ${item.quantity}x ${item.name} (${(item.price * item.quantity).toFixed(2)} MAD)\n`;
-    });
-    message += `\nSous-total : ${subtotal.toFixed(2)} MAD\n`;
-    if (discountAmount > 0) message += `Remise Promo : -${discountAmount.toFixed(2)} MAD\n`;
-    message += `Livraison : ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
-    message += `*Total : ${total.toFixed(2)} MAD*\n\n`;
-    message += "Merci de me confirmer la disponibilité.";
-    
-    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  };
-
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
+      // 1. Sauvegarder la commande dans le backend
       const payload = {
         customerName: formData.customerName,
         phone: formData.phone,
         city: formData.city,
         address: formData.address,
+        notes: formData.notes,
         items: items.map(i => ({
           productId: i.id,
           name: i.name,
@@ -174,11 +160,47 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
       });
 
       if (!res.ok) throw new Error('Order failed');
-      
+
+      // 2. Envoyer le message WhatsApp
+      const number = "212774656745";
+      let message = `🛒 *Nouvelle commande Fassia Secret*\n\n`;
+      message += `👤 *Nom:* ${formData.customerName}\n`;
+      message += `📞 *Téléphone:* ${formData.phone}\n`;
+      message += `📍 *Ville:* ${formData.city}\n`;
+      message += `🏠 *Adresse:* ${formData.address}\n`;
+      if (formData.notes) message += `📝 *Notes:* ${formData.notes}\n`;
+      message += `\n`;
+      message += `📦 *Produits:*\n`;
+      items.forEach(item => {
+        const effectivePrice = getEffectivePrice(item, activePromo, totalItems);
+        message += `  • ${item.quantity}x ${item.name} (${(effectivePrice * item.quantity).toFixed(2)} MAD)\n`;
+      });
+      message += `\n`;
+      if (activePromo) {
+        if (activePromo.type === 'CLIENT') {
+          message += `🏷️ *Code Promo Client:* ${activePromo.code}\n`;
+          message += `💰 *Prix standard:* ${originalSubtotal.toFixed(2)} MAD\n`;
+          message += `✅ *Prix promo:* ${subtotal.toFixed(2)} MAD\n`;
+        } else if (activePromo.type === 'WHOLESALE') {
+          message += `🏷️ *Code Promo Grossiste:* ${activePromo.code}\n`;
+          message += `💰 *Prix standard:* ${originalSubtotal.toFixed(2)} MAD\n`;
+          message += `✅ *Prix grossiste:* ${subtotal.toFixed(2)} MAD\n`;
+        } else {
+          message += `🏷️ *Code Promo:* ${activePromo.code}\n`;
+          message += `💰 *Remise:* -${discountAmount.toFixed(2)} MAD\n`;
+        }
+      }
+      message += `🚚 *Livraison:* ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
+      message += `💳 *Total:* ${total.toFixed(2)} MAD\n\n`;
+      message += `Merci de confirmer la disponibilité.`;
+
+      const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+
       setOrderSuccess(true);
       clearCart();
     } catch (err) {
-      alert("Une erreur est survenue lors de la commande. Veuillez réessayer ou nous contacter via WhatsApp.");
+      alert("Une erreur est survenue lors de la commande. Veuillez réessayer.");
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -259,6 +281,10 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Adresse complète *</label>
                 <textarea required value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={3} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', resize: 'vertical' }} />
               </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Notes (optionnel)</label>
+                <textarea value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} rows={2} placeholder="Instructions spéciales de livraison..." style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', resize: 'vertical' }} />
+              </div>
 
               {/* Code Promo dans le formulaire */}
               <div style={{ marginTop: '5px' }}>
@@ -314,8 +340,8 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                 </div>
               </div>
               
-              <button type="submit" disabled={isSubmitting} className="cart-checkout-btn" style={{ marginTop: '10px' }}>
-                {isSubmitting ? <Loader2 size={16} className="animate-spin" style={{ margin: '0 auto' }} /> : 'CONFIRMER LA COMMANDE'}
+              <button type="submit" disabled={isSubmitting} style={{ marginTop: '10px', width: '100%', padding: '0.7rem', background: '#25D366', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.3s ease', opacity: isSubmitting ? 0.7 : 1 }}>
+                {isSubmitting ? <Loader2 size={16} className="animate-spin" style={{ margin: '0 auto' }} /> : <><MessageCircle size={18} /> COMMANDER VIA WHATSAPP</>}
               </button>
             </form>
           </div>
@@ -390,19 +416,6 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
 
                 <button className="cart-checkout-btn" type="button" onClick={() => setCheckoutMode(true)}>
                   VALIDER MON PANIER <ArrowRight size={16} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleWhatsAppCheckout}
-                  style={{
-                    width: '100%', padding: '10px', background: '#25D366', color: '#fff',
-                    border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.8rem',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                    marginBottom: '6px'
-                  }}
-                >
-                  <MessageCircle size={16} /> COMMANDER PAR WHATSAPP
                 </button>
 
                 <button className="cart-continue-btn" onClick={onClose} type="button">
