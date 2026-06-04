@@ -7,7 +7,6 @@ import { AffichesSection } from './components/AffichesSection';
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { LOCAL_BANNERS } from './lib/bannersConfig';
 
 // Lazy load components that are below the fold to improve initial page load performance
 const IngredientsSection = dynamic(() => import('./components/IngredientsSection').then(mod => mod.IngredientsSection));
@@ -18,7 +17,6 @@ const OfficialShopsSection = dynamic(() => import('./components/OfficialShopsSec
 const KoreanStepsSection = dynamic(() => import('./components/KoreanStepsSection').then(mod => mod.KoreanStepsSection));
 
 function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
-  const bestSellersBanner = LOCAL_BANNERS.bestSellers;
   const [promoProducts, setPromoProducts] = useState<any[]>([]);
   const [loadingPromos, setLoadingPromos] = useState(true);
   const [makeupParfums, setMakeupParfums] = useState<any[]>([]);
@@ -125,7 +123,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       ) : (
         <CollectionCarousel 
           title="MEILLEURES VENTES"
-          imageSrc={bestSellersBanner}
+          imageSrc=""
           products={bestSellers}
           linkHref="/boutique?isEssential=true"
           linkTitle="Découvrir les meilleures ventes"
