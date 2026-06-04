@@ -19,7 +19,7 @@ module.exports = {
       restart_delay: 3000,
       kill_timeout: 5000,
       listen_timeout: 10000,
-      wait_ready: true,
+      wait_ready: false,
       autorestart: true,
       max_restarts: 5,
     },
@@ -41,7 +41,7 @@ module.exports = {
       restart_delay: 3000,
       kill_timeout: 5000,
       listen_timeout: 10000,
-      wait_ready: true,
+      wait_ready: false,
       autorestart: true,
       max_restarts: 5,
     }
