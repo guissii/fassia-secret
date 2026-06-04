@@ -5,7 +5,7 @@ module.exports = {
       cwd: './',
       script: 'node',
       args: '.next/standalone/server.js',
-      instances: 2,
+      instances: 4,
       exec_mode: 'cluster',
       max_memory_restart: '2000M',
       env: {

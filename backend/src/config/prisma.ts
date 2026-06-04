@@ -7,6 +7,15 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 export const prisma = globalForPrisma.prisma || new PrismaClient({
   datasourceUrl: process.env.DATABASE_URL as string,
   log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+  // Optimisé pour 12GB RAM / 6 vCPU
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL as string,
+    },
+  },
+  // Connection pool optimisé
+  poolTimeout: 30000,
+  connectionLimit: 25,
 });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
