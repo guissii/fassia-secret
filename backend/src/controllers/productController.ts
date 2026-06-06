@@ -32,7 +32,8 @@ export const getProducts = async (req: Request, res: Response) => {
     if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
-    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${isNew || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${page}:${limit}`;
+    const hasOldPrice = req.query.hasOldPrice as string;
+    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${isNew || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${hasOldPrice || 'all'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -81,6 +82,10 @@ export const getProducts = async (req: Request, res: Response) => {
 
     if (isNew !== undefined && isNew !== '') {
       where.isNew = isNew === 'true';
+    }
+
+    if (hasOldPrice === 'true') {
+      where.oldPrice = { gt: 0 };
     }
 
     const orderBy = random === 'true' ? undefined : { createdAt: 'desc' as const };

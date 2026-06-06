@@ -44,9 +44,9 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       .catch(() => setLoadingNouveautes(false));
   }, []);
 
-  // 2. HMIZAT
+  // 2. HMIZAT (produits avec prix barré)
   useEffect(() => {
-    fetch('/api/products?isPromo=true&random=true&limit=40')
+    fetch('/api/products?hasOldPrice=true&random=true&limit=4')
       .then(r => r.json())
       .then(data => {
         setPromoProducts(data.products || []);
