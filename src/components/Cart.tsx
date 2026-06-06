@@ -139,7 +139,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     // 1. Construire le message WhatsApp et ouvrir IMMÉDIATEMENT (avant tout await)
     //    pour éviter le blocage popup sur mobile
     const number = "212774656745";
-    let message = `🛒 *Nouvelle commande Fassia Secret*\n\n`;
+    let message = `🌸�🫰 *Nouvelle commande Fassia Secret* 🫰🌸\n\n`;
     message += `👤 *Nom:* ${formData.customerName}\n`;
     message += `📞 *Téléphone:* ${formData.phone}\n`;
     message += `📍 *Ville:* ${formData.city}\n`;
@@ -168,7 +168,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     }
     message += `🚚 *Livraison:* ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
     message += `💳 *Total:* ${total.toFixed(2)} MAD\n\n`;
-    message += `Merci de confirmer la disponibilité.`;
+    message += `🫰 Merci de confirmer la disponibilité 🌸`;
 
     const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
     // Ouvrir WhatsApp via un <a> caché : plus rapide et jamais bloqué par les navigateurs
