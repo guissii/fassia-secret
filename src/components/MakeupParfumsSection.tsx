@@ -27,9 +27,14 @@ const TILES: Tile[] = [
     image: '/images/banners/levres.webp',
   },
   {
-    title: 'Parfums',
-    href: '/boutique?category=Parfums',
+    title: 'Parfum Femme',
+    href: '/boutique?category=Parfums&q=femme',
     image: '/images/banners/PARFUM FEMME.webp',
+  },
+  {
+    title: 'Parfum Homme',
+    href: '/boutique?category=Parfums&q=homme',
+    image: '/images/banners/PARFUM HOMME.webp',
   },
 ];
 

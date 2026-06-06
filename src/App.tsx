@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { EssentialsSection } from './components/EssentialsSection';
 import { AffichesSection } from './components/AffichesSection';
+import { NouveautesSection } from './components/NouveautesSection';
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -15,11 +16,13 @@ const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel
 const Categories = dynamic(() => import('./components/Categories').then(mod => mod.Categories));
 const OfficialShopsSection = dynamic(() => import('./components/OfficialShopsSection').then(mod => mod.OfficialShopsSection));
 const KoreanStepsSection = dynamic(() => import('./components/KoreanStepsSection').then(mod => mod.KoreanStepsSection));
+const MakeupParfumsSection = dynamic(() => import('./components/MakeupParfumsSection').then(mod => mod.MakeupParfumsSection));
 
 function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
+  const [nouveautes, setNouveautes] = useState<any[]>([]);
+  const [loadingNouveautes, setLoadingNouveautes] = useState(true);
   const [promoProducts, setPromoProducts] = useState<any[]>([]);
   const [loadingPromos, setLoadingPromos] = useState(true);
-  const [makeupParfums, setMakeupParfums] = useState<any[]>([]);
   const [bestSellers, setBestSellers] = useState<any[]>(initialBestSellers);
   const [loadingBestSellers, setLoadingBestSellers] = useState(true);
   const [koreanProducts, setKoreanProducts] = useState<any[]>([]);
@@ -30,6 +33,18 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
     fetch('/api/track-view', { method: 'POST' }).catch(() => {});
   }, []);
 
+  // 1. Nouveautés - triées par date (pas de random)
+  useEffect(() => {
+    fetch('/api/products?isVisible=true&limit=20')
+      .then(r => r.json())
+      .then(data => {
+        setNouveautes(data.products || []);
+        setLoadingNouveautes(false);
+      })
+      .catch(() => setLoadingNouveautes(false));
+  }, []);
+
+  // 2. HMIZAT
   useEffect(() => {
     fetch('/api/products?isPromo=true&random=true&limit=20')
       .then(r => r.json())
@@ -40,6 +55,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       .catch(() => setLoadingPromos(false));
   }, []);
 
+  // 3. MEILLEURES VENTES
   useEffect(() => {
     fetch('/api/products?isEssential=true&random=true&limit=20')
       .then(r => r.json())
@@ -50,6 +66,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       .catch(() => setLoadingBestSellers(false));
   }, []);
 
+  // 5. K-BEAUTY carrousel
   useEffect(() => {
     fetch('/api/products?category=K-Beauty&isVisible=true&random=true&limit=40')
       .then(r => r.json())
@@ -60,32 +77,20 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       .catch(() => setLoadingKorean(false));
   }, []);
 
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/products?category=Maquillage&isVisible=true&random=true&limit=20').then(r => r.json()),
-      fetch('/api/products?category=Parfums&isVisible=true&random=true&limit=20').then(r => r.json()),
-    ])
-      .then(([maquillageData, parfumsData]) => {
-        const maquillage = maquillageData.products || [];
-        const parfums = parfumsData.products || [];
-        const combined = [...maquillage, ...parfums];
-
-        // Fallback: si aucun produit trouve, essayer la categorie combinee
-        if (combined.length === 0) {
-          fetch('/api/products?category=maquillage-et-parfums&isVisible=true&random=true&limit=20')
-            .then(r => r.json())
-            .then(data => setMakeupParfums(data.products || []));
-        } else {
-          setMakeupParfums(combined.slice(0, 20));
-        }
-      })
-      .catch(() => setMakeupParfums([]));
-  }, []);
-
   return (
     <>
       <AffichesSection />
 
+      {/* 1. NOUVEAUTÉS */}
+      {loadingNouveautes ? (
+        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: '#999' }}>Chargement des nouveautés...</span>
+        </div>
+      ) : (
+        <NouveautesSection products={nouveautes} />
+      )}
+
+      {/* 2. NOS HMIZAT (Promotions) */}
       {loadingPromos ? (
         <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ color: '#999' }}>Chargement des promotions...</span>
@@ -94,28 +99,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         <EssentialsSection products={promoProducts} />
       )}
 
-      {koreanProducts.length > 0 && (
-        <CollectionCarousel
-          title="K-BEAUTY"
-          imageSrc=""
-          products={koreanProducts}
-          linkHref="/boutique?category=K-Beauty"
-          linkTitle="Découvrir la K-Beauty"
-        />
-      )}
-
-      {makeupParfums.length > 0 && (
-        <CollectionCarousel
-          title="MAQUILLAGE & PARFUMS"
-          imageSrc=""
-          products={makeupParfums}
-          linkHref="/boutique?category=Maquillage"
-          linkTitle="Découvrir le maquillage et les parfums"
-        />
-      )}
-
-      <SupplementsSection />
-
+      {/* 3. MEILLEURES VENTES */}
       {loadingBestSellers ? (
         <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ color: '#999' }}>Chargement des meilleures ventes...</span>
@@ -130,13 +114,34 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         />
       )}
 
-      <Categories />
+      {/* 4. COMPLÉMENTS ALIMENTAIRES */}
+      <SupplementsSection />
 
+      {/* 5. K-BEAUTY carrousel */}
+      {koreanProducts.length > 0 && (
+        <CollectionCarousel
+          title="K-BEAUTY"
+          imageSrc=""
+          products={koreanProducts}
+          linkHref="/boutique?category=K-Beauty"
+          linkTitle="Découvrir la K-Beauty"
+        />
+      )}
+
+      {/* 6. Korean Steps (étapes) */}
       <KoreanStepsSection />
 
-      <OfficialShopsSection />
+      {/* 7. Maquillage & Parfums (types/steps) */}
+      <MakeupParfumsSection />
 
+      {/* 8. CATÉGORIE POPULAIRE */}
+      <Categories />
+
+      {/* 9. INGRÉDIENTS ACTIFS */}
       <IngredientsSection />
+
+      {/* 10. BOUTIQUES OFFICIELLES */}
+      <OfficialShopsSection />
 
       <div className="section-footer text-center mt-2xl">
         <Link href="/boutique" className="see-more-products-cta mt-lg mx-auto" style={{ display: 'inline-flex' }}>
