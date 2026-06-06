@@ -54,7 +54,7 @@ export function CategoriesTab() {
 
   const handleSaveCategory = async (cat: Category) => {
     try {
-      const existing = categories.find(c => c.id === cat.id);
+      const existing = cat.id && categories.find(c => c.id === cat.id);
       if (existing) {
         await api.fetchWithAuth(`/categories/${cat.id}`, {
           method: 'PUT',
@@ -84,7 +84,7 @@ export function CategoriesTab() {
 
   const handleSaveCollection = async (coll: Collection) => {
     try {
-      if (selectedCollection) {
+      if (selectedCollection?.id) {
         await api.fetchWithAuth(`/collections/${selectedCollection.id}`, {
           method: 'PUT',
           body: JSON.stringify({
@@ -185,6 +185,81 @@ export function CategoriesTab() {
     });
   };
 
+  const renderCollectionNode = (coll: any, depth: number, page: string) => {
+    const childCollections = collections.filter((c: any) => c.parentId === coll.id);
+    const hasChildren = childCollections.length > 0;
+    const isExpanded = expandedIds.has(coll.id);
+    const paddingLeft = depth * 1.5;
+
+    return (
+      <React.Fragment key={coll.id}>
+        <tr style={{ background: 'transparent' }}>
+          <td style={{ paddingLeft: `${paddingLeft}rem`, paddingTop: '0.4rem', paddingBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {hasChildren ? (
+                <button
+                  onClick={() => toggleExpand(coll.id)}
+                  style={{ background: 'none', border: 'none', color: '#0ea5e9', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}
+                >
+                  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </button>
+              ) : (
+                <span style={{ display: 'inline-block', width: '14px' }} />
+              )}
+              <span style={{ color: '#0ea5e9', fontSize: '0.85rem' }}>◆ {coll.name}</span>
+              {hasChildren && <span className="text-muted" style={{ fontSize: '0.7rem' }}>({childCollections.length})</span>}
+            </div>
+          </td>
+          <td></td>
+          <td>
+            <code style={{
+              background: 'rgba(255,255,255,0.05)',
+              padding: '0.2rem 0.5rem',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              color: 'var(--admin-text-muted)',
+            }}>
+              {coll.slug}
+            </code>
+          </td>
+          <td>
+            <span className="admin-badge badge-neutral">{coll._count?.products ?? 0}</span>
+          </td>
+          <td>
+            <div className="admin-row-actions">
+              <button
+                className="action-btn"
+                title="Ajouter sous-collection"
+                onClick={() => {
+                  setSelectedCollection({ id: '', name: '', slug: '', page, order: 0, parentId: coll.id } as any);
+                  setIsCollModalOpen(true);
+                }}
+                style={{ color: '#0ea5e9' }}
+              >
+                <Plus size={14} />
+              </button>
+              <button
+                className="action-btn"
+                title="Éditer"
+                onClick={() => { setSelectedCollection(coll); setIsCollModalOpen(true); }}
+              >
+                <Pencil size={14} />
+              </button>
+              <button
+                className="action-btn text-danger"
+                title="Supprimer"
+                onClick={() => handleDeleteCollection(coll.id)}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          </td>
+        </tr>
+        {isExpanded && hasChildren && childCollections.map((child: any) => renderCollectionNode(child, depth + 1, page))}
+      </React.Fragment>
+    );
+  };
+
   const renderTreeNode = (cat: any, depth = 0) => {
     const catCollections = collections.filter((c: any) => (c.page === cat.slug || c.page === cat.id) && !c.parentId);
     const hasCollections = catCollections.length > 0;
@@ -256,49 +331,7 @@ export function CategoriesTab() {
             </div>
           </td>
         </tr>
-        {isExpanded && hasCollections && catCollections.map((coll: any) => (
-          <tr key={coll.id} style={{ background: 'transparent' }}>
-            <td style={{ paddingLeft: `${(depth + 1) * 1.5}rem`, paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ display: 'inline-block', width: '16px' }} />
-                <span style={{ color: '#0ea5e9', fontSize: '0.85rem' }}>◆ {coll.name}</span>
-              </div>
-            </td>
-            <td></td>
-            <td>
-              <code style={{
-                background: 'rgba(255,255,255,0.05)',
-                padding: '0.2rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.8rem',
-                color: 'var(--admin-text-muted)',
-              }}>
-                {coll.slug}
-              </code>
-            </td>
-            <td>
-              <span className="admin-badge badge-neutral">{coll._count?.products ?? 0}</span>
-            </td>
-            <td>
-              <div className="admin-row-actions">
-                <button
-                  className="action-btn"
-                  title="Éditer"
-                  onClick={() => { setSelectedCollection(coll); setIsCollModalOpen(true); }}
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  className="action-btn text-danger"
-                  title="Supprimer"
-                  onClick={() => handleDeleteCollection(coll.id)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
+        {isExpanded && hasCollections && catCollections.map((coll: any) => renderCollectionNode(coll, depth + 1, cat.slug))}
       </React.Fragment>
     );
   };
