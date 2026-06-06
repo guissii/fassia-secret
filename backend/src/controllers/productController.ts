@@ -31,7 +31,7 @@ export const getProducts = async (req: Request, res: Response) => {
     if (limit > 500) limit = 500;
     const skip = (page - 1) * limit;
 
-    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${page}:${limit}`;
+    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${isNew || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -76,6 +76,10 @@ export const getProducts = async (req: Request, res: Response) => {
 
     if (isPromo !== undefined && isPromo !== '') {
       where.isPromo = isPromo === 'true';
+    }
+
+    if (isNew !== undefined && isNew !== '') {
+      where.isNew = isNew === 'true';
     }
 
     const orderBy = random === 'true' ? undefined : { createdAt: 'desc' as const };
@@ -123,7 +127,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isPromo, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isPromo, isNew, isEssential, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
 
     // Check for duplicate product name
     const existing = await prisma.product.findFirst({
@@ -156,7 +160,15 @@ export const createProduct = async (req: Request, res: Response) => {
         koreanBeautyStep: koreanBeautyStep ? parseInt(koreanBeautyStep) : null,
         supplementFocus: supplementFocus || null,
         isVisible: isVisible !== false,
-        isPromo: isPromo === true,
+        // Mutual exclusivity: un produit ne peut être que dans une section à la fois
+        ...(isNew === true
+          ? { isNew: true, isPromo: false, isEssential: false }
+          : isPromo === true
+            ? { isPromo: true, isNew: false, isEssential: false }
+            : isEssential === true
+              ? { isEssential: true, isNew: false, isPromo: false }
+              : { isNew: false, isPromo: false, isEssential: false }
+        ),
         categories: {
           connect: (categoryIds || []).map((id: string) => ({ id }))
         },
@@ -188,7 +200,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
 
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, isPromo, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, isPromo, isNew, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
 
     // Check for duplicate product name (excluding current product)
     const existing = await prisma.product.findFirst({
@@ -226,7 +238,15 @@ export const updateProduct = async (req: Request, res: Response) => {
         makeupStep: makeupStep ? parseInt(makeupStep) : null,
         isVisible: isVisible !== false,
         isArchived: isArchived === true,
-        isPromo: isPromo === true,
+        // Mutual exclusivity: un produit ne peut être que dans une section à la fois
+        ...(isNew === true
+          ? { isNew: true, isPromo: false, isEssential: false }
+          : isPromo === true
+            ? { isPromo: true, isNew: false, isEssential: false }
+            : isEssential === true
+              ? { isEssential: true, isNew: false, isPromo: false }
+              : { isNew: false, isPromo: false, isEssential: false }
+        ),
         categories: {
           set: [], // Disconnect all
           connect: (categoryIds || []).map((id: string) => ({ id }))

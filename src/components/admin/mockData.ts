@@ -48,6 +48,7 @@ export interface AdminProduct {
   isArchived: boolean;
   isEssential: boolean;
   isPromo: boolean;
+  isNew: boolean;
   salesCount: number;
   stock: number;
   tags: string[];

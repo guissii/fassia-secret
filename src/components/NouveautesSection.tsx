@@ -6,7 +6,7 @@ export function NouveautesSection({ products }: { products: any[] }) {
       title="NOUVEAUTÉS"
       imageSrc=""
       products={products}
-      linkHref="/boutique?isVisible=true"
+      linkHref="/boutique?isNew=true"
       linkTitle="Découvrir toutes les nouveautés"
     />
   );

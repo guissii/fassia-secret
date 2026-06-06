@@ -33,9 +33,9 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
     fetch('/api/track-view', { method: 'POST' }).catch(() => {});
   }, []);
 
-  // 1. Nouveautés - triées par date (pas de random)
+  // 1. NOUVEAUTÉS - sélection manuelle depuis admin
   useEffect(() => {
-    fetch('/api/products?isVisible=true&limit=20')
+    fetch('/api/products?isNew=true&limit=40')
       .then(r => r.json())
       .then(data => {
         setNouveautes(data.products || []);
@@ -46,7 +46,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
 
   // 2. HMIZAT
   useEffect(() => {
-    fetch('/api/products?isPromo=true&random=true&limit=20')
+    fetch('/api/products?isPromo=true&random=true&limit=40')
       .then(r => r.json())
       .then(data => {
         setPromoProducts(data.products || []);
@@ -57,7 +57,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
 
   // 3. MEILLEURES VENTES
   useEffect(() => {
-    fetch('/api/products?isEssential=true&random=true&limit=20')
+    fetch('/api/products?isEssential=true&random=true&limit=40')
       .then(r => r.json())
       .then(data => {
         setBestSellers(data.products || []);
@@ -66,7 +66,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
       .catch(() => setLoadingBestSellers(false));
   }, []);
 
-  // 5. K-BEAUTY carrousel
+  // 4. K-BEAUTY carrousel
   useEffect(() => {
     fetch('/api/products?category=K-Beauty&isVisible=true&random=true&limit=40')
       .then(r => r.json())
@@ -90,7 +90,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         <NouveautesSection products={nouveautes} />
       )}
 
-      {/* 2. NOS HMIZAT (Promotions) */}
+      {/* 2. HMIZAT (Promotions) */}
       {loadingPromos ? (
         <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ color: '#999' }}>Chargement des promotions...</span>
@@ -114,10 +114,7 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
         />
       )}
 
-      {/* 4. COMPLÉMENTS ALIMENTAIRES */}
-      <SupplementsSection />
-
-      {/* 5. K-BEAUTY carrousel */}
+      {/* 4. K-BEAUTY carrousel */}
       {koreanProducts.length > 0 && (
         <CollectionCarousel
           title="K-BEAUTY"
@@ -127,6 +124,9 @@ function App({ bestSellers: initialBestSellers }: { bestSellers: any[] }) {
           linkTitle="Découvrir la K-Beauty"
         />
       )}
+
+      {/* 5. COMPLÉMENTS ALIMENTAIRES */}
+      <SupplementsSection />
 
       {/* 6. Korean Steps (étapes) */}
       <KoreanStepsSection />

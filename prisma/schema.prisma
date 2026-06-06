@@ -48,6 +48,7 @@ model Product {
   isArchived  Boolean     @default(false)
   isEssential Boolean     @default(false)
   isPromo     Boolean     @default(false)
+  isNew       Boolean     @default(false)
   salesCount  Int         @default(0)
   stock       Int         @default(0)
   tags        String[]

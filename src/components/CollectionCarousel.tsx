@@ -22,7 +22,7 @@ interface CollectionCarouselProps {
 export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTitle }: CollectionCarouselProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const MAX_PRODUCTS = 20;
+  const MAX_PRODUCTS = 40;
   const displayProducts = products.slice(0, MAX_PRODUCTS);
 
   return (
@@ -31,7 +31,7 @@ export function CollectionCarousel({ title, imageSrc, products, linkHref, linkTi
         <div className="essentials-header-row">
           <div className="essentials-title-group">
             <h2 className="essentials-title">
-              NOS <span className="highlight">{title}</span>
+              {title}
             </h2>
           </div>
         </div>
