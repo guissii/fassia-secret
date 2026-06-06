@@ -197,6 +197,7 @@ const DEFAULT_CATEGORIES = [
   { name: 'K-Beauty', nameAr: 'كي بيوتي', slug: 'k-beauty' },
   { name: 'Dermo-Corner', nameAr: 'درمو كورنر', slug: 'dermo-corner' },
   { name: 'Accessoires', nameAr: 'إكسسوارات', slug: 'accessoires' },
+  { name: 'Ingrédients Actifs', nameAr: 'المكونات النشطة', slug: 'ingredients-actifs' },
   { name: 'Minceur', nameAr: 'التخسيس', slug: 'minceur' },
   { name: 'Sport', nameAr: 'رياضة', slug: 'sport' },
   { name: 'Hygiène', nameAr: 'النظافة', slug: 'hygiene' },

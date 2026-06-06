@@ -18,6 +18,9 @@ export function CategoriesTab() {
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
   const [isCollModalOpen, setIsCollModalOpen] = useState(false);
 
+  // Header dropdown
+  const [showNewMenu, setShowNewMenu] = useState(false);
+
   // Delete with migration
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const [migrateToId, setMigrateToId] = useState<string>('');
@@ -230,17 +233,6 @@ export function CategoriesTab() {
             <div className="admin-row-actions">
               <button
                 className="action-btn"
-                title="Ajouter sous-catégorie"
-                onClick={() => {
-                  setSelectedCategory({ id: '', name: '', nameAr: '', slug: '', productCount: 0, parentId: cat.id } as any);
-                  setIsModalOpen(true);
-                }}
-                style={{ color: '#10b981' }}
-              >
-                <Plus size={16} />
-              </button>
-              <button
-                className="action-btn"
                 title="Ajouter collection"
                 onClick={() => {
                   setSelectedCollection({ id: '', name: '', slug: '', page: cat.slug, order: 0, parentId: null } as any);
@@ -397,41 +389,45 @@ export function CategoriesTab() {
           <h2>Catégories</h2>
           <p className="admin-subtitle">Organisez vos produits par catégorie</p>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button
-            className="admin-btn-outline"
-            onClick={async () => {
-              try {
-                const res = await api.fetchWithAuth('/categories/seed', { method: 'POST' });
-                setToast({ message: res.message, type: 'success' });
-                loadData();
-              } catch (error: any) {
-                setToast({ message: error.message || 'Erreur import', type: 'error' });
-              }
-            }}
-          >
-            Importer catégories
-          </button>
-          <button
-            className="admin-btn-outline"
-            onClick={async () => {
-              try {
-                const res = await api.fetchWithAuth('/collections/seed', { method: 'POST' });
-                setToast({ message: res.message, type: 'success' });
-                loadData();
-              } catch (error: any) {
-                setToast({ message: error.message || 'Erreur import collections', type: 'error' });
-              }
-            }}
-          >
-            Importer collections
-          </button>
-          <button
-            className="admin-btn-primary"
-            onClick={() => { setSelectedCategory(null); setIsModalOpen(true); }}
-          >
-            <Plus size={18} /> Nouvelle catégorie
-          </button>
+        <div style={{ display: 'flex', gap: '0.75rem', position: 'relative' }}>
+          <div style={{ position: 'relative' }}>
+            <button
+              className="admin-btn-primary"
+              onClick={() => setShowNewMenu(prev => !prev)}
+            >
+              <Plus size={18} /> Nouveau
+            </button>
+            {showNewMenu && (
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 4px)',
+                right: 0,
+                background: '#1a1a1a',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '4px',
+                zIndex: 100,
+                minWidth: '160px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+              }}>
+                <button
+                  style={{ display: 'block', width: '100%', padding: '10px 14px', textAlign: 'left', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.9rem' }}
+                  onClick={() => { setShowNewMenu(false); setSelectedCategory(null); setIsModalOpen(true); }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(225,0,116,0.15)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                >
+                  <FolderTree size={14} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Catégorie
+                </button>
+                <button
+                  style={{ display: 'block', width: '100%', padding: '10px 14px', textAlign: 'left', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.9rem' }}
+                  onClick={() => { setShowNewMenu(false); setSelectedCollection(null); setIsCollModalOpen(true); }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(225,0,116,0.15)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                >
+                  <span style={{ marginRight: '8px', color: '#0ea5e9' }}>◆</span> Collection
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
