@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import "./OfficialShopsSection.css";
 
@@ -14,71 +14,11 @@ interface CategoryRow {
   brands: Brand[];
 }
 
-const CATEGORIES: CategoryRow[] = [
-  {
-    key: "kbeauty",
-    label: "Korean Beauty",
-    brands: [
-      { name: "COSRX" },
-      { name: "Laneige" },
-      { name: "Innisfree" },
-      { name: "Sulwhasoo" },
-      { name: "Beauty of Joseon" },
-      { name: "Anua" },
-      { name: "Mediheal" },
-      { name: "Dr. Jart+" },
-      { name: "Banila Co" },
-      { name: "Etude House" },
-      { name: "Missha" },
-      { name: "The Face Shop" },
-      { name: "Pyunkang Yul" },
-      { name: "Purito" },
-      { name: "Benton" },
-    ],
-  },
-  {
-    key: "complements",
-    label: "Compléments Alimentaires",
-    brands: [
-      { name: "Pure Encapsulations" },
-      { name: "Optimum Nutrition" },
-      { name: "Now Foods" },
-      { name: "Solgar" },
-      { name: "Garden of Life" },
-      { name: "Thorne" },
-      { name: "Life Extension" },
-      { name: "Doctor's Best" },
-      { name: "Jarrow Formulas" },
-      { name: "Nordic Naturals" },
-      { name: "Sports Research" },
-      { name: "Nature's Way" },
-      { name: "Source Naturals" },
-      { name: "Country Life" },
-      { name: "Nutrilite" },
-    ],
-  },
-  {
-    key: "maquillage",
-    label: "Maquillage & Parfums",
-    brands: [
-      { name: "Chanel" },
-      { name: "Dior" },
-      { name: "YSL" },
-      { name: "Lancôme" },
-      { name: "MAC" },
-      { name: "NARS" },
-      { name: "Fenty Beauty" },
-      { name: "Tarte" },
-      { name: "Urban Decay" },
-      { name: "Estée Lauder" },
-      { name: "Maybelline" },
-      { name: "L'Oréal" },
-      { name: "Charlotte Tilbury" },
-      { name: "Huda Beauty" },
-      { name: "Benefit" },
-    ],
-  },
-];
+const CATEGORY_LABELS: Record<string, string> = {
+  kbeauty: "Korean Beauty",
+  complements: "Compléments Alimentaires",
+  maquillage: "Maquillage & Parfums",
+};
 
 function MarqueeRow({ brands }: { brands: Brand[] }) {
   const doubled = [...brands, ...brands];
@@ -101,6 +41,69 @@ function MarqueeRow({ brands }: { brands: Brand[] }) {
 }
 
 export function OfficialShopsSection() {
+  const [categories, setCategories] = useState<CategoryRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/official-shops')
+      .then(r => r.json())
+      .then(data => {
+        const shops = data.shops || [];
+        const grouped: CategoryRow[] = Object.entries(CATEGORY_LABELS).map(([key, label]) => ({
+          key,
+          label,
+          brands: shops
+            .filter((s: any) => s.category === key)
+            .sort((a: any, b: any) => a.order - b.order)
+            .map((s: any) => ({ name: s.name })),
+        }));
+        setCategories(grouped);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const displayCategories = categories.filter(c => c.brands.length > 0);
+
+  // Fallback si aucune donnée
+  const fallbackCategories: CategoryRow[] = [
+    {
+      key: "kbeauty",
+      label: "Korean Beauty",
+      brands: [
+        { name: "COSRX" }, { name: "Laneige" }, { name: "Innisfree" },
+        { name: "Sulwhasoo" }, { name: "Beauty of Joseon" }, { name: "Anua" },
+        { name: "Mediheal" }, { name: "Dr. Jart+" }, { name: "Banila Co" },
+        { name: "Etude House" }, { name: "Missha" }, { name: "The Face Shop" },
+        { name: "Pyunkang Yul" }, { name: "Purito" }, { name: "Benton" },
+      ],
+    },
+    {
+      key: "complements",
+      label: "Compléments Alimentaires",
+      brands: [
+        { name: "Pure Encapsulations" }, { name: "Optimum Nutrition" }, { name: "Now Foods" },
+        { name: "Solgar" }, { name: "Garden of Life" }, { name: "Thorne" },
+        { name: "Life Extension" }, { name: "Doctor's Best" }, { name: "Jarrow Formulas" },
+        { name: "Nordic Naturals" }, { name: "Sports Research" }, { name: "Nature's Way" },
+        { name: "Source Naturals" }, { name: "Country Life" }, { name: "Nutrilite" },
+      ],
+    },
+    {
+      key: "maquillage",
+      label: "Maquillage & Parfums",
+      brands: [
+        { name: "Chanel" }, { name: "Dior" }, { name: "YSL" },
+        { name: "Lancôme" }, { name: "MAC" }, { name: "NARS" },
+        { name: "Fenty Beauty" }, { name: "Tarte" }, { name: "Urban Decay" },
+        { name: "Estée Lauder" }, { name: "Maybelline" }, { name: "L'Oréal" },
+        { name: "Charlotte Tilbury" }, { name: "Huda Beauty" }, { name: "Benefit" },
+      ],
+    },
+  ];
+
+  const catsToShow = displayCategories.length > 0 ? displayCategories : fallbackCategories;
+
   return (
     <section className="official-shops-section py-3xl">
       <div className="container">
@@ -109,7 +112,7 @@ export function OfficialShopsSection() {
           <div className="section-ornament-premium" aria-hidden="true" />
         </div>
 
-        {CATEGORIES.map((cat) => (
+        {catsToShow.map((cat) => (
           <div key={cat.key} className="official-shops-category">
             <h3 className="official-shops-category-title">{cat.label}</h3>
             <MarqueeRow brands={cat.brands} />

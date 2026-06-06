@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Package, 
-  FolderTree, 
-  TicketPercent, 
-  Settings, 
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  FolderTree,
+  TicketPercent,
+  Settings,
   LogOut,
   Menu,
   X,
-  Activity
+  Activity,
+  Store
 } from 'lucide-react';
 import './AdminPage.css';
 import { AdminLogin } from './AdminLogin';
@@ -23,8 +24,9 @@ import { PromosTab } from './PromosTab';
 import { CollectionsTab } from './CollectionsTab';
 import { SettingsTab } from './SettingsTab';
 import { ServerTab } from './ServerTab';
+import { OfficialShopsTab } from './OfficialShopsTab';
 
-type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'collections' | 'promos' | 'settings' | 'server';
+type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'collections' | 'promos' | 'official-shops' | 'settings' | 'server';
 
 export function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -48,16 +50,17 @@ export function AdminPage() {
     setIsAuthenticated(false);
   };
 
-  const navItems = [
+  const navItems: Array<{ id: TabId; label: string; icon: typeof LayoutDashboard; badge?: number }> = [
     { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
     { id: 'orders', label: 'Commandes', icon: ShoppingBag, badge: pendingOrdersCount },
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'categories', label: 'Catégories', icon: FolderTree },
     { id: 'collections', label: 'Collections', icon: FolderTree },
     { id: 'promos', label: 'Promotions', icon: TicketPercent },
+    { id: 'official-shops', label: 'Boutiques Off.', icon: Store },
     { id: 'settings', label: 'Paramètres', icon: Settings },
     { id: 'server', label: 'Serveur (VPS)', icon: Activity },
-  ] as const;
+  ];
 
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;
@@ -71,6 +74,7 @@ export function AdminPage() {
       case 'categories': return <CategoriesTab />;
       case 'collections': return <CollectionsTab />;
       case 'promos': return <PromosTab />;
+      case 'official-shops': return <OfficialShopsTab />;
       case 'settings': return <SettingsTab />;
       case 'server': return <ServerTab />;
       default: return <DashboardTab />;

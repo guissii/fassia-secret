@@ -37,7 +37,7 @@
 .marquee-brand {
   flex-shrink: 0;
   padding: 0.7rem 1.5rem;
-  border-radius: 9999px;
+  border-radius: 0;
   border: 1.5px solid #e5e7eb;
   background: #fff;
   color: #374151;

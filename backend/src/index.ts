@@ -18,6 +18,7 @@ import promoRoutes from './routes/promoRoutes';
 import serverRoutes from './routes/serverRoutes';
 import collectionRoutes from './routes/collectionRoutes';
 import statsRoutes from './routes/statsRoutes';
+import officialShopRoutes from './routes/officialShopRoutes';
 
 dotenv.config();
 
@@ -74,6 +75,7 @@ function createApp() {
   app.use('/api/promos', promoRoutes);
   app.use('/api/server', serverRoutes);
   app.use('/api/collections', collectionRoutes);
+  app.use('/api/official-shops', officialShopRoutes);
   app.use('/api', statsRoutes);
 
   return app;
