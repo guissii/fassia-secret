@@ -62,7 +62,6 @@ export function CategoriesTab() {
             name: cat.name,
             nameAr: cat.nameAr,
             slug: cat.slug,
-            parentId: (cat as any).parentId || null,
           }),
         });
         setToast({ message: 'Catégorie mise à jour', type: 'success' });
@@ -73,7 +72,6 @@ export function CategoriesTab() {
             name: cat.name,
             nameAr: cat.nameAr,
             slug: cat.slug,
-            parentId: (cat as any).parentId || null,
           }),
         });
         setToast({ message: 'Catégorie créée', type: 'success' });
@@ -188,9 +186,8 @@ export function CategoriesTab() {
   };
 
   const renderTreeNode = (cat: any, depth = 0) => {
-    const catChildren = cat.children || [];
     const catCollections = collections.filter((c: any) => (c.page === cat.slug || c.page === cat.id) && !c.parentId);
-    const hasChildren = catChildren.length > 0 || catCollections.length > 0;
+    const hasCollections = catCollections.length > 0;
     const isExpanded = expandedIds.has(cat.id);
     const paddingLeft = depth * 1.5;
 
@@ -199,7 +196,7 @@ export function CategoriesTab() {
         <tr style={{ background: 'transparent' }}>
           <td style={{ paddingLeft: `${paddingLeft}rem`, paddingTop: '0.6rem', paddingBottom: '0.6rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              {hasChildren ? (
+              {hasCollections ? (
                 <button
                   onClick={() => toggleExpand(cat.id)}
                   style={{ background: 'none', border: 'none', color: '#e10074', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}
@@ -209,9 +206,9 @@ export function CategoriesTab() {
               ) : (
                 <span style={{ display: 'inline-block', width: '16px' }} />
               )}
-              <FolderTree size={16} style={{ color: depth === 0 ? '#e10074' : '#888' }} />
-              <span style={{ fontWeight: depth === 0 ? 600 : 400 }}>{cat.name}</span>
-              {hasChildren && <span className="text-muted" style={{ fontSize: '0.75rem' }}>({catChildren.length + catCollections.length})</span>}
+              <FolderTree size={16} style={{ color: '#e10074' }} />
+              <span style={{ fontWeight: 600 }}>{cat.name}</span>
+              {hasCollections && <span className="text-muted" style={{ fontSize: '0.75rem' }}>({catCollections.length})</span>}
             </div>
           </td>
           <td style={{ direction: 'rtl', fontFamily: 'sans-serif' }}>{cat.nameAr}</td>
@@ -259,54 +256,49 @@ export function CategoriesTab() {
             </div>
           </td>
         </tr>
-        {isExpanded && (
-          <>
-            {catChildren.map((child: any) => renderTreeNode(child, depth + 1))}
-            {catCollections.map((coll: any) => (
-              <tr key={coll.id} style={{ background: 'transparent' }}>
-                <td style={{ paddingLeft: `${(depth + 1) * 1.5}rem`, paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ display: 'inline-block', width: '16px' }} />
-                    <span style={{ color: '#0ea5e9', fontSize: '0.85rem' }}>◆ {coll.name}</span>
-                  </div>
-                </td>
-                <td></td>
-                <td>
-                  <code style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    padding: '0.2rem 0.5rem',
-                    borderRadius: '4px',
-                    fontSize: '0.8rem',
-                    color: 'var(--admin-text-muted)',
-                  }}>
-                    {coll.slug}
-                  </code>
-                </td>
-                <td>
-                  <span className="admin-badge badge-neutral">{coll._count?.products ?? 0}</span>
-                </td>
-                <td>
-                  <div className="admin-row-actions">
-                    <button
-                      className="action-btn"
-                      title="Éditer"
-                      onClick={() => { setSelectedCollection(coll); setIsCollModalOpen(true); }}
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      className="action-btn text-danger"
-                      title="Supprimer"
-                      onClick={() => handleDeleteCollection(coll.id)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </>
-        )}
+        {isExpanded && hasCollections && catCollections.map((coll: any) => (
+          <tr key={coll.id} style={{ background: 'transparent' }}>
+            <td style={{ paddingLeft: `${(depth + 1) * 1.5}rem`, paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ display: 'inline-block', width: '16px' }} />
+                <span style={{ color: '#0ea5e9', fontSize: '0.85rem' }}>◆ {coll.name}</span>
+              </div>
+            </td>
+            <td></td>
+            <td>
+              <code style={{
+                background: 'rgba(255,255,255,0.05)',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '4px',
+                fontSize: '0.8rem',
+                color: 'var(--admin-text-muted)',
+              }}>
+                {coll.slug}
+              </code>
+            </td>
+            <td>
+              <span className="admin-badge badge-neutral">{coll._count?.products ?? 0}</span>
+            </td>
+            <td>
+              <div className="admin-row-actions">
+                <button
+                  className="action-btn"
+                  title="Éditer"
+                  onClick={() => { setSelectedCollection(coll); setIsCollModalOpen(true); }}
+                >
+                  <Pencil size={16} />
+                </button>
+                <button
+                  className="action-btn text-danger"
+                  title="Supprimer"
+                  onClick={() => handleDeleteCollection(coll.id)}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
       </React.Fragment>
     );
   };
@@ -320,7 +312,6 @@ export function CategoriesTab() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveCategory}
-        allCategories={categories}
       />
 
       <CollectionFormModal

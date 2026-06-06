@@ -7,7 +7,6 @@ interface CategoryFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (category: Category) => void;
-  allCategories?: Category[];
 }
 
 function generateSlug(name: string): string {
@@ -19,11 +18,10 @@ function generateSlug(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export function CategoryFormModal({ category, isOpen, onClose, onSave, allCategories = [] }: CategoryFormModalProps) {
+export function CategoryFormModal({ category, isOpen, onClose, onSave }: CategoryFormModalProps) {
   const [name, setName] = useState('');
   const [nameAr, setNameAr] = useState('');
   const [slug, setSlug] = useState('');
-  const [parentId, setParentId] = useState<string | null>(null);
   const [autoSlug, setAutoSlug] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -33,13 +31,11 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave, allCatego
         setName(category.name);
         setNameAr(category.nameAr);
         setSlug(category.slug);
-        setParentId((category as any).parentId || null);
         setAutoSlug(false);
       } else {
         setName('');
         setNameAr('');
         setSlug('');
-        setParentId(null);
         setAutoSlug(true);
       }
     }
@@ -63,7 +59,6 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave, allCatego
         nameAr: nameAr.trim(),
         slug: slug || generateSlug(name),
         productCount: category?.productCount || 0,
-        parentId,
       } as Category);
       setLoading(false);
       onClose();
@@ -137,24 +132,6 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave, allCatego
               </span>
             </div>
 
-            <div className="form-group">
-              <label>Catégorie parente</label>
-              <select
-                className="admin-select"
-                value={parentId || ''}
-                onChange={e => setParentId(e.target.value || null)}
-                style={{ width: '100%' }}
-              >
-                <option value="">— Racine (aucune) —</option>
-                {allCategories
-                  .filter(c => c.id !== category?.id)
-                  .map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
           </div>
 
           <div className="admin-modal-actions">
