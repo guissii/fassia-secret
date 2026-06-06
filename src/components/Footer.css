@@ -9,8 +9,9 @@
 }
 
 .footer-grid {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* More compact columns */
-  gap: var(--spacing-lg); /* Reduced from xl */
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--spacing-xl);
+  align-items: start;
 }
 
 .footer-brand {
@@ -156,13 +157,11 @@
   }
 
   .footer-grid {
-    grid-template-columns: 1fr 1fr; /* 2 columns on mobile instead of stacking */
-    gap: var(--spacing-md);
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
   }
 
   .footer-col:first-child {
-    grid-column: 1 / -1; /* Brand column full width */
-    margin-bottom: var(--spacing-sm);
     text-align: center;
   }
 
