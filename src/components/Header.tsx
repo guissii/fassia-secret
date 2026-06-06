@@ -167,10 +167,6 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
             </div>
           </div>
 
-          <button className="top-lang" type="button" aria-label="Langue">
-            <span>FR</span>
-            <ChevronDown size={14} />
-          </button>
         </div>
       </div>
 
