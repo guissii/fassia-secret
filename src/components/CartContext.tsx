@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import type { CartItem } from './Cart';
 
 export interface ActivePromo {
@@ -24,10 +24,42 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | null>(null);
 
+const CART_STORAGE_KEY = 'fassia_cart';
+const PROMO_STORAGE_KEY = 'fassia_promo';
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [activePromo, setActivePromo] = useState<ActivePromo | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Charger depuis localStorage au montage (client-side only)
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      if (savedCart) setCartItems(JSON.parse(savedCart));
+      const savedPromo = localStorage.getItem(PROMO_STORAGE_KEY);
+      if (savedPromo) setActivePromo(JSON.parse(savedPromo));
+    } catch {
+      // ignore parse errors
+    }
+    setHydrated(true);
+  }, []);
+
+  // Sauvegarder dans localStorage à chaque changement
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+  }, [cartItems, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (activePromo) {
+      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(activePromo));
+    } else {
+      localStorage.removeItem(PROMO_STORAGE_KEY);
+    }
+  }, [activePromo, hydrated]);
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
