@@ -49,14 +49,19 @@ export function OrdersTab() {
   });
 
   const handleChangeStatus = async (id: string, newStatus: OrderStatus) => {
-    // Optimistic update
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
-    if (selectedOrder?.id === id) {
-      setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
+    try {
+      await api.fetchWithAuth(`/orders/${id}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus })
+      });
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+      if (selectedOrder?.id === id) {
+        setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
+      }
+      setToast({ message: `Statut mis à jour`, type: 'success' });
+    } catch {
+      setToast({ message: `Erreur lors de la mise à jour du statut`, type: 'error' });
     }
-    
-    setToast({ message: `Statut mis à jour`, type: 'success' });
-    await delay(300); // Simulate API call
   };
 
   const handleSync = async (id: string) => {
@@ -190,12 +195,12 @@ export function OrdersTab() {
                         {getOrderStatusLabel(order.status)}
                       </span>
                     </td>
-                    <td onClick={e => e.stopPropagation()}>
+                    <td>
                       <div className="admin-row-actions">
                         <button 
                           className="action-btn" 
                           title="Voir"
-                          onClick={() => { setSelectedOrder(order); setIsModalOpen(true); }}
+                          onClick={(e) => { e.stopPropagation(); setSelectedOrder(order); setIsModalOpen(true); }}
                         >
                           <Eye size={18} />
                         </button>
@@ -203,7 +208,7 @@ export function OrdersTab() {
                           <button 
                             className="action-btn text-success" 
                             title="Approuver"
-                            onClick={() => handleChangeStatus(order.id, 'processing')}
+                            onClick={(e) => { e.stopPropagation(); handleChangeStatus(order.id, 'processing'); }}
                           >
                             <Check size={18} />
                           </button>
@@ -211,7 +216,7 @@ export function OrdersTab() {
                         <button 
                           className="action-btn text-danger" 
                           title="Supprimer"
-                          onClick={() => setConfirmDeleteId(order.id)}
+                          onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(order.id); }}
                         >
                           <Trash2 size={18} />
                         </button>

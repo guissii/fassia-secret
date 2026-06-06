@@ -95,3 +95,18 @@ export const deleteOrder = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete order' });
   }
 };
+
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const updated = await prisma.order.update({
+      where: { id },
+      data: { status: status.toUpperCase() }
+    });
+    res.json({ order: updated, success: true });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ error: 'Failed to update order status' });
+  }
+};
