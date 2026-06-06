@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, FolderTree, ChevronRight, ChevronDown } from 'lucide-react';
-import { api, Category, delay } from './mockData';
+import { api, Category, Collection, delay } from './mockData';
 import { CategoryFormModal } from './CategoryFormModal';
+import { CollectionFormModal } from './CollectionFormModal';
 import { Toast, ToastType } from './shared';
 
 export function CategoriesTab() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // UI State
+  // UI State Category
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // UI State Collection
+  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+  const [isCollModalOpen, setIsCollModalOpen] = useState(false);
 
   // Delete with migration
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
@@ -23,11 +29,15 @@ export function CategoriesTab() {
   // Toasts
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
-  const loadCategories = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const data = await api.getCategories();
-      setCategories(data);
+      const [cats, colls] = await Promise.all([
+        api.getCategories(),
+        api.getCollections(),
+      ]);
+      setCategories(cats);
+      setCollections(colls);
     } catch {
       setToast({ message: 'Erreur de chargement', type: 'error' });
     } finally {
@@ -36,7 +46,7 @@ export function CategoriesTab() {
   };
 
   useEffect(() => {
-    loadCategories();
+    loadData();
   }, []);
 
   const handleSaveCategory = async (cat: Category) => {
@@ -65,9 +75,55 @@ export function CategoriesTab() {
         });
         setToast({ message: 'Catégorie créée', type: 'success' });
       }
-      loadCategories();
+      loadData();
     } catch (error: any) {
       setToast({ message: error.message || 'Erreur lors de la sauvegarde', type: 'error' });
+    }
+  };
+
+  const handleSaveCollection = async (coll: Collection) => {
+    try {
+      if (selectedCollection) {
+        await api.fetchWithAuth(`/collections/${selectedCollection.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            name: coll.name,
+            slug: coll.slug,
+            page: coll.page,
+            order: coll.order,
+            parentId: (coll as any).parentId || null,
+          }),
+        });
+        setToast({ message: 'Collection mise à jour', type: 'success' });
+      } else {
+        await api.fetchWithAuth('/collections', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: coll.name,
+            slug: coll.slug,
+            page: coll.page || 'general',
+            order: coll.order || 0,
+            parentId: (coll as any).parentId || null,
+          }),
+        });
+        setToast({ message: 'Collection créée', type: 'success' });
+      }
+      setIsCollModalOpen(false);
+      setSelectedCollection(null);
+      loadData();
+    } catch {
+      setToast({ message: 'Erreur lors de la sauvegarde', type: 'error' });
+    }
+  };
+
+  const handleDeleteCollection = async (id: string) => {
+    if (!confirm('Supprimer cette collection ?')) return;
+    try {
+      await api.fetchWithAuth(`/collections/${id}`, { method: 'DELETE' });
+      setCollections(prev => prev.filter(c => c.id !== id));
+      setToast({ message: 'Collection supprimée', type: 'success' });
+    } catch {
+      setToast({ message: 'Erreur lors de la suppression', type: 'error' });
     }
   };
 
@@ -129,7 +185,9 @@ export function CategoriesTab() {
   };
 
   const renderTreeNode = (cat: any, depth = 0) => {
-    const hasChildren = cat.children && cat.children.length > 0;
+    const catChildren = cat.children || [];
+    const catCollections = collections.filter((c: any) => (c.page === cat.slug || c.page === cat.id) && !c.parentId);
+    const hasChildren = catChildren.length > 0 || catCollections.length > 0;
     const isExpanded = expandedIds.has(cat.id);
     const paddingLeft = depth * 1.5;
 
@@ -148,9 +206,9 @@ export function CategoriesTab() {
               ) : (
                 <span style={{ display: 'inline-block', width: '16px' }} />
               )}
-              <FolderTree size={16} className="text-muted" />
+              <FolderTree size={16} style={{ color: depth === 0 ? '#e10074' : '#888' }} />
               <span style={{ fontWeight: depth === 0 ? 600 : 400 }}>{cat.name}</span>
-              {hasChildren && <span className="text-muted" style={{ fontSize: '0.75rem' }}>({cat.children.length})</span>}
+              {hasChildren && <span className="text-muted" style={{ fontSize: '0.75rem' }}>({catChildren.length + catCollections.length})</span>}
             </div>
           </td>
           <td style={{ direction: 'rtl', fontFamily: 'sans-serif' }}>{cat.nameAr}</td>
@@ -183,6 +241,17 @@ export function CategoriesTab() {
               </button>
               <button
                 className="action-btn"
+                title="Ajouter collection"
+                onClick={() => {
+                  setSelectedCollection({ id: '', name: '', slug: '', page: cat.slug, order: 0, parentId: null } as any);
+                  setIsCollModalOpen(true);
+                }}
+                style={{ color: '#0ea5e9' }}
+              >
+                <Plus size={16} />
+              </button>
+              <button
+                className="action-btn"
                 title="Éditer"
                 onClick={() => { setSelectedCategory(cat); setIsModalOpen(true); }}
               >
@@ -198,7 +267,54 @@ export function CategoriesTab() {
             </div>
           </td>
         </tr>
-        {isExpanded && hasChildren && cat.children.map((child: any) => renderTreeNode(child, depth + 1))}
+        {isExpanded && (
+          <>
+            {catChildren.map((child: any) => renderTreeNode(child, depth + 1))}
+            {catCollections.map((coll: any) => (
+              <tr key={coll.id} style={{ background: 'transparent' }}>
+                <td style={{ paddingLeft: `${(depth + 1) * 1.5}rem`, paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ display: 'inline-block', width: '16px' }} />
+                    <span style={{ color: '#0ea5e9', fontSize: '0.85rem' }}>◆ {coll.name}</span>
+                  </div>
+                </td>
+                <td></td>
+                <td>
+                  <code style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    color: 'var(--admin-text-muted)',
+                  }}>
+                    {coll.slug}
+                  </code>
+                </td>
+                <td>
+                  <span className="admin-badge badge-neutral">{coll._count?.products ?? 0}</span>
+                </td>
+                <td>
+                  <div className="admin-row-actions">
+                    <button
+                      className="action-btn"
+                      title="Éditer"
+                      onClick={() => { setSelectedCollection(coll); setIsCollModalOpen(true); }}
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="action-btn text-danger"
+                      title="Supprimer"
+                      onClick={() => handleDeleteCollection(coll.id)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </>
+        )}
       </React.Fragment>
     );
   };
@@ -213,6 +329,14 @@ export function CategoriesTab() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveCategory}
         allCategories={categories}
+      />
+
+      <CollectionFormModal
+        collection={selectedCollection}
+        isOpen={isCollModalOpen}
+        onClose={() => { setIsCollModalOpen(false); setSelectedCollection(null); }}
+        onSave={handleSaveCollection}
+        allCollections={collections}
       />
 
       {/* Custom Delete/Migrate Modal */}
@@ -280,7 +404,7 @@ export function CategoriesTab() {
               try {
                 const res = await api.fetchWithAuth('/categories/seed', { method: 'POST' });
                 setToast({ message: res.message, type: 'success' });
-                loadCategories();
+                loadData();
               } catch (error: any) {
                 setToast({ message: error.message || 'Erreur import', type: 'error' });
               }
@@ -294,6 +418,7 @@ export function CategoriesTab() {
               try {
                 const res = await api.fetchWithAuth('/collections/seed', { method: 'POST' });
                 setToast({ message: res.message, type: 'success' });
+                loadData();
               } catch (error: any) {
                 setToast({ message: error.message || 'Erreur import collections', type: 'error' });
               }

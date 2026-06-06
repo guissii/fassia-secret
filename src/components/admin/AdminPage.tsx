@@ -21,12 +21,11 @@ import { ProductsTab } from './ProductsTab';
 import { CategoriesTab } from './CategoriesTab';
 import { PromosTab } from './PromosTab';
 
-import { CollectionsTab } from './CollectionsTab';
 import { SettingsTab } from './SettingsTab';
 import { ServerTab } from './ServerTab';
 import { OfficialShopsTab } from './OfficialShopsTab';
 
-type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'collections' | 'promos' | 'official-shops' | 'settings' | 'server';
+type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'official-shops' | 'settings' | 'server';
 
 export function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -55,7 +54,6 @@ export function AdminPage() {
     { id: 'orders', label: 'Commandes', icon: ShoppingBag, badge: pendingOrdersCount },
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'categories', label: 'Catégories', icon: FolderTree },
-    { id: 'collections', label: 'Collections', icon: FolderTree },
     { id: 'promos', label: 'Promotions', icon: TicketPercent },
     { id: 'official-shops', label: 'Boutiques Off.', icon: Store },
     { id: 'settings', label: 'Paramètres', icon: Settings },
@@ -72,7 +70,6 @@ export function AdminPage() {
       case 'orders': return <OrdersTab />;
       case 'products': return <ProductsTab />;
       case 'categories': return <CategoriesTab />;
-      case 'collections': return <CollectionsTab />;
       case 'promos': return <PromosTab />;
       case 'official-shops': return <OfficialShopsTab />;
       case 'settings': return <SettingsTab />;
