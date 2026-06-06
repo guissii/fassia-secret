@@ -218,10 +218,6 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
                   role="option"
                   aria-selected={index === highlightedIndex}
                   onMouseEnter={() => setHighlightedIndex(index)}
-                  onClick={() => {
-                    setIsOpen(false);
-                    setQuery(product.name);
-                  }}
                 >
                   <img
                     src={product.image || '/images/placeholder.png'}
