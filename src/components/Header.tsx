@@ -17,12 +17,11 @@ import { SearchBar } from './SearchBar';
 import { useSiteConfig } from './SiteConfigContext';
 
 import {
-  desktopMenuCategories,
-  mobileDrawerCategories,
   mobileMenuItems,
   mobileQuickCategories,
   type DrawerItem
 } from '../data/menuData';
+import { useMenuCollections } from '../hooks/useMenuCollections';
 
 interface HeaderProps {
   onCartOpen: () => void;
@@ -32,6 +31,7 @@ interface HeaderProps {
 
 export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) {
   const { freeDeliveryThreshold } = useSiteConfig();
+  const { mobileDrawerCategories, desktopMenuCategories } = useMenuCollections();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -218,6 +218,7 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
         openCategory={openMobileCategory}
         setOpenCategory={setOpenMobileCategory}
         closeButtonRef={mobileMenuCloseButtonRef}
+        drawerCategories={mobileDrawerCategories}
       />
 
       {/* Main Header */}

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ChevronDown, Headphones, Leaf, Lock, ShoppingCart, Truck, X } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
-import { mobileDrawerCategories, mobileMenuItems, type DrawerItem } from '../data/menuData';
+import { mobileMenuItems, type DrawerItem } from '../data/menuData';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface MobileDrawerProps {
   openCategory: string | null;
   setOpenCategory: React.Dispatch<React.SetStateAction<string | null>>;
   closeButtonRef?: React.RefObject<HTMLButtonElement | null>;
+  drawerCategories?: { title: string; items: DrawerItem[] }[];
 }
 
 export function MobileDrawer({
@@ -21,9 +22,10 @@ export function MobileDrawer({
   openCategory,
   setOpenCategory,
   closeButtonRef,
+  drawerCategories = [],
 }: MobileDrawerProps) {
   const mobileMenuCategories = mobileMenuItems.map(({ label, Icon }) => {
-    const fromDrawer = mobileDrawerCategories.find((c) => c.title === label);
+    const fromDrawer = drawerCategories.find((c) => c.title === label);
     const items: DrawerItem[] = fromDrawer?.items ?? [];
 
     return { label, Icon, items };
