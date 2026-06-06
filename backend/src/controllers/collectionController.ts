@@ -25,7 +25,17 @@ export const getCollections = async (req: Request, res: Response) => {
       include: {
         _count: {
           select: { products: true }
-        }
+        },
+        children: {
+          include: {
+            _count: { select: { products: true } },
+            children: {
+              include: {
+                _count: { select: { products: true } },
+              },
+            },
+          },
+        },
       },
       orderBy: [
         { page: 'asc' },
@@ -96,10 +106,10 @@ export const getCollectionProducts = async (req: Request, res: Response) => {
 
 export const createCollection = async (req: Request, res: Response) => {
   try {
-    const { name, slug, description, image, page, order } = req.body;
+    const { name, slug, description, image, page, order, parentId } = req.body;
 
     const newCollection = await prisma.collection.create({
-      data: { name, slug, description, image, page: page || 'general', order: order || 0 },
+      data: { name, slug, description, image, page: page || 'general', order: order || 0, parentId: parentId || null },
     });
 
     await invalidateCollectionCache();
@@ -114,11 +124,11 @@ export const createCollection = async (req: Request, res: Response) => {
 export const updateCollection = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { name, slug, description, image, page, order } = req.body;
+    const { name, slug, description, image, page, order, parentId } = req.body;
 
     const updated = await prisma.collection.update({
       where: { id },
-      data: { name, slug, description, image, page, order },
+      data: { name, slug, description, image, page, order, parentId: parentId || null },
     });
 
     await invalidateCollectionCache();

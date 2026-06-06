@@ -7,6 +7,7 @@ interface CollectionFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (collection: Collection) => void;
+  allCollections?: Collection[];
 }
 
 function generateSlug(name: string): string {
@@ -18,11 +19,12 @@ function generateSlug(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export function CollectionFormModal({ collection, isOpen, onClose, onSave }: CollectionFormModalProps) {
+export function CollectionFormModal({ collection, isOpen, onClose, onSave, allCollections = [] }: CollectionFormModalProps) {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [page, setPage] = useState('general');
   const [order, setOrder] = useState(0);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [autoSlug, setAutoSlug] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -33,12 +35,14 @@ export function CollectionFormModal({ collection, isOpen, onClose, onSave }: Col
         setSlug(collection.slug);
         setPage(collection.page || 'general');
         setOrder(collection.order || 0);
+        setParentId((collection as any).parentId || null);
         setAutoSlug(false);
       } else {
         setName('');
         setSlug('');
         setPage('general');
         setOrder(0);
+        setParentId(null);
         setAutoSlug(true);
       }
     }
@@ -64,7 +68,8 @@ export function CollectionFormModal({ collection, isOpen, onClose, onSave }: Col
         image: collection?.image || '',
         page: page || 'general',
         order: order || 0,
-      });
+        parentId,
+      } as Collection);
       setLoading(false);
       onClose();
     }, 600);
@@ -145,6 +150,25 @@ export function CollectionFormModal({ collection, isOpen, onClose, onSave }: Col
                 onChange={e => setOrder(parseInt(e.target.value) || 0)}
                 min={0}
               />
+            </div>
+
+            <div className="form-group">
+              <label>Collection parente</label>
+              <select
+                className="admin-select"
+                value={parentId || ''}
+                onChange={e => setParentId(e.target.value || null)}
+                style={{ width: '100%' }}
+              >
+                <option value="">— Racine (aucune) —</option>
+                {allCollections
+                  .filter(c => c.id !== collection?.id)
+                  .map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+              </select>
             </div>
           </div>
 

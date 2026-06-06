@@ -92,12 +92,16 @@ model Collection {
   image       String?
   page        String    // e.g. "korean-beauty", "complements", "maquillage"
   order       Int       @default(0)
+  parentId    String?
+  parent      Collection? @relation("CollectionHierarchy", fields: [parentId], references: [id])
+  children    Collection[] @relation("CollectionHierarchy")
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([slug])
   @@index([page])
+  @@index([parentId])
 }
 
 model Order {

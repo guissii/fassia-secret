@@ -25,7 +25,17 @@ export const getCategories = async (req: Request, res: Response) => {
       include: {
         _count: {
           select: { products: true }
-        }
+        },
+        children: {
+          include: {
+            _count: { select: { products: true } },
+            children: {
+              include: {
+                _count: { select: { products: true } },
+              },
+            },
+          },
+        },
       },
       orderBy: [
         { page: 'asc' },
@@ -97,10 +107,10 @@ export const getCategoryProducts = async (req: Request, res: Response) => {
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const { name, nameAr, slug, description, image, page, order } = req.body;
+    const { name, nameAr, slug, description, image, page, order, parentId } = req.body;
 
     const newCategory = await prisma.category.create({
-      data: { name, nameAr, slug, description, image, page: page || 'general', order: order || 0 },
+      data: { name, nameAr, slug, description, image, page: page || 'general', order: order || 0, parentId: parentId || null },
     });
 
     await invalidateCategoryCache();
@@ -115,11 +125,11 @@ export const createCategory = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { name, nameAr, slug, description, image, page, order } = req.body;
+    const { name, nameAr, slug, description, image, page, order, parentId } = req.body;
 
     const updated = await prisma.category.update({
       where: { id },
-      data: { name, nameAr, slug, description, image, page, order },
+      data: { name, nameAr, slug, description, image, page, order, parentId: parentId || null },
     });
 
     await invalidateCategoryCache();
