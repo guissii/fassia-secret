@@ -22,6 +22,7 @@ export const getProducts = async (req: Request, res: Response) => {
     const isVisible = req.query.isVisible as string;
     const isEssential = req.query.isEssential as string;
     const isPromo = req.query.isPromo as string;
+    const isNew = req.query.isNew as string;
     const includeArchived = req.query.includeArchived as string;
     const koreanBeautyStep = req.query.koreanBeautyStep as string;
     const makeupStep = req.query.makeupStep as string;
@@ -200,7 +201,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid product ID' });
     }
 
-    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, isPromo, isNew, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
+    const { brand, name, nameAr, description, descriptionAr, price, oldPrice, promoPrice, wholesalePrice, bulkWholesalePrice, image, categoryIds, collectionIds, concerns, badge, stock, tags, isVisible, isArchived, isPromo, isNew, isEssential, koreanBeautyStep, supplementFocus, makeupStep } = req.body;
 
     // Check for duplicate product name (excluding current product)
     const existing = await prisma.product.findFirst({
