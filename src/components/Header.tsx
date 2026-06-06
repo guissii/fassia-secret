@@ -203,7 +203,7 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
             </button>
           </div>
           <Suspense fallback={<div className="search-placeholder">Chargement...</div>}>
-            <SearchBar inputRef={mobileSearchInputRef} />
+            <SearchBar inputRef={mobileSearchInputRef} onNavigate={closeMobileSearch} />
           </Suspense>
         </div>
       </div>

@@ -16,6 +16,7 @@ interface SearchResult {
 interface SearchBarProps {
   className?: string;
   inputRef?: RefObject<HTMLInputElement | null>;
+  onNavigate?: () => void;
 }
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -27,7 +28,7 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced;
 }
 
-export function SearchBar({ className = '', inputRef }: SearchBarProps) {
+export function SearchBar({ className = '', inputRef, onNavigate }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const ownInputRef = useRef<HTMLInputElement>(null);
@@ -218,6 +219,12 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
                   role="option"
                   aria-selected={index === highlightedIndex}
                   onMouseEnter={() => setHighlightedIndex(index)}
+                  onTouchStart={() => {
+                    onNavigate?.();
+                  }}
+                  onClick={() => {
+                    onNavigate?.();
+                  }}
                 >
                   <img
                     src={product.image || '/images/placeholder.png'}
