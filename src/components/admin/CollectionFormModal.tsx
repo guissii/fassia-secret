@@ -104,30 +104,6 @@ export function CollectionFormModal({ collection, isOpen, onClose, onSave, allCo
             </div>
 
             <div className="form-group">
-              <label>Slug URL</label>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  className="admin-input"
-                  value={slug}
-                  onChange={e => { setSlug(e.target.value); setAutoSlug(false); }}
-                  placeholder="corps-bain"
-                  style={{ flex: 1 }}
-                />
-                {!autoSlug && (
-                  <button
-                    type="button"
-                    className="admin-btn-outline"
-                    style={{ whiteSpace: 'nowrap', fontSize: '0.8rem' }}
-                    onClick={() => { setAutoSlug(true); setSlug(generateSlug(name)); }}
-                  >
-                    Auto
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="form-group">
               <label>Page associée</label>
               <input
                 type="text"
@@ -152,24 +128,6 @@ export function CollectionFormModal({ collection, isOpen, onClose, onSave, allCo
               />
             </div>
 
-            <div className="form-group">
-              <label>Collection parente</label>
-              <select
-                className="admin-select"
-                value={parentId || ''}
-                onChange={e => setParentId(e.target.value || null)}
-                style={{ width: '100%' }}
-              >
-                <option value="">— Racine (aucune) —</option>
-                {allCollections
-                  .filter(c => c.id !== collection?.id)
-                  .map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
           </div>
 
           <div className="admin-modal-actions">
