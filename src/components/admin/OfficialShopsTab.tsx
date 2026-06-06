@@ -146,12 +146,12 @@ export function OfficialShopsTab() {
             </thead>
             <tbody>
               {filteredShops.length === 0 ? (
-                <tr>
+                <tr style={{ background: 'transparent' }}>
                   <td colSpan={2} className="text-center text-muted">Aucune marque dans cette catégorie</td>
                 </tr>
               ) : (
                 filteredShops.map(shop => (
-                  <tr key={shop.id}>
+                  <tr key={shop.id} style={{ background: 'transparent' }}>
                     <td>
                       {editingId === shop.id ? (
                         <input
