@@ -1,6 +1,7 @@
 import { Search, X, Loader2 } from 'lucide-react';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import type { RefObject } from 'react';
 import { productHref } from '../lib/productSlug';
 
@@ -179,13 +180,17 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
           role="listbox"
         >
           {suggestions.map((product, index) => (
-            <div
+            <Link
               key={product.id}
+              href={productHref(product)}
               className={`search-suggestion ${index === highlightedIndex ? 'highlighted' : ''}`}
               role="option"
               aria-selected={index === highlightedIndex}
               onMouseEnter={() => setHighlightedIndex(index)}
-              onClick={() => handleSelect(product)}
+              onClick={() => {
+                setIsOpen(false);
+                setQuery(product.name);
+              }}
             >
               <img src={product.image} alt="" className="search-suggestion-img" loading="lazy" />
               <div className="search-suggestion-text">
@@ -195,7 +200,7 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
                 <div className="search-suggestion-brand">{product.brand}</div>
               </div>
               <div className="search-suggestion-price">{product.price.toFixed(2)} MAD</div>
-            </div>
+            </Link>
           ))}
           <div className="search-dropdown-footer">
             <button
