@@ -43,8 +43,10 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
 
   const debouncedQuery = useDebounce(query, 150);
 
+  const MIN_CHARS = 2;
+
   const fetchSuggestions = useCallback(async (q: string) => {
-    if (!q.trim() || q.trim().length < 1) {
+    if (!q.trim() || q.trim().length < MIN_CHARS) {
       setSuggestions([]);
       setIsOpen(false);
       return;
@@ -108,10 +110,16 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
     if (!isOpen) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+      const next = (highlightedIndex + 1) % suggestions.length;
+      setHighlightedIndex(next);
+      setQuery(suggestions[next].name);
+      scrollSuggestionIntoView(next);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setHighlightedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
+      const prev = (highlightedIndex - 1 + suggestions.length) % suggestions.length;
+      setHighlightedIndex(prev);
+      setQuery(suggestions[prev].name);
+      scrollSuggestionIntoView(prev);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
@@ -122,6 +130,11 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
     } else if (e.key === 'Escape') {
       setIsOpen(false);
     }
+  };
+
+  const scrollSuggestionIntoView = (index: number) => {
+    const el = document.querySelector(`[data-suggestion-index="${index}"]`);
+    el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   };
 
   const highlightMatch = (text: string, match: string) => {
@@ -143,7 +156,9 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => {
-            if (suggestions.length > 0) setIsOpen(true);
+            if (suggestions.length > 0 || (query.trim().length >= MIN_CHARS && isLoading)) {
+              setIsOpen(true);
+            }
           }}
           placeholder="Rechercher un produit, une marque..."
           aria-label="Rechercher un produit, une marque"
@@ -173,46 +188,68 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
         </button>
       </form>
 
-      {isOpen && suggestions.length > 0 && (
+      {isOpen && (
         <div
           id="search-suggestions"
           className="search-dropdown"
           role="listbox"
         >
-          {suggestions.map((product, index) => (
-            <Link
-              key={product.id}
-              href={productHref(product)}
-              className={`search-suggestion ${index === highlightedIndex ? 'highlighted' : ''}`}
-              role="option"
-              aria-selected={index === highlightedIndex}
-              onMouseEnter={() => setHighlightedIndex(index)}
-              onClick={() => {
-                setIsOpen(false);
-                setQuery(product.name);
-              }}
-            >
-              <img src={product.image} alt="" className="search-suggestion-img" loading="lazy" />
-              <div className="search-suggestion-text">
-                <div className="search-suggestion-name">
-                  {highlightMatch(product.name, debouncedQuery)}
-                </div>
-                <div className="search-suggestion-brand">{product.brand}</div>
+          {isLoading ? (
+            <div className="search-dropdown-empty">
+              <Loader2 size={20} className="search-spinner-inline" />
+              <span>Recherche en cours...</span>
+            </div>
+          ) : suggestions.length === 0 ? (
+            <div className="search-dropdown-empty">
+              {query.trim().length >= MIN_CHARS ? (
+                <span>Aucun produit trouvé pour &quot;{query.trim()}&quot;</span>
+              ) : (
+                <span>Saisissez au moins {MIN_CHARS} caractères</span>
+              )}
+            </div>
+          ) : (
+            <>
+              {suggestions.map((product, index) => (
+                <Link
+                  key={product.id}
+                  href={productHref(product)}
+                  data-suggestion-index={index}
+                  className={`search-suggestion ${index === highlightedIndex ? 'highlighted' : ''}`}
+                  role="option"
+                  aria-selected={index === highlightedIndex}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    setQuery(product.name);
+                  }}
+                >
+                  <img
+                    src={product.image || '/images/placeholder.png'}
+                    alt=""
+                    className="search-suggestion-img"
+                    loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png'; }}
+                  />
+                  <div className="search-suggestion-text">
+                    <div className="search-suggestion-name">
+                      {highlightMatch(product.name, debouncedQuery)}
+                    </div>
+                    <div className="search-suggestion-brand">{product.brand}</div>
+                  </div>
+                  <div className="search-suggestion-price">{product.price.toFixed(2)} MAD</div>
+                </Link>
+              ))}
+              <div className="search-dropdown-footer">
+                <Link
+                  href={`/boutique?q=${encodeURIComponent(query.trim())}`}
+                  className="search-see-all"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Voir tous les résultats pour &quot;{query.trim()}&quot;
+                </Link>
               </div>
-              <div className="search-suggestion-price">{product.price.toFixed(2)} MAD</div>
-            </Link>
-          ))}
-          <div className="search-dropdown-footer">
-            <button
-              className="search-see-all"
-              onClick={() => {
-                setIsOpen(false);
-                router.push(`/boutique?q=${encodeURIComponent(query.trim())}`);
-              }}
-            >
-              Voir tous les résultats pour &quot;{query.trim()}&quot;
-            </button>
-          </div>
+            </>
+          )}
         </div>
       )}
     </div>
