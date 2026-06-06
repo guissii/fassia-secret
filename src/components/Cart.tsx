@@ -266,88 +266,85 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
             </button>
           </div>
         ) : checkoutMode ? (
-          <div className="cart-checkout-form-container" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-            <button type="button" onClick={() => setCheckoutMode(false)} style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <div className="cart-checkout-form-container" style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+            <button type="button" onClick={() => setCheckoutMode(false)} style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.8rem' }}>
               ← Retour au panier
             </button>
-            <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Nom & Prénom *</label>
-                <input required type="text" value={formData.customerName} onChange={e => setFormData({...formData, customerName: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
+            <form onSubmit={handleCheckoutSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, marginBottom: '2px' }}>Nom & Prénom</label>
+                  <input type="text" value={formData.customerName} onChange={e => setFormData({...formData, customerName: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.85rem' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, marginBottom: '2px' }}>Téléphone *</label>
+                  <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="06..." style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.85rem' }} />
+                </div>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Téléphone *</label>
-                <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="06..." style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Ville *</label>
-                <input required type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Adresse complète *</label>
-                <textarea required value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={3} style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', resize: 'vertical' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Notes (optionnel)</label>
-                <textarea value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} rows={2} placeholder="Instructions spéciales de livraison..." style={{ width: '100%', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', resize: 'vertical' }} />
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, marginBottom: '2px' }}>Ville *</label>
+                  <input required type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.85rem' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, marginBottom: '2px' }}>Adresse *</label>
+                  <input required type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Rue, quartier..." style={{ width: '100%', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.85rem' }} />
+                </div>
               </div>
 
-              {/* Code Promo dans le formulaire */}
-              <div style={{ marginTop: '5px' }}>
+              {/* Code Promo */}
+              <div style={{ marginTop: '4px' }}>
                 {activePromo ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Tag size={16} color="#10b981" />
-                      <span style={{ fontWeight: 600, color: '#10b981' }}>Code promo actif : {activePromo.code}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Tag size={14} color="#10b981" />
+                      <span style={{ fontWeight: 600, color: '#10b981', fontSize: '0.8rem' }}>{activePromo.code}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => { setActivePromo(null); setPromoCode(''); }}
-                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.85rem' }}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.75rem' }}
                     >
                       Retirer
                     </button>
                   </div>
                 ) : (
-                  <>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '5px' }}>Code Promo</label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        type="text"
-                        placeholder="Entrez votre code promo"
-                        value={promoCode}
-                        onChange={e => { setPromoCode(e.target.value); setPromoError(''); }}
-                        disabled={promoLoading}
-                        style={{ flex: 1, padding: '10px', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleApplyPromo}
-                        disabled={promoLoading}
-                        style={{ padding: '0 15px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', opacity: promoLoading ? 0.6 : 1 }}
-                      >
-                        {promoLoading ? '...' : 'Appliquer'}
-                      </button>
-                    </div>
-                    {promoError && (
-                      <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '6px', marginBottom: 0 }}>{promoError}</p>
-                    )}
-                  </>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      placeholder="Code promo"
+                      value={promoCode}
+                      onChange={e => { setPromoCode(e.target.value); setPromoError(''); }}
+                      disabled={promoLoading}
+                      style={{ flex: 1, padding: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.8rem' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyPromo}
+                      disabled={promoLoading}
+                      style={{ padding: '0 12px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 500, fontSize: '0.75rem', cursor: 'pointer', opacity: promoLoading ? 0.6 : 1 }}
+                    >
+                      {promoLoading ? '...' : 'OK'}
+                    </button>
+                  </div>
+                )}
+                {promoError && (
+                  <p style={{ color: '#ef4444', fontSize: '0.7rem', marginTop: '4px', marginBottom: 0 }}>{promoError}</p>
                 )}
               </div>
               
-              <div style={{ marginTop: '10px', padding: '15px', background: '#f9fafb', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span>Total à payer</span>
-                  <span style={{ fontWeight: 600 }}>{total.toFixed(2)} MAD</span>
+              <div style={{ marginTop: '4px', padding: '10px', background: '#f9fafb', borderRadius: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.85rem' }}>Total</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{total.toFixed(2)} MAD</span>
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#6b7280', textAlign: 'center' }}>
-                  Paiement à la livraison (Cash on Delivery)
+                <div style={{ fontSize: '0.7rem', color: '#6b7280', textAlign: 'center', marginTop: '2px' }}>
+                  Paiement à la livraison
                 </div>
               </div>
               
-              <button type="submit" disabled={isSubmitting} style={{ marginTop: '10px', width: '100%', padding: '0.7rem', background: '#25D366', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.3s ease', opacity: isSubmitting ? 0.7 : 1 }}>
-                {isSubmitting ? <Loader2 size={16} className="animate-spin" style={{ margin: '0 auto' }} /> : <><MessageCircle size={18} /> COMMANDER VIA WHATSAPP</>}
+              <button type="submit" disabled={isSubmitting} style={{ width: '100%', padding: '0.6rem', background: '#25D366', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer', opacity: isSubmitting ? 0.7 : 1 }}>
+                {isSubmitting ? <Loader2 size={14} className="animate-spin" style={{ margin: '0 auto' }} /> : <><MessageCircle size={16} /> COMMANDER VIA WHATSAPP</>}
               </button>
             </form>
           </div>
