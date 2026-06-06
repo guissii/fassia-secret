@@ -169,20 +169,20 @@ export function OfficialShopsTab() {
                     <td style={{ textAlign: 'right' }}>
                       {editingId === shop.id ? (
                         <>
-                          <button className="admin-icon-btn" onClick={() => handleUpdate(shop.id)} title="Enregistrer" style={{ borderRadius: 0 }}>
-                            <Save size={16} />
+                          <button className="admin-icon-btn" onClick={() => handleUpdate(shop.id)} title="Enregistrer" style={{ borderRadius: '4px', background: '#e10074', color: '#fff', border: 'none', padding: '4px 8px', marginRight: '4px' }}>
+                            <Save size={16} color="#fff" />
                           </button>
-                          <button className="admin-icon-btn" onClick={() => { setEditingId(null); setEditName(''); }} title="Annuler" style={{ borderRadius: 0 }}>
-                            <X size={16} />
+                          <button className="admin-icon-btn" onClick={() => { setEditingId(null); setEditName(''); }} title="Annuler" style={{ borderRadius: '4px', background: '#374151', color: '#fff', border: 'none', padding: '4px 8px' }}>
+                            <X size={16} color="#fff" />
                           </button>
                         </>
                       ) : (
                         <>
-                          <button className="admin-icon-btn" onClick={() => { setEditingId(shop.id); setEditName(shop.name); }} title="Modifier" style={{ borderRadius: 0 }}>
-                            <Pencil size={16} />
+                          <button className="admin-icon-btn" onClick={() => { setEditingId(shop.id); setEditName(shop.name); }} title="Modifier" style={{ borderRadius: '4px', background: '#e10074', color: '#fff', border: 'none', padding: '4px 8px', marginRight: '4px' }}>
+                            <Pencil size={16} color="#fff" />
                           </button>
-                          <button className="admin-icon-btn danger" onClick={() => handleDelete(shop.id)} title="Supprimer" style={{ borderRadius: 0 }}>
-                            <Trash2 size={16} />
+                          <button className="admin-icon-btn danger" onClick={() => handleDelete(shop.id)} title="Supprimer" style={{ borderRadius: '4px', background: '#dc2626', color: '#fff', border: 'none', padding: '4px 8px' }}>
+                            <Trash2 size={16} color="#fff" />
                           </button>
                         </>
                       )}
