@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Store, Truck, Bell, Share2, Users, Plus } from 'lucide-react';
+import { Save, Store, Truck, Share2, Users, Plus } from 'lucide-react';
 import { delay } from './mockData';
 import { Toast, ToastType } from './shared';
 
@@ -14,18 +14,15 @@ export function SettingsTab() {
     storePhone: '+212 6 00 00 00 00',
     deliveryFee: 35,
     freeDeliveryThreshold: 500,
-    notifyEmail: true,
-    notifyWhatsapp: true,
-    whatsappNumber: '+212 6 00 00 00 00',
     instagram: 'https://instagram.com/fassiasecret',
     facebook: 'https://facebook.com/fassiasecret',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     setSettings(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+      [name]: type === 'number' ? Number(value) : value,
     }));
   };
 
@@ -112,60 +109,6 @@ export function SettingsTab() {
           </div>
         </div>
 
-        {/* Notifications */}
-        <div className="admin-card">
-          <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Bell size={20} className="text-primary" /> Notifications
-            </h3>
-          </div>
-          
-          <div className="form-col" style={{ gap: '1.5rem' }}>
-            <div className="form-group toggle-group">
-              <label className="toggle-label">
-                <div>
-                  <span style={{ fontWeight: 500 }}>Notifications Email</span>
-                  <p className="text-muted text-sm" style={{ margin: 0 }}>Recevoir un email pour chaque nouvelle commande</p>
-                </div>
-                <div className="switch-wrapper">
-                  <input type="checkbox" name="notifyEmail" checked={settings.notifyEmail} onChange={handleChange} />
-                  <span className="slider round"></span>
-                </div>
-              </label>
-            </div>
-            
-            <div className="form-group toggle-group">
-              <label className="toggle-label">
-                <div>
-                  <span style={{ fontWeight: 500 }}>Notifications WhatsApp</span>
-                  <p className="text-muted text-sm" style={{ margin: 0 }}>Recevoir un message pour chaque nouvelle commande</p>
-                </div>
-                <div className="switch-wrapper">
-                  <input type="checkbox" name="notifyWhatsapp" checked={settings.notifyWhatsapp} onChange={handleChange} />
-                  <span className="slider round"></span>
-                </div>
-              </label>
-            </div>
-
-            {settings.notifyWhatsapp && (
-              <div className="form-group" style={{ paddingLeft: '1rem', borderLeft: '2px solid rgba(255,255,255,0.1)' }}>
-                <label>Numéro WhatsApp de réception</label>
-                <input type="text" className="admin-input" name="whatsappNumber" value={settings.whatsappNumber} onChange={handleChange} />
-              </div>
-            )}
-            
-            <div>
-              <button 
-                className="admin-btn-primary" 
-                onClick={() => handleSave('Notifications')}
-                disabled={loading}
-              >
-                <Save size={16} /> Sauvegarder
-              </button>
-            </div>
-          </div>
-        </div>
-        
         {/* Réseaux Sociaux */}
         <div className="admin-card">
           <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
