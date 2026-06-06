@@ -25,26 +25,6 @@ export function Footer() {
           </div>
 
           <div className="footer-col">
-            <h4 className="mb-md">Liens Rapides</h4>
-            <ul className="footer-links">
-              <li><a href="#">Conditions de livraison</a></li>
-              <li><a href="#">Mentions légales</a></li>
-              <li><a href="#">Conditions générales</a></li>
-              <li><a href="#">Suivi de commande</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4 className="mb-md">Mon Compte</h4>
-            <ul className="footer-links">
-              <li><a href="#">Informations personnelles</a></li>
-              <li><a href="#">Historique des commandes</a></li>
-              <li><a href="#">Mes adresses</a></li>
-              <li><a href="#">Liste de souhaits</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
             <h4 className="mb-md">Contactez-nous</h4>
             <div className="footer-map" aria-label="Carte - localisation">
               <iframe
