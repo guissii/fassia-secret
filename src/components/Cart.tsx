@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { X, Minus, Plus, ShoppingBag, Leaf, ArrowRight, Trash2, ShieldCheck, Truck, CheckCircle2, Loader2, Tag, MessageCircle } from 'lucide-react';
 import { publicAssetUrl } from '../lib/publicUrl';
 import { useCart } from './CartContext';
+import { useSiteConfig } from './SiteConfigContext';
 
 export interface CartItem {
   id: number;
@@ -23,9 +24,6 @@ interface CartProps {
   onUpdateQuantity: (id: number, quantity: number) => void;
   onRemoveItem: (id: number) => void;
 }
-
-const SHIPPING_THRESHOLD = 500;
-const SHIPPING_COST = 35;
 
 function getEffectivePrice(
   item: CartItem,
@@ -61,6 +59,7 @@ function getEffectivePrice(
 }
 
 export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: CartProps) {
+  const { deliveryFee, freeDeliveryThreshold } = useSiteConfig();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const waLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -85,10 +84,10 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
   const subtotal = lineItems.reduce((sum, item) => sum + item.effectivePrice * item.quantity, 0);
   const originalSubtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discountAmount = originalSubtotal - subtotal;
-  const isFreeShipping = subtotal >= SHIPPING_THRESHOLD;
-  const shipping = isFreeShipping ? 0 : SHIPPING_COST;
+  const isFreeShipping = subtotal >= freeDeliveryThreshold;
+  const shipping = isFreeShipping ? 0 : deliveryFee;
   const total = subtotal + shipping;
-  const progressPct = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
+  const progressPct = Math.min((subtotal / freeDeliveryThreshold) * 100, 100);
 
   // Reset states when cart opens/closes
   useEffect(() => {
@@ -166,7 +165,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
         message += `💰 *Remise:* -${discountAmount.toFixed(2)} MAD\n`;
       }
     }
-    message += `🚚 *Livraison:* ${isFreeShipping ? 'GRATUITE' : SHIPPING_COST.toFixed(2) + ' MAD'}\n`;
+    message += `🚚 *Livraison:* ${isFreeShipping ? 'GRATUITE' : deliveryFee.toFixed(2) + ' MAD'}\n`;
     message += `💳 *Total:* ${total.toFixed(2)} MAD\n\n`;
     message += `🫰 Merci de confirmer la disponibilité 🌸`;
 
@@ -363,7 +362,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                     </span>
                   ) : (
                     <span>
-                      Plus que <strong>{Math.max(0, SHIPPING_THRESHOLD - subtotal).toFixed(2)} MAD</strong> pour la livraison gratuite
+                      Plus que <strong>{Math.max(0, freeDeliveryThreshold - subtotal).toFixed(2)} MAD</strong> pour la livraison gratuite
                     </span>
                   )}
                 </div>
@@ -411,7 +410,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
                   <div className="cart-summary-row">
                     <span>Livraison</span>
                     <span className={isFreeShipping ? 'cart-free-shipping-label' : ''}>
-                      {isFreeShipping ? 'GRATUITE' : `${SHIPPING_COST.toFixed(2)} MAD`}
+                      {isFreeShipping ? 'GRATUITE' : `${deliveryFee.toFixed(2)} MAD`}
                     </span>
                   </div>
                   <div className="cart-summary-divider" />

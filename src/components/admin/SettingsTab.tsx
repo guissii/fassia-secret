@@ -24,7 +24,7 @@ export function SettingsTab() {
     storeEmail: 'contact@fassiasecret.com',
     storePhone: '+212 6 00 00 00 00',
     deliveryFee: 35,
-    freeDeliveryThreshold: 500,
+    freeDeliveryThreshold: 800,
     instagram: 'https://instagram.com/fassiasecret',
     facebook: 'https://facebook.com/fassiasecret',
   });

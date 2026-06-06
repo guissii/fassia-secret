@@ -4,6 +4,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { Cart } from './Cart';
 import { CartProvider, useCart } from './CartContext';
+import { SiteConfigProvider } from './SiteConfigContext';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { isCartOpen, setIsCartOpen, cartItems, updateQuantity, removeItem, totalCartCount } = useCart();
@@ -32,8 +33,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <CartProvider>
-      <LayoutContent>{children}</LayoutContent>
-    </CartProvider>
+    <SiteConfigProvider>
+      <CartProvider>
+        <LayoutContent>{children}</LayoutContent>
+      </CartProvider>
+    </SiteConfigProvider>
   );
 }

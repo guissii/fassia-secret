@@ -14,6 +14,7 @@ import {
 import { publicAssetUrl } from '../lib/publicUrl';
 import { MobileDrawer } from './MobileDrawer';
 import { SearchBar } from './SearchBar';
+import { useSiteConfig } from './SiteConfigContext';
 
 import {
   desktopMenuCategories,
@@ -30,6 +31,7 @@ interface HeaderProps {
 }
 
 export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) {
+  const { freeDeliveryThreshold } = useSiteConfig();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -144,7 +146,7 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
             <div className="top-info-track">
               <div className="top-info-item">
                 <Truck size={16} className="top-info-icon" />
-                <span>Livraison gratuite dès 400 MAD d'achat</span>
+                <span>Livraison gratuite dès {freeDeliveryThreshold} MAD d&apos;achat</span>
               </div>
               <div className="top-info-sep" />
               <div className="top-info-item">
@@ -155,7 +157,7 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
               <div className="top-info-sep" />
               <div className="top-info-item">
                 <Truck size={16} className="top-info-icon" />
-                <span>Livraison gratuite dès 400 MAD d'achat</span>
+                <span>Livraison gratuite dès {freeDeliveryThreshold} MAD d&apos;achat</span>
               </div>
               <div className="top-info-sep" />
               <div className="top-info-item">

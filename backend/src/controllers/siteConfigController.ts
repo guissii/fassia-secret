@@ -5,7 +5,7 @@ export const getSiteConfig = async (req: Request, res: Response) => {
   try {
     let config = await prisma.siteConfig.findFirst();
     if (!config) {
-      config = await prisma.siteConfig.create({ data: {} });
+      config = await prisma.siteConfig.create({ data: { freeDeliveryThreshold: 800 } });
     }
     res.json({ config });
   } catch (error) {

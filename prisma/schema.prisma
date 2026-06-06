@@ -192,7 +192,7 @@ model SiteConfig {
   storeEmail            String @default("contact@fassiasecret.com")
   storePhone            String @default("+212 6 00 00 00 00")
   deliveryFee           Int    @default(35)
-  freeDeliveryThreshold Int    @default(500)
+  freeDeliveryThreshold Int    @default(800)
   instagram             String @default("https://instagram.com/fassiasecret")
   facebook              String @default("https://facebook.com/fassiasecret")
   updatedAt             DateTime @updatedAt
