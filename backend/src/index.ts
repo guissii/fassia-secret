@@ -19,6 +19,7 @@ import serverRoutes from './routes/serverRoutes';
 import collectionRoutes from './routes/collectionRoutes';
 import statsRoutes from './routes/statsRoutes';
 import officialShopRoutes from './routes/officialShopRoutes';
+import siteConfigRoutes from './routes/siteConfigRoutes';
 
 dotenv.config();
 
@@ -76,6 +77,7 @@ function createApp() {
   app.use('/api/server', serverRoutes);
   app.use('/api/collections', collectionRoutes);
   app.use('/api/official-shops', officialShopRoutes);
+  app.use('/api/site-config', siteConfigRoutes);
   app.use('/api', statsRoutes);
 
   return app;
