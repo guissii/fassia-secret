@@ -2,6 +2,7 @@ import { Search, X, Loader2 } from 'lucide-react';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { RefObject } from 'react';
+import { productHref } from '../lib/productSlug';
 
 interface SearchResult {
   id: number;
@@ -99,7 +100,7 @@ export function SearchBar({ className = '', inputRef }: SearchBarProps) {
   const handleSelect = (product: SearchResult) => {
     setIsOpen(false);
     setQuery(product.name);
-    router.push(`/produit/${product.id}`);
+    router.push(productHref(product));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
