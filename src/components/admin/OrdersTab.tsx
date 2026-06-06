@@ -70,9 +70,14 @@ export function OrdersTab() {
     setToast({ message: "Synchronisé avec Google Sheets", type: 'success' });
   };
 
-  const handleDelete = (id: string) => {
-    setOrders(prev => prev.filter(o => o.id !== id));
-    setToast({ message: "Commande supprimée", type: 'info' });
+  const handleDelete = async (id: string) => {
+    try {
+      await api.fetchWithAuth(`/orders/${id}`, { method: 'DELETE' });
+      setOrders(prev => prev.filter(o => o.id !== id));
+      setToast({ message: "Commande supprimée", type: 'success' });
+    } catch {
+      setToast({ message: "Erreur lors de la suppression", type: 'error' });
+    }
   };
 
   const handleExport = async () => {

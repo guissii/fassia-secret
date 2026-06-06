@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getOrders, createOrder } from '../controllers/orderController';
+import { getOrders, createOrder, deleteOrder } from '../controllers/orderController';
 import { authenticateAdmin } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { orderSchema } from '../validators';
@@ -11,5 +11,8 @@ router.post('/', validate(orderSchema), createOrder);
 
 // Protected route for admin to view orders (Security Fix applied)
 router.get('/', authenticateAdmin, getOrders);
+
+// Protected route for admin to delete orders
+router.delete('/:id', authenticateAdmin, deleteOrder);
 
 export default router;

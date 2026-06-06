@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, DollarSign, Eye, Users, Clock, Loader } from 'lucide-react';
+import { ShoppingBag, DollarSign, Eye, Clock, Loader } from 'lucide-react';
 import { api, Stats, Order, AdminProduct, getOrderStatusLabel, getOrderStatusColor, Skeleton } from './mockData';
 import { publicAssetUrl } from '../../lib/publicUrl';
 
@@ -9,29 +9,35 @@ export function DashboardTab() {
   const [popularProducts, setPopularProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [statsData, ordersData, productsData] = await Promise.all([
+        api.getStats(),
+        api.getOrders(),
+        api.getProducts()
+      ]);
+      
+      setStats(statsData);
+      // Sort orders by date descending (already mock sorted, just take first 5)
+      setRecentOrders(ordersData.slice(0, 5));
+      // Sort products by salesCount descending
+      setPopularProducts([...productsData].sort((a, b) => b.salesCount - a.salesCount).slice(0, 5));
+    } catch (error) {
+      console.error("Failed to load dashboard data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const [statsData, ordersData, productsData] = await Promise.all([
-          api.getStats(),
-          api.getOrders(),
-          api.getProducts()
-        ]);
-        
-        setStats(statsData);
-        // Sort orders by date descending (already mock sorted, just take first 5)
-        setRecentOrders(ordersData.slice(0, 5));
-        // Sort products by salesCount descending
-        setPopularProducts([...productsData].sort((a, b) => b.salesCount - a.salesCount).slice(0, 5));
-      } catch (error) {
-        console.error("Failed to load dashboard data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const onFocus = () => loadData();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, []);
 
   const formatMAD = (amount: number) => {
@@ -93,16 +99,6 @@ export function DashboardTab() {
           <div className="stat-content">
             <span className="stat-label">Vues Totales</span>
             <span className="stat-value">{stats?.totalViews.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div className="admin-stat-card">
-          <div className="stat-icon-wrapper" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' }}>
-            <Users size={24} />
-          </div>
-          <div className="stat-content">
-            <span className="stat-label">Visiteurs Uniques</span>
-            <span className="stat-value">{stats?.uniqueVisitors.toLocaleString()}</span>
           </div>
         </div>
 
