@@ -11,7 +11,8 @@ interface MobileDrawerProps {
   openCategory: string | null;
   setOpenCategory: React.Dispatch<React.SetStateAction<string | null>>;
   closeButtonRef?: React.RefObject<HTMLButtonElement | null>;
-  drawerCategories?: { title: string; items: DrawerItem[] }[];
+  drawerCategories?: { title: string; page: string; items: DrawerItem[] }[];
+  pageLabelMap?: Record<string, string>;
 }
 
 export function MobileDrawer({
@@ -23,12 +24,14 @@ export function MobileDrawer({
   setOpenCategory,
   closeButtonRef,
   drawerCategories = [],
+  pageLabelMap = {},
 }: MobileDrawerProps) {
-  const mobileMenuCategories = mobileMenuItems.map(({ label, Icon }) => {
-    const fromDrawer = drawerCategories.find((c) => c.title === label);
+  const mobileMenuCategories = mobileMenuItems.map(({ label, page, Icon }) => {
+    const fromDrawer = drawerCategories.find((c) => c.page === page);
     const items: DrawerItem[] = fromDrawer?.items ?? [];
+    const dynamicLabel = pageLabelMap[page] || label;
 
-    return { label, Icon, items };
+    return { label: dynamicLabel, page, Icon, items };
   });
 
   return (
@@ -67,22 +70,22 @@ export function MobileDrawer({
       </div>
 
       <ul className="mobile-menu-list">
-        {mobileMenuCategories.map(({ label, Icon, items }) => (
-          <li key={label} className="mobile-menu-list-item">
+        {mobileMenuCategories.map(({ label, page, Icon, items }) => (
+          <li key={page} className="mobile-menu-list-item">
             <button
               className="mobile-menu-link"
               type="button"
-              onClick={() => setOpenCategory((v) => (v === label ? null : label))}
-              aria-expanded={openCategory === label}
+              onClick={() => setOpenCategory((v) => (v === page ? null : page))}
+              aria-expanded={openCategory === page}
             >
               <span className="mobile-menu-link-left">
                 <Icon size={20} className="mobile-menu-link-icon" />
                 <span className="mobile-menu-link-label">{label}</span>
               </span>
-              <ChevronDown size={18} className={`mobile-menu-link-chevron ${openCategory === label ? 'open' : ''}`} />
+              <ChevronDown size={18} className={`mobile-menu-link-chevron ${openCategory === page ? 'open' : ''}`} />
             </button>
 
-            <div className={`mobile-submenu ${openCategory === label ? 'open' : ''}`}>
+            <div className={`mobile-submenu ${openCategory === page ? 'open' : ''}`}>
               {items.map((item) => (
                 <Link
                   key={item.label}

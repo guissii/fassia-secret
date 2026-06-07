@@ -31,7 +31,7 @@ interface HeaderProps {
 
 export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) {
   const { freeDeliveryThreshold } = useSiteConfig();
-  const { mobileDrawerCategories, desktopMenuCategories } = useMenuCollections();
+  const { mobileDrawerCategories, desktopMenuCategories, pageLabelMap } = useMenuCollections();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -215,6 +215,7 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
         setOpenCategory={setOpenMobileCategory}
         closeButtonRef={mobileMenuCloseButtonRef}
         drawerCategories={mobileDrawerCategories}
+        pageLabelMap={pageLabelMap}
       />
 
       {/* Main Header */}

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
 export type DrawerItem = { label: string; href: string };
-export type DrawerCategory = { title: string; items: DrawerItem[] };
+export type DrawerCategory = { title: string; page: string; items: DrawerItem[] };
 
-const PAGE_LABEL_MAP: Record<string, string> = {
+// Static fallback for pages not yet in DB
+const STATIC_FALLBACK: Record<string, string> = {
   'dermo-corner': 'DERMO-CORNER',
   'k-beauty': 'K-BEAUTY',
   'corps': 'CORPS',
@@ -24,23 +25,20 @@ const PAGE_LABEL_MAP: Record<string, string> = {
   'premium-hair-care': 'PREMIUM HAIR CARE',
 };
 
-const LABEL_PAGE_MAP: Record<string, string> = Object.fromEntries(
-  Object.entries(PAGE_LABEL_MAP).map(([page, label]) => [label, page])
-);
-
-function buildDrawerCategories(collections: any[]): DrawerCategory[] {
-  const grouped: Record<string, { name: string; slug: string; order: number }[]> = {};
+function buildDrawerCategories(collections: any[], pageLabelMap: Record<string, string>): DrawerCategory[] {
+  const grouped: Record<string, { page: string; name: string; slug: string; order: number }[]> = {};
 
   collections
     .filter((c: any) => !c.parentId)
     .forEach((c: any) => {
-      const label = PAGE_LABEL_MAP[c.page] || c.page;
+      const label = pageLabelMap[c.page] || STATIC_FALLBACK[c.page] || c.page;
       if (!grouped[label]) grouped[label] = [];
-      grouped[label].push({ name: c.name, slug: c.slug, order: c.order ?? 0 });
+      grouped[label].push({ page: c.page, name: c.name, slug: c.slug, order: c.order ?? 0 });
     });
 
   return Object.entries(grouped).map(([title, items]) => ({
     title,
+    page: items[0]?.page || '',
     items: items
       .sort((a, b) => a.order - b.order)
       .map((item) => ({
@@ -53,16 +51,16 @@ function buildDrawerCategories(collections: any[]): DrawerCategory[] {
 export type DesktopCategoryItem = { label: string; slug: string };
 export type DesktopCategory = { title: string; items: DesktopCategoryItem[] };
 
-function buildDesktopCategories(collections: any[]): DesktopCategory[] {
-  const drawer = buildDrawerCategories(collections);
-  const desktopTitles = [
-    'CORPS', 'VISAGE', 'CHEVEUX', 'HYGIÈNE DENTAIRE', 'MAQUILLAGE',
-    'HYGIÈNE & INTIMITÉ', 'SANTÉ', 'HOMMES', 'COMPLEMENTS ALIMENTAIRES', 'PREOCCUPATIONS',
+function buildDesktopCategories(collections: any[], pageLabelMap: Record<string, string>): DesktopCategory[] {
+  const drawer = buildDrawerCategories(collections, pageLabelMap);
+  const desktopPages = [
+    'corps', 'visage', 'cheveux', 'hygiene-dentaire', 'maquillage',
+    'hygiene-intimite', 'sante', 'hommes', 'complements-alimentaires', 'preoccupations',
   ];
-  return desktopTitles
-    .map((title) => {
-      const found = drawer.find((c) => c.title === title);
-      return { title, items: found?.items.map((i) => ({ label: i.label, slug: i.href.replace('/boutique?collectionSlug=', '') })) || [] };
+  return desktopPages
+    .map((page) => {
+      const found = drawer.find((c) => c.page === page);
+      return { title: pageLabelMap[page] || STATIC_FALLBACK[page] || page, items: found?.items.map((i) => ({ label: i.label, slug: i.href.replace('/boutique?collectionSlug=', '') })) || [] };
     })
     .filter((c) => c.items.length > 0);
 }
@@ -70,15 +68,29 @@ function buildDesktopCategories(collections: any[]): DesktopCategory[] {
 export function useMenuCollections() {
   const [mobileDrawerCategories, setMobileDrawerCategories] = useState<DrawerCategory[]>([]);
   const [desktopMenuCategories, setDesktopMenuCategories] = useState<DesktopCategory[]>([]);
+  const [pageLabelMap, setPageLabelMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/collections')
-      .then((r) => r.json())
-      .then((data) => {
-        const collections = data.collections || [];
-        setMobileDrawerCategories(buildDrawerCategories(collections));
-        setDesktopMenuCategories(buildDesktopCategories(collections));
+    Promise.all([
+      fetch('/api/collections').then((r) => r.json()),
+      fetch('/api/categories').then((r) => r.json()),
+    ])
+      .then(([collData, catData]) => {
+        const collections = collData.collections || [];
+        const categories = catData.categories || [];
+
+        // Build dynamic page → label map from categories (slug → name)
+        const dynamicMap: Record<string, string> = {};
+        for (const cat of categories) {
+          if (cat.slug && cat.name) {
+            dynamicMap[cat.slug] = cat.name;
+          }
+        }
+        setPageLabelMap(dynamicMap);
+
+        setMobileDrawerCategories(buildDrawerCategories(collections, dynamicMap));
+        setDesktopMenuCategories(buildDesktopCategories(collections, dynamicMap));
       })
       .catch(() => {
         setMobileDrawerCategories([]);
@@ -87,7 +99,11 @@ export function useMenuCollections() {
       .finally(() => setLoading(false));
   }, []);
 
-  return { mobileDrawerCategories, desktopMenuCategories, loading };
+  return { mobileDrawerCategories, desktopMenuCategories, pageLabelMap, loading };
 }
+
+const LABEL_PAGE_MAP: Record<string, string> = Object.fromEntries(
+  Object.entries(STATIC_FALLBACK).map(([page, label]) => [label, page])
+);
 
 export { LABEL_PAGE_MAP };

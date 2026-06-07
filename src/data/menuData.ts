@@ -202,31 +202,31 @@ export const mobileDrawerCategories: DrawerCategory[] = [
   ] },
 ];
 
-export const mobileMenuItems: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }> }> = [
-  { label: 'DERMO-CORNER', Icon: ShieldCheck },
-  // { label: 'PROMOTIONS !', Icon: Tag },
-  { label: 'K-BEAUTY', Icon: Sparkles },
-  { label: 'CORPS', Icon: Droplet },
-  { label: 'VISAGE', Icon: Sparkles },
-  { label: 'CHEVEUX', Icon: Scissors },
-  { label: 'HYGIÈNE DENTAIRE', Icon: Smile },
-  { label: 'MAQUILLAGE', Icon: Brush },
-  { label: 'HYGIÈNE & INTIMITÉ', Icon: Leaf },
-  { label: 'HYGIÈNE', Icon: Leaf },
-  { label: 'ACCESSOIRES', Icon: MoreHorizontal },
-  { label: 'MINCEUR', Icon: HeartPulse },
-  { label: 'SPORT', Icon: HeartPulse },
-  { label: 'MAMAN & BEBE', Icon: Heart },
-  { label: 'HOMMES', Icon: Heart },
-  { label: 'SANTÉ', Icon: HeartPulse },
-  { label: 'PREOCCUPATIONS', Icon: Flame },
-  { label: 'COMPLEMENTS ALIMENTAIRES', Icon: Sprout },
-  { label: 'PREMIUM HAIR CARE', Icon: Scissors }
+export const mobileMenuItems: Array<{ label: string; page: string; Icon: ComponentType<{ size?: number; className?: string }> }> = [
+  { label: 'DERMO-CORNER', page: 'dermo-corner', Icon: ShieldCheck },
+  // { label: 'PROMOTIONS !', page: 'promotions', Icon: Tag },
+  { label: 'K-BEAUTY', page: 'k-beauty', Icon: Sparkles },
+  { label: 'CORPS', page: 'corps', Icon: Droplet },
+  { label: 'VISAGE', page: 'visage', Icon: Sparkles },
+  { label: 'CHEVEUX', page: 'cheveux', Icon: Scissors },
+  { label: 'HYGIÈNE DENTAIRE', page: 'hygiene-dentaire', Icon: Smile },
+  { label: 'MAQUILLAGE', page: 'maquillage', Icon: Brush },
+  { label: 'HYGIÈNE & INTIMITÉ', page: 'hygiene-intimite', Icon: Leaf },
+  { label: 'HYGIÈNE', page: 'hygiene', Icon: Leaf },
+  { label: 'ACCESSOIRES', page: 'accessoires', Icon: MoreHorizontal },
+  { label: 'MINCEUR', page: 'minceur', Icon: HeartPulse },
+  { label: 'SPORT', page: 'sport', Icon: HeartPulse },
+  { label: 'MAMAN & BEBE', page: 'maman-bebe', Icon: Heart },
+  { label: 'HOMMES', page: 'hommes', Icon: Heart },
+  { label: 'SANTÉ', page: 'sante', Icon: HeartPulse },
+  { label: 'PREOCCUPATIONS', page: 'preoccupations', Icon: Flame },
+  { label: 'COMPLEMENTS ALIMENTAIRES', page: 'complements-alimentaires', Icon: Sprout },
+  { label: 'PREMIUM HAIR CARE', page: 'premium-hair-care', Icon: Scissors }
 ];
 
-export const mobileQuickCategories: Array<{ label: string; Icon: ComponentType<{ size?: number; className?: string }>; href?: string; openKey?: string }> = [
+export const mobileQuickCategories: Array<{ label: string; page?: string; Icon: ComponentType<{ size?: number; className?: string }>; href?: string; openKey?: string }> = [
   { label: 'PROMOTIONS', Icon: Tag, href: '/boutique?hasOldPrice=true' },
-  { label: 'COMPLÉMENTS\nALIMENTAIRES', Icon: Sprout, href: '/complements-alimentaires' },
-  { label: 'KOREAN\nBEAUTY', Icon: Sparkles, href: '/korean-beauty' },
-  { label: 'PARFUMS\n& MAQUILLAGE', Icon: Brush, href: '/maquillage-parfums' },
+  { label: 'COMPLÉMENTS\nALIMENTAIRES', page: 'complements-alimentaires', Icon: Sprout, href: '/complements-alimentaires' },
+  { label: 'KOREAN\nBEAUTY', page: 'k-beauty', Icon: Sparkles, href: '/korean-beauty' },
+  { label: 'PARFUMS\n& MAQUILLAGE', page: 'maquillage', Icon: Brush, href: '/maquillage-parfums' },
 ];
