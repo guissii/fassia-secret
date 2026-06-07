@@ -336,15 +336,51 @@ export default function BoutiqueClientPage() {
                 </div>
 
                 <div className="shop-grid" aria-label="Liste des produits">
-                  {visibleProducts.map((p) => (
-                    <ProductCard
-                      key={p.id}
-                      product={p}
-                      label={p.brand}
-                      onNavigate={() => router.push(productHref(p))}
-                      onAddToCart={() => addToCart(p)}
-                    />
-                  ))}
+                  {visibleProducts.length === 0 ? (
+                    <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem 1rem' }}>
+                      <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: '#111', marginBottom: '0.75rem' }}>
+                        Aucun produit dans cette sélection
+                      </div>
+                      <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem', maxWidth: '400px', marginInline: 'auto' }}>
+                        Découvrez nos autres produits disponibles dès maintenant.
+                      </p>
+                      <button
+                        type="button"
+                        className="admin-btn-primary"
+                        onClick={() => {
+                          router.push('/boutique');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '14px 32px',
+                          background: 'var(--color-primary)',
+                          color: '#fff',
+                          borderRadius: '4px',
+                          fontWeight: '700',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em',
+                          border: 'none',
+                          cursor: 'pointer',
+                          boxShadow: '0 8px 24px rgba(225, 0, 116, 0.15)',
+                        }}
+                      >
+                        Explorer tous les produits
+                      </button>
+                    </div>
+                  ) : (
+                    visibleProducts.map((p) => (
+                      <ProductCard
+                        key={p.id}
+                        product={p}
+                        label={p.brand}
+                        onNavigate={() => router.push(productHref(p))}
+                        onAddToCart={() => addToCart(p)}
+                      />
+                    ))
+                  )}
                 </div>
 
                 {totalPages > 1 && (
@@ -386,13 +422,13 @@ export default function BoutiqueClientPage() {
             </div>
           </div>
 
-          {(query || selectedCategories.length > 0 || onlyPromos || onlyNew) && (
+          {(query || selectedCategories.length > 0 || onlyPromos || onlyNew || collectionSlug) && (
             <div className="container" style={{ marginTop: '60px', textAlign: 'center', borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '40px' }}>
               <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginBottom: '20px', color: '#111' }}>
                 Vous cherchez d'autres pépites ?
               </h3>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => {
                   updateSearchParams((sp) => {
                     sp.delete('q');
@@ -401,6 +437,7 @@ export default function BoutiqueClientPage() {
                     sp.delete('new');
                     sp.delete('sort');
                     sp.delete('page');
+                    sp.delete('collectionSlug');
                   });
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}

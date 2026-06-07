@@ -18,7 +18,7 @@ const invalidateProductCache = async () => {
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const categorySlug = req.query.category as string;
-    const collectionSlug = req.query.collection as string;
+    const collectionSlug = (req.query.collectionSlug as string) || (req.query.collection as string);
     const isVisible = req.query.isVisible as string;
     const isEssential = req.query.isEssential as string;
     const isPromo = req.query.isPromo as string;
