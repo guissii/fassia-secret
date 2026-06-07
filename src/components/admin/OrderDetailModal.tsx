@@ -99,7 +99,7 @@ export function OrderDetailModal({ order, isOpen, onClose, onChangeStatus, onSyn
             </thead>
             <tbody>
               {order.items.map((item, index) => {
-                const imageSrc = item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('blob:') ? item.image : publicAssetUrl(item.image);
+                const imageSrc = item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('blob:')) ? item.image : publicAssetUrl(item.image || 'placeholder.png');
                 return (
                   <tr key={index}>
                     <td>
