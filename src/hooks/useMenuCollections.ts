@@ -45,7 +45,7 @@ function buildDrawerCategories(collections: any[]): DrawerCategory[] {
       .sort((a, b) => a.order - b.order)
       .map((item) => ({
         label: item.name,
-        href: `/boutique?collection=${encodeURIComponent(item.slug)}`,
+        href: `/collection/${item.slug}`,
       })),
   }));
 }

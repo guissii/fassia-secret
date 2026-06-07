@@ -12,7 +12,12 @@ import { useCart } from './components/CartContext';
 
 type SortKey = 'reco' | 'price-asc' | 'price-desc';
 
-export default function BoutiqueClientPage() {
+interface BoutiqueClientPageProps {
+  collectionSlug?: string;
+  collectionName?: string;
+}
+
+export default function BoutiqueClientPage({ collectionSlug, collectionName }: BoutiqueClientPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
@@ -51,7 +56,14 @@ export default function BoutiqueClientPage() {
   const [isSearchLoading, setIsSearchLoading] = useState(false);
 
   useEffect(() => {
-    if (query.trim()) {
+    if (collectionSlug) {
+      fetch(`/api/products?collectionSlug=${encodeURIComponent(collectionSlug)}&limit=500`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.products) setAllProducts(data.products);
+        })
+        .catch(console.error);
+    } else if (query.trim()) {
       setIsSearchLoading(true);
       fetch(`/api/products/search?q=${encodeURIComponent(query.trim())}&limit=500`)
         .then((res) => res.json())
@@ -82,13 +94,14 @@ export default function BoutiqueClientPage() {
         })
         .catch(console.error);
     }
-  }, [query, isPromoBackend, isEssentialBackend]);
+  }, [query, isPromoBackend, isEssentialBackend, collectionSlug]);
 
+  const basePath = collectionSlug ? `/collection/${collectionSlug}` : '/boutique';
   const updateSearchParams = (mutate: (sp: URLSearchParams) => void) => {
     const sp = new URLSearchParams(searchParams.toString());
     mutate(sp);
     const qs = sp.toString();
-    router.replace(qs ? `/boutique?${qs}` : '/boutique', { scroll: false });
+    router.replace(qs ? `${basePath}?${qs}` : basePath, { scroll: false });
   };
 
 
@@ -257,7 +270,7 @@ export default function BoutiqueClientPage() {
           <div className="container">
             <div className="shop-header">
               <div className="shop-title">
-                <h1 className="section-title-premium">{isPromoBackend ? 'Promotions' : isEssentialBackend ? 'Meilleures ventes' : 'Tous les produits'}</h1>
+                <h1 className="section-title-premium">{collectionName || (isPromoBackend ? 'Promotions' : isEssentialBackend ? 'Meilleures ventes' : 'Tous les produits')}</h1>
                 <div className="shop-count">{filteredProducts.length} produits</div>
               </div>
 
