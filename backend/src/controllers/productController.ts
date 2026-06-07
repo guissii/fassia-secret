@@ -542,46 +542,6 @@ export const importScrapedProducts = async (req: Request, res: Response) => {
   }
 };
 
-export const getPromotions = async (req: Request, res: Response) => {
-  try {
-    const cacheKey = 'products:promotions';
-    const cachedData = await redis.get(cacheKey);
-
-    if (cachedData) {
-      return res.json(JSON.parse(cachedData));
-    }
-
-    const products = await prisma.product.findMany({
-      where: {
-        isVisible: true,
-        isArchived: false,
-        oldPrice: { not: null },
-      },
-      include: {
-        categories: { select: { id: true, name: true, slug: true } },
-        collections: { select: { id: true, name: true, slug: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    // Filter products with > 20% discount
-    const promoProducts = products
-      .map((p: any) => {
-        const discount = p.oldPrice && p.price > 0
-          ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)
-          : 0;
-        return { ...p, discount };
-      })
-      .filter((p: any) => p.discount > 20);
-
-    await redis.setex(cacheKey, 300, JSON.stringify({ products: promoProducts }));
-    res.json({ products: promoProducts });
-  } catch (error) {
-    console.error('Error fetching promotions:', error);
-    res.status(500).json({ error: 'Failed to fetch promotions' });
-  }
-};
-
 export const searchProducts = async (req: Request, res: Response) => {
   try {
     const query = (req.query.q as string || '').trim();
