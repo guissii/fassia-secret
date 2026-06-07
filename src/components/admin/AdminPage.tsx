@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   Activity,
-  Store
+  Store,
+  FlaskConical
 } from 'lucide-react';
 import './AdminPage.css';
 import { AdminLogin } from './AdminLogin';
@@ -24,8 +25,9 @@ import { PromosTab } from './PromosTab';
 import { SettingsTab } from './SettingsTab';
 import { ServerTab } from './ServerTab';
 import { OfficialShopsTab } from './OfficialShopsTab';
+import { IngredientsTab } from './IngredientsTab';
 
-type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'promos' | 'official-shops' | 'settings' | 'server';
+type TabId = 'dashboard' | 'orders' | 'products' | 'categories' | 'ingredients' | 'promos' | 'official-shops' | 'settings' | 'server';
 
 export function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -54,6 +56,7 @@ export function AdminPage() {
     { id: 'orders', label: 'Commandes', icon: ShoppingBag, badge: pendingOrdersCount },
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'categories', label: 'Catégories', icon: FolderTree },
+    { id: 'ingredients', label: 'Ingrédients', icon: FlaskConical },
     { id: 'promos', label: 'Promotions', icon: TicketPercent },
     { id: 'official-shops', label: 'Boutiques Off.', icon: Store },
     { id: 'settings', label: 'Paramètres', icon: Settings },
@@ -70,6 +73,7 @@ export function AdminPage() {
       case 'orders': return <OrdersTab />;
       case 'products': return <ProductsTab />;
       case 'categories': return <CategoriesTab />;
+      case 'ingredients': return <IngredientsTab />;
       case 'promos': return <PromosTab />;
       case 'official-shops': return <OfficialShopsTab />;
       case 'settings': return <SettingsTab />;

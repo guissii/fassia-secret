@@ -43,6 +43,7 @@ model Product {
   image       String
   categories  Category[]
   collections Collection[]
+  ingredients Ingredient[]
   badge       String?
   isVisible   Boolean     @default(true)
   isArchived  Boolean     @default(false)
@@ -184,6 +185,26 @@ model OfficialShop {
 
   @@unique([category, name])
   @@index([category])
+}
+
+model Ingredient {
+  id          String    @id @default(cuid())
+  tag         String
+  title       String
+  subtitle    String
+  description String
+  image       String
+  icon        String    @default("sparkles")
+  accent      String    @default("#e10074")
+  searchQuery String
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([order])
+  @@index([isActive])
 }
 
 model SiteConfig {
