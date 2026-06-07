@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, DollarSign, Eye, Clock, Loader } from 'lucide-react';
+import { ShoppingBag, DollarSign, Eye, Clock, Loader, Shield } from 'lucide-react';
 import { api, Stats, Order, AdminProduct, getOrderStatusLabel, getOrderStatusColor, Skeleton } from './mockData';
 import { publicAssetUrl } from '../../lib/publicUrl';
+
+interface AdminSession {
+  adminId: string;
+  email: string;
+  ip: string;
+  userAgent: string;
+  createdAt: string;
+  ttl: number;
+}
 
 export function DashboardTab() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [popularProducts, setPopularProducts] = useState<AdminProduct[]>([]);
+  const [sessions, setSessions] = useState<AdminSession[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, ordersData, productsData] = await Promise.all([
+      const [statsData, ordersData, productsData, sessionsData] = await Promise.all([
         api.getStats(),
         api.getOrders(),
-        api.getProducts()
+        api.getProducts(),
+        api.fetchWithAuth('/auth/sessions').then((r: any) => r.sessions || []).catch(() => [])
       ]);
       
       setStats(statsData);
-      // Sort orders by date descending (already mock sorted, just take first 5)
       setRecentOrders(ordersData.slice(0, 5));
-      // Sort products by salesCount descending
       setPopularProducts([...productsData].sort((a, b) => b.salesCount - a.salesCount).slice(0, 5));
+      setSessions(sessionsData);
     } catch (error) {
       console.error("Failed to load dashboard data", error);
     } finally {
@@ -201,6 +211,47 @@ export function DashboardTab() {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="admin-dashboard-tables">
+        <div className="admin-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="admin-card-header">
+            <h3><Shield size={18} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> Sessions actives</h3>
+            <span className="admin-badge badge-neutral">{sessions.length} connecté(s)</span>
+          </div>
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>IP</th>
+                  <th>Navigateur</th>
+                  <th>Connecté le</th>
+                  <th>Expire dans</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sessions.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-muted)' }}>
+                      Aucune session active
+                    </td>
+                  </tr>
+                ) : (
+                  sessions.map((s, i) => (
+                    <tr key={i}>
+                      <td className="font-medium">{s.email}</td>
+                      <td className="text-muted">{s.ip}</td>
+                      <td className="text-muted" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.userAgent}</td>
+                      <td className="text-muted">{formatDate(s.createdAt)}</td>
+                      <td>{Math.ceil(s.ttl / 3600)}h {Math.ceil((s.ttl % 3600) / 60)}m</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -42,6 +42,13 @@ class MemoryCache {
     return Array.from(this.cache.keys()).filter(k => regex.test(k));
   }
 
+  async ttl(key: string): Promise<number> {
+    const entry = this.cache.get(key);
+    if (!entry) return -2;
+    const remaining = Math.ceil((entry.expiresAt - Date.now()) / 1000);
+    return remaining > 0 ? remaining : -2;
+  }
+
   async incr(key: string): Promise<number> {
     const current = await this.get(key);
     const next = (parseInt(current || '0', 10) + 1).toString();
@@ -77,6 +84,7 @@ interface CacheInterface {
   setex(key: string, seconds: number, value: string): Promise<any>;
   del(keys: string | string[]): Promise<any>;
   keys(pattern: string): Promise<string[]>;
+  ttl(key: string): Promise<number>;
   incr(key: string): Promise<number>;
   sadd(key: string, ...members: string[]): Promise<number>;
   scard(key: string): Promise<number>;
@@ -128,6 +136,7 @@ const cache: CacheInterface = {
   setex: (key, seconds, value) => cacheInstance.setex(key, seconds, value),
   del: (keys) => cacheInstance.del(keys),
   keys: (pattern) => cacheInstance.keys(pattern),
+  ttl: (key) => cacheInstance.ttl(key),
   incr: (key) => cacheInstance.incr(key),
   sadd: (key, ...members) => cacheInstance.sadd(key, ...members),
   scard: (key) => cacheInstance.scard(key),
