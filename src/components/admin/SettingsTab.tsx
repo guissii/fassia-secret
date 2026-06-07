@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Store, Truck, Share2, Users, Plus } from 'lucide-react';
+import { Save, Truck, Users, Plus } from 'lucide-react';
 import { api } from './mockData';
 import { Toast, ToastType } from './shared';
 
@@ -87,41 +87,6 @@ export function SettingsTab() {
       </div>
 
       <div style={{ display: 'grid', gap: '2rem', maxWidth: '800px' }}>
-        {/* Informations Boutique */}
-        <div className="admin-card">
-          <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Store size={20} className="text-primary" /> Informations générales
-            </h3>
-          </div>
-          
-          <div className="form-col" style={{ gap: '1.5rem' }}>
-            <div className="form-group">
-              <label>Nom de la boutique</label>
-              <input type="text" className="admin-input" name="storeName" value={settings.storeName} onChange={handleChange} />
-            </div>
-            <div className="form-row">
-              <div className="form-group" style={{ flex: 1 }}>
-                <label>Email de contact</label>
-                <input type="email" className="admin-input" name="storeEmail" value={settings.storeEmail} onChange={handleChange} />
-              </div>
-              <div className="form-group" style={{ flex: 1 }}>
-                <label>Téléphone</label>
-                <input type="text" className="admin-input" name="storePhone" value={settings.storePhone} onChange={handleChange} />
-              </div>
-            </div>
-            <div>
-              <button 
-                className="admin-btn-primary" 
-                onClick={() => handleSave('Informations')}
-                disabled={saving}
-              >
-                <Save size={16} /> Sauvegarder
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Livraison */}
         <div className="admin-card">
           <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
@@ -145,35 +110,6 @@ export function SettingsTab() {
               <button 
                 className="admin-btn-primary" 
                 onClick={() => handleSave('Livraison')}
-                disabled={saving}
-              >
-                <Save size={16} /> Sauvegarder
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Réseaux Sociaux */}
-        <div className="admin-card">
-          <div className="admin-card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Share2 size={20} className="text-primary" /> Réseaux sociaux
-            </h3>
-          </div>
-          
-          <div className="form-col" style={{ gap: '1.5rem' }}>
-            <div className="form-group">
-              <label>Lien Instagram</label>
-              <input type="url" className="admin-input" name="instagram" value={settings.instagram} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <label>Lien Facebook</label>
-              <input type="url" className="admin-input" name="facebook" value={settings.facebook} onChange={handleChange} />
-            </div>
-            <div>
-              <button 
-                className="admin-btn-primary" 
-                onClick={() => handleSave('Réseaux sociaux')}
                 disabled={saving}
               >
                 <Save size={16} /> Sauvegarder
