@@ -219,9 +219,6 @@ export function SearchBar({ className = '', inputRef, onNavigate }: SearchBarPro
                   role="option"
                   aria-selected={index === highlightedIndex}
                   onMouseEnter={() => setHighlightedIndex(index)}
-                  onTouchStart={() => {
-                    onNavigate?.();
-                  }}
                   onClick={() => {
                     onNavigate?.();
                   }}
