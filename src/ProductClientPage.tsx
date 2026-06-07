@@ -125,7 +125,12 @@ export default function ProductClientPage({ product }: { product: Product }) {
               <h1 className="product-title">{product.name}</h1>
 
               <div className="product-meta-row">
-                <span className="product-category">{product.categories?.[0]?.name || ''}</span>
+                {product.categories?.map((cat: any) => (
+                  <span key={cat.id} className="product-category">{cat.name}</span>
+                ))}
+                {product.collections?.map((coll: any) => (
+                  <span key={coll.id} className="product-tag">{coll.name}</span>
+                ))}
                 {product.badge ? <span className="product-chip">{product.badge}</span> : null}
               </div>
 

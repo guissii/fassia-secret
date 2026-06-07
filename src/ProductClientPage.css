@@ -105,6 +105,16 @@
   color: rgba(196, 120, 138, 0.95);
 }
 
+.product-tag {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(225, 0, 116, 0.25);
+  background: rgba(225, 0, 116, 0.06);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(225, 0, 116, 0.85);
+}
+
 .product-price-block {
   margin: 14px 0 12px;
   padding: 14px 14px;
