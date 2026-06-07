@@ -251,7 +251,7 @@
 
 .main-nav-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
 }
 
@@ -261,12 +261,12 @@
 
 .nav-link {
   display: flex;
-  padding: var(--spacing-sm) var(--spacing-sm);
-  font-size: 0.75rem;
+  padding: var(--spacing-sm) 0.6rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--color-text);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   position: relative;
   transition: color 0.3s;
   white-space: nowrap;
@@ -281,8 +281,8 @@
   content: '';
   position: absolute;
   bottom: 0;
-  left: var(--spacing-md);
-  width: calc(100% - calc(var(--spacing-md) * 2));
+  left: 0.6rem;
+  width: calc(100% - 1.2rem);
   height: 1px;
   background-color: #e10074;
   transform: scaleX(0);
