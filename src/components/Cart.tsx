@@ -138,7 +138,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }:
     // 1. Construire le message WhatsApp et ouvrir IMMÉDIATEMENT (avant tout await)
     //    pour éviter le blocage popup sur mobile
     const number = "212774656745";
-    let message = `🌸�🫰 *Nouvelle commande Fassia Secret* 🫰🌸\n\n`;
+    let message = `🌸🫰 *Nouvelle commande Fassia Secret* 🫰🌸\n\n`;
     message += `👤 *Nom:* ${formData.customerName}\n`;
     message += `📞 *Téléphone:* ${formData.phone}\n`;
     message += `📍 *Ville:* ${formData.city}\n`;
