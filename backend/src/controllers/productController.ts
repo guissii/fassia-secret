@@ -146,6 +146,23 @@ export const createProduct = async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'Un produit avec ce nom existe déjà' });
     }
 
+    // Fallback: resolve IDs by name if frontend sends names instead of IDs
+    let finalCategoryIds = categoryIds || [];
+    let finalCollectionIds = collectionIds || [];
+
+    if (finalCategoryIds.length === 0 && req.body.categories?.length > 0) {
+      const found = await prisma.category.findMany({
+        where: { name: { in: req.body.categories } }
+      });
+      finalCategoryIds = found.map((c: any) => c.id);
+    }
+    if (finalCollectionIds.length === 0 && req.body.collections?.length > 0) {
+      const found = await prisma.collection.findMany({
+        where: { name: { in: req.body.collections } }
+      });
+      finalCollectionIds = found.map((c: any) => c.id);
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         brand,
@@ -176,10 +193,10 @@ export const createProduct = async (req: Request, res: Response) => {
               : { isNew: false, isPromo: false, isEssential: false }
         ),
         categories: {
-          connect: (categoryIds || []).map((id: string) => ({ id }))
+          connect: (finalCategoryIds || []).map((id: string) => ({ id }))
         },
         collections: {
-          connect: (collectionIds || []).map((id: string) => ({ id }))
+          connect: (finalCollectionIds || []).map((id: string) => ({ id }))
         }
       },
       include: {
@@ -220,6 +237,23 @@ export const updateProduct = async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'Un produit avec ce nom existe déjà' });
     }
 
+    // Fallback: resolve IDs by name if frontend sends names instead of IDs
+    let finalCategoryIds = categoryIds || [];
+    let finalCollectionIds = collectionIds || [];
+
+    if (finalCategoryIds.length === 0 && req.body.categories?.length > 0) {
+      const found = await prisma.category.findMany({
+        where: { name: { in: req.body.categories } }
+      });
+      finalCategoryIds = found.map((c: any) => c.id);
+    }
+    if (finalCollectionIds.length === 0 && req.body.collections?.length > 0) {
+      const found = await prisma.collection.findMany({
+        where: { name: { in: req.body.collections } }
+      });
+      finalCollectionIds = found.map((c: any) => c.id);
+    }
+
     // Disconnect all existing relations before reconnecting
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
@@ -255,11 +289,11 @@ export const updateProduct = async (req: Request, res: Response) => {
         ),
         categories: {
           set: [], // Disconnect all
-          connect: (categoryIds || []).map((id: string) => ({ id }))
+          connect: (finalCategoryIds || []).map((id: string) => ({ id }))
         },
         collections: {
           set: [], // Disconnect all
-          connect: (collectionIds || []).map((id: string) => ({ id }))
+          connect: (finalCollectionIds || []).map((id: string) => ({ id }))
         }
       },
       include: {

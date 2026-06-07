@@ -98,19 +98,21 @@ function toHierarchicalSelection(
   collections: string[]
 ): CategorySelection[] {
   const result: CategorySelection[] = [];
-  
+  const assignedCollections = new Set<string>();
+
   // Map category names to their data
   for (const catName of categories) {
     const catData = CATEGORY_COLLECTIONS_DATA.find(
       c => c.category === catName || c.slug === catName.toLowerCase().replace(/\s+/g, '-')
     );
-    
+
     if (catData) {
       // Find collections that belong to this category AND are in the selected collections
-      const catCollections = collections.filter(coll => 
+      const catCollections = collections.filter(coll =>
         catData.collections.includes(coll)
       );
-      
+      catCollections.forEach(c => assignedCollections.add(c));
+
       result.push({
         categorySlug: catData.slug,
         categoryName: catData.category,
@@ -118,7 +120,17 @@ function toHierarchicalSelection(
       });
     }
   }
-  
+
+  // Handle orphaned collections (exist in collections array but not in any known category)
+  const orphaned = collections.filter(c => !assignedCollections.has(c));
+  if (orphaned.length > 0) {
+    result.push({
+      categorySlug: 'autres',
+      categoryName: 'Autres',
+      collections: orphaned
+    });
+  }
+
   return result;
 }
 
@@ -128,15 +140,14 @@ function fromHierarchicalSelection(
 ): { categories: string[]; collections: string[] } {
   const categories: string[] = [];
   const collections: string[] = [];
-  
+
   for (const sel of selection) {
     categories.push(sel.categoryName);
     collections.push(...sel.collections);
   }
-  
-  // Also add any collections from selected categories that might not be explicitly selected
-  // but are needed for proper categorization
-  return { categories, collections };
+
+  // Deduplicate collections
+  return { categories, collections: [...new Set(collections)] };
 }
 
 interface ProductFormModalProps {
