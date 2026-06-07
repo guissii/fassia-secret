@@ -45,12 +45,15 @@ function buildDrawerCategories(collections: any[]): DrawerCategory[] {
       .sort((a, b) => a.order - b.order)
       .map((item) => ({
         label: item.name,
-        href: `/collection/${item.slug}`,
+        href: `/boutique?collectionSlug=${encodeURIComponent(item.slug)}`,
       })),
   }));
 }
 
-function buildDesktopCategories(collections: any[]) {
+export type DesktopCategoryItem = { label: string; slug: string };
+export type DesktopCategory = { title: string; items: DesktopCategoryItem[] };
+
+function buildDesktopCategories(collections: any[]): DesktopCategory[] {
   const drawer = buildDrawerCategories(collections);
   const desktopTitles = [
     'CORPS', 'VISAGE', 'CHEVEUX', 'HYGIÈNE DENTAIRE', 'MAQUILLAGE',
@@ -59,14 +62,14 @@ function buildDesktopCategories(collections: any[]) {
   return desktopTitles
     .map((title) => {
       const found = drawer.find((c) => c.title === title);
-      return { title, items: found?.items.map((i) => i.label) || [] };
+      return { title, items: found?.items.map((i) => ({ label: i.label, slug: i.href.replace('/boutique?collectionSlug=', '') })) || [] };
     })
     .filter((c) => c.items.length > 0);
 }
 
 export function useMenuCollections() {
   const [mobileDrawerCategories, setMobileDrawerCategories] = useState<DrawerCategory[]>([]);
-  const [desktopMenuCategories, setDesktopMenuCategories] = useState<{ title: string; items: string[] }[]>([]);
+  const [desktopMenuCategories, setDesktopMenuCategories] = useState<DesktopCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

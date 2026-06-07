@@ -305,51 +305,20 @@ export function Header({ onCartOpen, cartCount = 0, cartBumpKey }: HeaderProps) 
         <div className="container">
           <ul className="flex items-center gap-xs main-nav-list">
             {desktopMenuCategories.map((category, index) => {
-              // Map each desktop category title to a proper boutique filter
-              const desktopCatHrefMap: Record<string, string> = {
-                'CORPS': '/boutique?category=Corps',
-                'VISAGE': '/boutique?category=Visage',
-                'CHEVEUX': '/boutique?category=Cheveux',
-                'HYGIÈNE DENTAIRE': '/boutique?category=Hygi%C3%A8ne+Dentaire',
-                'MAQUILLAGE': '/maquillage-parfums',
-                'HYGIÈNE & INTIMITÉ': '/boutique?category=Hygi%C3%A8ne',
-                'SANTÉ': '/boutique?category=Sant%C3%A9',
-                'HOMMES': '/boutique?category=Hommes',
-                'COMPLEMENTS ALIMENTAIRES': '/complements-alimentaires',
-                'PREOCCUPATIONS': '/boutique',
-              };
-              const parentHref = desktopCatHrefMap[category.title] || '/boutique';
               return (
               <li key={index} className="nav-item">
-                <Link
-                  href={parentHref}
-                  className="nav-link flex items-center gap-xs"
-                >
+                <span className="nav-link flex items-center gap-xs cursor-default">
                   {category.title} <ChevronDown size={14} className="dropdown-icon" />
-                </Link>
+                </span>
                 <div className="dropdown-menu">
                   <ul>
-                    {category.items.map((item, idx) => {
-                      let itemHref = parentHref;
-                      if (category.title === 'PREOCCUPATIONS') {
-                        itemHref = `/boutique?q=${encodeURIComponent(item)}`;
-                      } else if (category.title === 'SANTÉ' && item === 'Compléments alimentaires') {
-                        itemHref = '/complements-alimentaires';
-                      } else if (category.title === 'MAQUILLAGE') {
-                        if (['Teint', 'Yeux', 'Lèvres'].includes(item)) {
-                          itemHref = '/maquillage-parfums';
-                        } else {
-                          itemHref = `/boutique?category=Maquillage`;
-                        }
-                      }
-                      return (
+                    {category.items.map((item, idx) => (
                       <li key={idx}>
-                        <Link href={itemHref} className="dropdown-item">
-                          {item}
+                        <Link href={`/boutique?collectionSlug=${encodeURIComponent(item.slug)}`} className="dropdown-item">
+                          {item.label}
                         </Link>
                       </li>
-                      );
-                    })}
+                    ))}
                   </ul>
                 </div>
               </li>

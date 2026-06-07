@@ -12,12 +12,7 @@ import { useCart } from './components/CartContext';
 
 type SortKey = 'reco' | 'price-asc' | 'price-desc';
 
-interface BoutiqueClientPageProps {
-  collectionSlug?: string;
-  collectionName?: string;
-}
-
-export default function BoutiqueClientPage({ collectionSlug, collectionName }: BoutiqueClientPageProps) {
+export default function BoutiqueClientPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
@@ -28,6 +23,8 @@ export default function BoutiqueClientPage({ collectionSlug, collectionName }: B
   });
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
+  const collectionSlug = useMemo(() => searchParams.get('collectionSlug') ?? '', [searchParams]);
+  const [collectionName, setCollectionName] = useState<string>('');
   const query = useMemo(() => searchParams.get('q') ?? '', [searchParams]);
   const selectedCategories = useMemo(() => {
     const raw = searchParams.get('category') ?? '';
@@ -54,6 +51,18 @@ export default function BoutiqueClientPage({ collectionSlug, collectionName }: B
 
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
+
+  useEffect(() => {
+    if (!collectionSlug) return;
+    fetch('/api/collections')
+      .then((r) => r.json())
+      .then((data) => {
+        const collections = data.collections || [];
+        const found = collections.find((c: any) => c.slug === collectionSlug);
+        if (found) setCollectionName(found.name);
+      })
+      .catch(() => {});
+  }, [collectionSlug]);
 
   useEffect(() => {
     if (collectionSlug) {
@@ -96,12 +105,11 @@ export default function BoutiqueClientPage({ collectionSlug, collectionName }: B
     }
   }, [query, isPromoBackend, isEssentialBackend, collectionSlug]);
 
-  const basePath = collectionSlug ? `/collection/${collectionSlug}` : '/boutique';
   const updateSearchParams = (mutate: (sp: URLSearchParams) => void) => {
     const sp = new URLSearchParams(searchParams.toString());
     mutate(sp);
     const qs = sp.toString();
-    router.replace(qs ? `${basePath}?${qs}` : basePath, { scroll: false });
+    router.replace(qs ? `/boutique?${qs}` : '/boutique', { scroll: false });
   };
 
 
