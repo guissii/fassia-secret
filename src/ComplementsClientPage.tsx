@@ -6,98 +6,24 @@ import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { useCart } from './components/CartContext';
 import { productHref } from './lib/productSlug';
+import { FOCUSES } from './lib/supplementFocuses';
 
 import { ProductCard } from './components/ProductCard';
 import './styles/CollectionLayout.css';
 import './ComplementsClientPage.css';
 
-type Focus = {
-  key: string;
-  label: string;
-  timing: string;
-  title: string;
-  description: string;
-  q: string;
-};
-
-const FOCUSES: Focus[] = [
-  {
-    key: 'sleep',
-    label: 'Sommeil',
-    timing: 'Soir',
-    title: 'Sommeil & Relaxation',
-    description: 'Mélatonine, magnésium glycinate, plantes apaisantes.',
-    q: 'melatonine magnesium sommeil',
-  },
-  {
-    key: 'stress',
-    label: 'Équilibre',
-    timing: 'Matin',
-    title: 'Stress & Humeur',
-    description: 'Adaptogènes & focus doux: ashwagandha, rhodiola, L-théanine.',
-    q: 'ashwagandha theanine rhodiola',
-  },
-  {
-    key: 'digest',
-    label: 'Intestin',
-    timing: 'Repas',
-    title: 'Digestion & Probiotiques',
-    description: 'Confort intestinal, enzymes & microbiote (probiotiques).',
-    q: 'probiotiques enzymes digestion',
-  },
-  {
-    key: 'metabolic',
-    label: 'Silhouette',
-    timing: 'Avant repas',
-    title: 'Poids & Métabolisme',
-    description: 'Berbérine, chrome, ALA: routine métabolique.',
-    q: 'berberine chrome ala metabolisme',
-  },
-  {
-    key: 'immunity',
-    label: 'Immunité',
-    timing: 'Matin',
-    title: 'Immunité & Ruche',
-    description: 'Propolis, vitamine C, zinc: protection quotidienne.',
-    q: 'propolis zinc vitamine c',
-  },
-  {
-    key: 'beauty',
-    label: 'Beauty',
-    timing: 'Matin',
-    title: 'Beauté In & Out',
-    description: 'Collagène, biotine & acide hyaluronique: glow, cheveux, ongles.',
-    q: 'collagene biotine hyaluronique',
-  },
-];
-
-const normalize = (s: string) =>
-  s
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-
-const matchesQuery = (p: any, q: string) => {
-  const hay = normalize(`${p.brand} ${p.name} ${p.description}`);
-  const tokens = q
-    .split(/\s+/)
-    .map((t) => normalize(t))
-    .filter(Boolean);
-  if (!tokens.length) return true;
-  return tokens.some((t) => hay.includes(t));
-};
-
 interface ComplementsClientPageProps {
   products?: any[];
+  productsByFocus?: Record<string, any[]>;
 }
 
-export default function ComplementsClientPage({ products: initialProducts = [] }: ComplementsClientPageProps) {
+export default function ComplementsClientPage({ products: initialProducts = [], productsByFocus }: ComplementsClientPageProps) {
   const router = useRouter();
   const [supplements, setSupplements] = useState<any[]>(initialProducts);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    if (initialProducts.length === 0) {
+    if (!productsByFocus && initialProducts.length === 0) {
       fetch('/api/products?category=complements-alimentaires&limit=100')
         .then((res) => res.json())
         .then((data) => {
@@ -105,7 +31,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
         })
         .catch(console.error);
     }
-  }, [initialProducts]);
+  }, [initialProducts, productsByFocus]);
 
   return (
     <>
@@ -123,7 +49,7 @@ export default function ComplementsClientPage({ products: initialProducts = [] }
         </section>
 
         {FOCUSES.map((f) => {
-          const products = supplements.filter((p) => matchesQuery(p, f.q));
+          const products = productsByFocus?.[f.key] ?? supplements.filter((p) => p.supplementFocus === f.key);
           const href = `/boutique?category=complements-alimentaires&q=${encodeURIComponent(f.q)}`;
 
           return (

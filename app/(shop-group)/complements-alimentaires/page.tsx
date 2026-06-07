@@ -3,15 +3,16 @@ export const dynamic = 'force-dynamic';
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import ComplementsClientPage from '../../../src/ComplementsClientPage';
+import { FOCUSES } from '../../../src/lib/supplementFocuses';
 
 // Côté serveur: localhost direct, côté client: URL publique
 const API_URL = typeof window === 'undefined'
   ? 'http://localhost:5000'
   : (process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com');
 
-async function getComplements() {
+async function getProductsByFocus(focusKey: string) {
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=50&category=complements-alimentaires`, {
+    const res = await fetch(`${API_URL}/api/products?limit=20&supplementFocus=${focusKey}&isVisible=true`, {
       cache: 'no-store',
     });
     if (!res.ok) return [];
@@ -32,11 +33,17 @@ export const metadata: Metadata = {
 };
 
 export default async function ComplementsAlimentairesPage() {
-  const products = await getComplements();
+  // Charger les produits par focus depuis la DB
+  const productsByFocus: Record<string, any[]> = {};
+  await Promise.all(
+    FOCUSES.map(async (f) => {
+      productsByFocus[f.key] = await getProductsByFocus(f.key);
+    })
+  );
 
   return (
     <Suspense>
-      <ComplementsClientPage products={products} />
+      <ComplementsClientPage productsByFocus={productsByFocus} />
     </Suspense>
   );
 }

@@ -26,6 +26,7 @@ export const getProducts = async (req: Request, res: Response) => {
     const includeArchived = req.query.includeArchived as string;
     const koreanBeautyStep = req.query.koreanBeautyStep as string;
     const makeupStep = req.query.makeupStep as string;
+    const supplementFocus = req.query.supplementFocus as string;
     const random = req.query.random as string;
     const page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 50;
@@ -33,7 +34,7 @@ export const getProducts = async (req: Request, res: Response) => {
     const skip = (page - 1) * limit;
 
     const hasOldPrice = req.query.hasOldPrice as string;
-    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${isNew || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${random || 'false'}:${hasOldPrice || 'all'}:${page}:${limit}`;
+    const cacheKey = `products:${categorySlug || 'all'}:${collectionSlug || 'all'}:${isVisible || 'all'}:${isEssential || 'all'}:${isPromo || 'all'}:${isNew || 'all'}:${includeArchived || 'false'}:${koreanBeautyStep || 'all'}:${makeupStep || 'all'}:${supplementFocus || 'all'}:${random || 'false'}:${hasOldPrice || 'all'}:${page}:${limit}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -70,6 +71,10 @@ export const getProducts = async (req: Request, res: Response) => {
       if (!isNaN(stepNum)) {
         where.makeupStep = stepNum;
       }
+    }
+
+    if (supplementFocus) {
+      where.supplementFocus = supplementFocus;
     }
 
     if (isEssential !== undefined && isEssential !== '') {

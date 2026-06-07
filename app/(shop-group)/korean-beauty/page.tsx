@@ -13,8 +13,10 @@ const API_URL = typeof window === 'undefined'
 
 async function getKBeautyProducts(step?: number) {
   try {
+    // Quand on filtre par étape, on ne requiert pas la catégorie k-beauty
+    // Le produit peut apparaître dans le carrousel même s'il est dans une autre catégorie
     const url = step
-      ? `${API_URL}/api/products?limit=20&random=true&category=k-beauty&koreanBeautyStep=${step}`
+      ? `${API_URL}/api/products?limit=20&random=true&koreanBeautyStep=${step}`
       : `${API_URL}/api/products?limit=100&random=true&category=k-beauty`;
     const res = await fetch(url, {
       cache: 'no-store',

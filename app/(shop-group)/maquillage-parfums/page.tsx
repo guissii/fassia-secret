@@ -12,8 +12,10 @@ const API_URL = typeof window === 'undefined'
 
 async function getProducts(category: string, step?: number, limit = 10) {
   try {
-    let url = `${API_URL}/api/products?limit=${limit}&category=${category}&isVisible=true`;
+    // Quand on filtre par makeupStep, on ne requiert pas la catégorie maquillage
+    let url = `${API_URL}/api/products?limit=${limit}&isVisible=true`;
     if (step) url += `&makeupStep=${step}`;
+    else url += `&category=${category}`;
     const res = await fetch(url, {
       cache: 'no-store',
     });
