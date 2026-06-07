@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Truck, Users, Plus } from 'lucide-react';
+import { Save, Truck, Users, Plus, Eye, EyeOff } from 'lucide-react';
 import { api } from './mockData';
 import { Toast, ToastType } from './shared';
 
@@ -17,6 +17,11 @@ export function SettingsTab() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+
+  // Admin form state
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Settings State
   const [settings, setSettings] = useState<SiteConfig>({
@@ -53,6 +58,27 @@ export function SettingsTab() {
     };
     loadConfig();
   }, []);
+
+  const handleAddAdmin = async () => {
+    if (!adminEmail.trim() || !adminPassword.trim()) {
+      setToast({ message: "Veuillez remplir tous les champs", type: 'error' });
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.fetchWithAuth('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ email: adminEmail.trim(), password: adminPassword.trim() })
+      });
+      setToast({ message: "Nouvel administrateur créé avec succès !", type: 'success' });
+      setAdminEmail('');
+      setAdminPassword('');
+    } catch (error: any) {
+      setToast({ message: error.message || "Erreur lors de la création de l'admin", type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -130,40 +156,44 @@ export function SettingsTab() {
             <p className="text-muted text-sm">Ajouter un nouveau compte administrateur pour gérer la boutique.</p>
             <div className="form-group">
               <label>Email de l'administrateur</label>
-              <input type="email" className="admin-input" id="newAdminEmail" placeholder="admin@fassiasecret.com" />
+              <input type="email" className="admin-input" value={adminEmail} onChange={e => setAdminEmail(e.target.value)} placeholder="admin@fassiasecret.com" />
             </div>
             <div className="form-group">
               <label>Mot de passe</label>
-              <input type="password" className="admin-input" id="newAdminPassword" placeholder="••••••••" minLength={6} />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="admin-input"
+                  value={adminPassword}
+                  onChange={e => setAdminPassword(e.target.value)}
+                  placeholder="••••••••"
+                  minLength={6}
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--admin-text-muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  title={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div>
-              <button 
-                className="admin-btn-primary" 
-                onClick={async () => {
-                  const emailInput = document.getElementById('newAdminEmail') as HTMLInputElement;
-                  const passwordInput = document.getElementById('newAdminPassword') as HTMLInputElement;
-                  if (!emailInput.value || !passwordInput.value) {
-                    setToast({ message: "Veuillez remplir tous les champs", type: 'error' });
-                    return;
-                  }
-                  
-                  setLoading(true);
-                  try {
-                    const { api } = await import('./mockData');
-                    await api.fetchWithAuth('/auth/register', {
-                      method: 'POST',
-                      body: JSON.stringify({ email: emailInput.value, password: passwordInput.value })
-                    });
-                    setToast({ message: "Nouvel administrateur créé avec succès !", type: 'success' });
-                    emailInput.value = '';
-                    passwordInput.value = '';
-                  } catch (error: any) {
-                    setToast({ message: error.message || "Erreur lors de la création de l'admin", type: 'error' });
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                disabled={saving}
+              <button
+                className="admin-btn-primary"
+                onClick={handleAddAdmin}
+                disabled={saving || loading}
               >
                 <Plus size={16} /> Ajouter l'administrateur
               </button>
