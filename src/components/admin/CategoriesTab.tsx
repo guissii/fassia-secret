@@ -52,27 +52,28 @@ export function CategoriesTab() {
     loadData();
   }, []);
 
-  const handleSaveCategory = async (cat: Category) => {
+  const handleSaveCategory = async (cat: any) => {
     try {
       const existing = cat.id && categories.find(c => c.id === cat.id);
+      const payload = {
+        name: cat.name,
+        nameAr: cat.nameAr,
+        slug: cat.slug,
+        description: cat.description || null,
+        image: cat.image || null,
+        page: cat.page || 'general',
+        order: typeof cat.order === 'number' ? cat.order : 0,
+      };
       if (existing) {
         await api.fetchWithAuth(`/categories/${cat.id}`, {
           method: 'PUT',
-          body: JSON.stringify({
-            name: cat.name,
-            nameAr: cat.nameAr,
-            slug: cat.slug,
-          }),
+          body: JSON.stringify(payload),
         });
         setToast({ message: 'Catégorie mise à jour', type: 'success' });
       } else {
         await api.fetchWithAuth('/categories', {
           method: 'POST',
-          body: JSON.stringify({
-            name: cat.name,
-            nameAr: cat.nameAr,
-            slug: cat.slug,
-          }),
+          body: JSON.stringify(payload),
         });
         setToast({ message: 'Catégorie créée', type: 'success' });
       }
@@ -128,8 +129,10 @@ export function CategoriesTab() {
     }
   };
 
+  const getProductCount = (cat: any) => cat._count?.products ?? cat.productCount ?? 0;
+
   const openDeleteModal = (cat: Category) => {
-    setDeleteTarget(cat);
+    setDeleteTarget(cat as any);
     setMigrateToId('');
     setIsDeleteModalOpen(true);
   };
@@ -137,7 +140,9 @@ export function CategoriesTab() {
   const handleDeleteCategory = async () => {
     if (!deleteTarget) return;
 
-    if (deleteTarget.productCount > 0 && !migrateToId) {
+    const productCount = getProductCount(deleteTarget);
+
+    if (productCount > 0 && !migrateToId) {
       setToast({ message: 'Choisissez une catégorie de destination pour les produits', type: 'error' });
       return;
     }
@@ -147,16 +152,18 @@ export function CategoriesTab() {
         method: 'DELETE',
         body: JSON.stringify({ migrateToId: migrateToId || null })
       });
-      
+
       const migratedTo = categories.find(c => c.id === migrateToId);
 
       setCategories(prev => {
         let updated = prev.filter(c => c.id !== deleteTarget.id);
         // If migration target exists, add product count
         if (migratedTo) {
+          const migratedCount = getProductCount(migratedTo);
+          const deletedCount = getProductCount(deleteTarget);
           updated = updated.map(c =>
             c.id === migrateToId
-              ? { ...c, productCount: c.productCount + deleteTarget.productCount }
+              ? { ...c, productCount: migratedCount + deletedCount }
               : c
           );
         }
@@ -165,7 +172,7 @@ export function CategoriesTab() {
 
       setToast({
         message: migratedTo
-          ? `Catégorie supprimée. ${deleteTarget.productCount} produit(s) migré(s) vers "${migratedTo.name}"`
+          ? `Catégorie supprimée. ${productCount} produit(s) migré(s) vers "${migratedTo.name}"`
           : 'Catégorie supprimée',
         type: 'success',
       });

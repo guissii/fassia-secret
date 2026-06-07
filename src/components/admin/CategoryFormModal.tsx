@@ -22,6 +22,10 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave }: Categor
   const [name, setName] = useState('');
   const [nameAr, setNameAr] = useState('');
   const [slug, setSlug] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState('');
+  const [page, setPage] = useState('general');
+  const [order, setOrder] = useState(0);
   const [autoSlug, setAutoSlug] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -29,13 +33,21 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave }: Categor
     if (isOpen) {
       if (category) {
         setName(category.name);
-        setNameAr(category.nameAr);
+        setNameAr(category.nameAr || '');
         setSlug(category.slug);
+        setDescription((category as any).description || '');
+        setImage((category as any).image || '');
+        setPage((category as any).page || 'general');
+        setOrder((category as any).order ?? 0);
         setAutoSlug(false);
       } else {
         setName('');
         setNameAr('');
         setSlug('');
+        setDescription('');
+        setImage('');
+        setPage('general');
+        setOrder(0);
         setAutoSlug(true);
       }
     }
@@ -58,8 +70,12 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave }: Categor
         name: name.trim(),
         nameAr: nameAr.trim(),
         slug: slug || generateSlug(name),
+        description: description.trim() || null,
+        image: image.trim() || null,
+        page: page.trim() || 'general',
+        order: Number(order) || 0,
         productCount: category?.productCount || 0,
-      } as Category);
+      } as any);
       setLoading(false);
       onClose();
     }, 600);
@@ -130,6 +146,54 @@ export function CategoryFormModal({ category, isOpen, onClose, onSave }: Categor
               <span className="text-muted" style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
                 URL : /boutique?category={slug || '...'}
               </span>
+            </div>
+
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                className="admin-input"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Description de la catégorie"
+                rows={3}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Image URL</label>
+              <input
+                type="text"
+                className="admin-input"
+                value={image}
+                onChange={e => setImage(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-group">
+                <label>Page</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  value={page}
+                  onChange={e => setPage(e.target.value)}
+                  placeholder="general"
+                />
+                <span className="text-muted" style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                  ex: general, k-beauty, visage...
+                </span>
+              </div>
+              <div className="form-group">
+                <label>Ordre</label>
+                <input
+                  type="number"
+                  className="admin-input"
+                  value={order}
+                  onChange={e => setOrder(Number(e.target.value))}
+                  placeholder="0"
+                />
+              </div>
             </div>
 
           </div>
