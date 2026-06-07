@@ -87,7 +87,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
 export const deleteOrder = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await prisma.order.delete({ where: { id } });
     res.json({ success: true, message: 'Order deleted' });
   } catch (error) {
@@ -98,7 +98,7 @@ export const deleteOrder = async (req: Request, res: Response) => {
 
 export const updateOrderStatus = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { status } = req.body;
     const updated = await prisma.order.update({
       where: { id },
