@@ -245,9 +245,10 @@
   backdrop-filter: blur(8px);
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
+  padding: 2rem 1rem;
+  overflow-y: auto;
 }
 
 .admin-modal-content {
@@ -258,6 +259,8 @@
   padding: 2rem;
   width: 100%;
   max-width: 500px;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
