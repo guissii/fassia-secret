@@ -88,6 +88,8 @@ export const createOrder = async (req: Request, res: Response) => {
 export const deleteOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
+    // Supprimer d'abord les items liés (contrainte de clé étrangère)
+    await prisma.orderItem.deleteMany({ where: { orderId: id } });
     await prisma.order.delete({ where: { id } });
     res.json({ success: true, message: 'Order deleted' });
   } catch (error) {
