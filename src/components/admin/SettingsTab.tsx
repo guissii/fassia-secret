@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Truck, Users, Plus, Eye, EyeOff } from 'lucide-react';
+import { Save, Truck, Users, Plus, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { api } from './mockData';
-import { Toast, ToastType } from './shared';
+import { Toast, ToastType, ConfirmModal } from './shared';
 
 interface SiteConfig {
   storeName: string;
@@ -22,6 +22,8 @@ export function SettingsTab() {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [admins, setAdmins] = useState<Array<{ id: string; email: string; createdAt: string }>>([]);
+  const [deleteAdminId, setDeleteAdminId] = useState<string | null>(null);
 
   // Settings State
   const [settings, setSettings] = useState<SiteConfig>({
@@ -57,7 +59,28 @@ export function SettingsTab() {
       }
     };
     loadConfig();
+    loadAdmins();
   }, []);
+
+  const loadAdmins = async () => {
+    try {
+      const data = await api.fetchWithAuth('/auth/admins');
+      setAdmins(data.admins || []);
+    } catch (error: any) {
+      console.error('Failed to load admins', error);
+    }
+  };
+
+  const handleDeleteAdmin = async (id: string) => {
+    try {
+      await api.fetchWithAuth(`/auth/admins/${id}`, { method: 'DELETE' });
+      setToast({ message: "Administrateur supprimé", type: 'success' });
+      loadAdmins();
+    } catch (error: any) {
+      setToast({ message: error.message || "Erreur lors de la suppression", type: 'error' });
+    }
+    setDeleteAdminId(null);
+  };
 
   const handleAddAdmin = async () => {
     if (!adminEmail.trim() || !adminPassword.trim()) {
@@ -73,6 +96,7 @@ export function SettingsTab() {
       setToast({ message: "Nouvel administrateur créé avec succès !", type: 'success' });
       setAdminEmail('');
       setAdminPassword('');
+      loadAdmins();
     } catch (error: any) {
       setToast({ message: error.message || "Erreur lors de la création de l'admin", type: 'error' });
     } finally {
@@ -198,10 +222,57 @@ export function SettingsTab() {
                 <Plus size={16} /> Ajouter l'administrateur
               </button>
             </div>
+
+            {/* Liste des admins existants */}
+            <div style={{ marginTop: '1rem' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--color-text)' }}>
+                Comptes existants ({admins.length})
+              </h4>
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Email</th>
+                      <th>Créé le</th>
+                      <th style={{ width: '60px' }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {admins.map((admin) => (
+                      <tr key={admin.id}>
+                        <td className="font-medium">{admin.email}</td>
+                        <td className="text-muted">{new Date(admin.createdAt).toLocaleDateString('fr-FR')}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="admin-icon-btn"
+                            title="Supprimer"
+                            onClick={() => setDeleteAdminId(admin.id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
 
       </div>
+
+      <ConfirmModal
+        isOpen={!!deleteAdminId}
+        title="Supprimer cet administrateur ?"
+        message="Cette action est irréversible."
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        isDestructive
+        onConfirm={() => { if (deleteAdminId) handleDeleteAdmin(deleteAdminId); }}
+        onCancel={() => setDeleteAdminId(null)}
+      />
     </div>
   );
 }
