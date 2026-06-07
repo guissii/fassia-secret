@@ -66,7 +66,21 @@ export function OrderDetailModal({ order, isOpen, onClose, onChangeStatus, onSyn
           </div>
 
           <div className="order-timeline">
-            <h4>Suivi</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <h4 style={{ margin: 0 }}>Suivi</h4>
+              <select
+                className="admin-select"
+                value={order.status}
+                onChange={(e) => onChangeStatus(order.id, e.target.value as OrderStatus)}
+                style={{ minWidth: '150px', fontSize: '0.8rem' }}
+              >
+                <option value="pending">En attente</option>
+                <option value="processing">En traitement</option>
+                <option value="shipped">Expédié</option>
+                <option value="delivered">Livré</option>
+                <option value="cancelled">Annulé</option>
+              </select>
+            </div>
             <div className="timeline-step active">
               <div className="timeline-dot"></div>
               <span>Créée</span>
@@ -134,22 +148,6 @@ export function OrderDetailModal({ order, isOpen, onClose, onChangeStatus, onSyn
 
         <div className="admin-modal-actions">
           <button className="admin-btn-outline" onClick={onClose}>Fermer</button>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--admin-text-muted)' }}>Statut :</label>
-            <select
-              className="admin-select"
-              value={order.status}
-              onChange={(e) => onChangeStatus(order.id, e.target.value as OrderStatus)}
-              style={{ minWidth: '160px' }}
-            >
-              <option value="pending">En attente</option>
-              <option value="processing">En traitement</option>
-              <option value="shipped">Expédié</option>
-              <option value="delivered">Livré</option>
-              <option value="cancelled">Annulé</option>
-            </select>
-          </div>
 
           <button 
             className="admin-btn-outline" 
