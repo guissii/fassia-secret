@@ -61,11 +61,14 @@ export function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <div className="container flex justify-between items-center text-xs text-muted">
+        <div className="container flex justify-between items-center text-xs text-muted" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
           <p>© 2026 Fassia Secret. Tous droits réservés.</p>
-          <div className="payment-methods" aria-label="Paiement sécurisé">
-            <ShieldCheck size={16} />
-            <span>Paiement sécurisé</span>
+          <div className="flex items-center gap-md" style={{ flexWrap: 'wrap' }}>
+            <Link href="/conditions-generales" className="footer-link">Conditions générales</Link>
+            <div className="payment-methods" aria-label="Paiement à la livraison">
+              <ShieldCheck size={16} />
+              <span>Paiement à la livraison</span>
+            </div>
           </div>
         </div>
       </div>
