@@ -12,7 +12,11 @@ const invalidateCollectionCache = async () => {
 export const getCollections = async (req: Request, res: Response) => {
   try {
     const page = req.query.page as string;
-    const cacheKey = page ? `collections:page:${page}` : 'collections:all';
+    const includeProducts = req.query.includeProducts === 'true';
+    const productLimit = parseInt(req.query.productLimit as string) || 4;
+    const cacheKey = page
+      ? `collections:page:${page}:products:${includeProducts}:${productLimit}`
+      : `collections:all:products:${includeProducts}`;
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -20,23 +24,39 @@ export const getCollections = async (req: Request, res: Response) => {
     }
 
     const where = page ? { page } : {};
-    const collections = await prisma.collection.findMany({
-      where,
-      include: {
-        _count: {
-          select: { products: true }
-        },
-        children: {
-          include: {
-            _count: { select: { products: true } },
-            children: {
-              include: {
-                _count: { select: { products: true } },
-              },
+    const include: any = {
+      _count: {
+        select: { products: true }
+      },
+      children: {
+        include: {
+          _count: { select: { products: true } },
+          children: {
+            include: {
+              _count: { select: { products: true } },
             },
           },
         },
       },
+    };
+
+    if (includeProducts) {
+      include.products = {
+        where: { isVisible: true, isArchived: false },
+        take: productLimit,
+        select: {
+          id: true, brand: true, name: true, nameAr: true, price: true,
+          oldPrice: true, promoPrice: true, image: true, description: true,
+          isVisible: true, isArchived: true, isPromo: true, isNew: true,
+          salesCount: true, stock: true, tags: true, concerns: true,
+          koreanBeautyStep: true, supplementFocus: true, makeupStep: true,
+        },
+      };
+    }
+
+    const collections = await prisma.collection.findMany({
+      where,
+      include,
       orderBy: [
         { page: 'asc' },
         { order: 'asc' },

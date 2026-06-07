@@ -4,21 +4,28 @@ import ProductClientPage from '../../../../src/ProductClientPage';
 import type { Metadata } from 'next';
 import { parseProductIdFromSlug } from '../../../../src/lib/productSlug';
 
+const API_URL = typeof window === 'undefined'
+  ? 'http://localhost:5000'
+  : (process.env.NEXT_PUBLIC_API_URL || 'https://fassiasecret.com');
+
+async function getProductById(id: number) {
+  try {
+    const res = await fetch(`${API_URL}/api/products/${id}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.product || null;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const id = parseProductIdFromSlug(slug);
   if (!id) return { title: 'Produit non trouvé' };
-  let product: any = null;
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products?limit=500`, { next: { revalidate: 60 } });
-    const data = await res.json();
-    if (data && data.products) {
-      product = data.products.find((p: any) => p.id === id);
-    }
-  } catch (e) {
-    console.error(e);
-  }
 
+  const product = await getProductById(id);
   if (!product) return { title: 'Produit non trouvé' };
 
   return {
@@ -36,17 +43,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const id = parseProductIdFromSlug(slug);
   if (!id) return notFound();
 
-  let product: any = null;
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products?limit=500`, { cache: 'no-store' });
-    const data = await res.json();
-    if (data && data.products) {
-      product = data.products.find((p: any) => p.id === id);
-    }
-  } catch (e) {
-    console.error(e);
-  }
-
+  const product = await getProductById(id);
   if (!product) return notFound();
 
   return <ProductClientPage product={product} />;

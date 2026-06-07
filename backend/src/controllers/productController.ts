@@ -738,3 +738,36 @@ export const searchProducts = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to search products' });
   }
 };
+
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = parseInt(rawId);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid product ID' });
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        categories: { select: { id: true, name: true, slug: true } },
+        collections: { select: { id: true, name: true, slug: true } },
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const mappedProduct = {
+      ...product,
+      category: product.categories?.[0]?.name || 'Visage',
+      categorySlug: product.categories?.[0]?.slug || 'visage',
+    };
+
+    res.json({ product: mappedProduct });
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    res.status(500).json({ error: 'Failed to fetch product' });
+  }
+};
