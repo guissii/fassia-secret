@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X, ChevronDown, ChevronRightIcon } from 'lucide-react';
 import { productHref } from './lib/productSlug';
 
 import { ProductCard } from './components/ProductCard';
@@ -52,6 +52,16 @@ export default function BoutiqueClientPage() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
 
+  const [allCategories, setAllCategories] = useState<any[]>([]);
+  const [allCollections, setAllCollections] = useState<any[]>([]);
+  const [expandedFilterCats, setExpandedFilterCats] = useState<Set<string>>(new Set());
+
+  const selectedCollections = useMemo(() => {
+    const raw = searchParams.get('collection') ?? '';
+    if (!raw.trim()) return [];
+    return raw.split(',').map((v) => v.trim()).filter(Boolean);
+  }, [searchParams]);
+
   useEffect(() => {
     if (!collectionSlug) return;
     fetch('/api/collections')
@@ -63,6 +73,16 @@ export default function BoutiqueClientPage() {
       })
       .catch(() => {});
   }, [collectionSlug]);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/categories').then(r => r.json()),
+      fetch('/api/collections').then(r => r.json()),
+    ]).then(([catsData, collsData]) => {
+      setAllCategories(catsData.categories || []);
+      setAllCollections(collsData.collections || []);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (collectionSlug) {
@@ -114,23 +134,30 @@ export default function BoutiqueClientPage() {
 
 
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    for (const p of allProducts) {
-      if (p.category) set.add(p.category);
-    }
-    return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
-  }, [allProducts]);
+  const categoryTree = useMemo(() => {
+    return allCategories.map((cat: any) => ({
+      ...cat,
+      collections: allCollections.filter((c: any) =>
+        (c.page === cat.slug || c.page === cat.id) && !c.parentId
+      ),
+    }));
+  }, [allCategories, allCollections]);
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const keywords = normalized.split(/\s+/).filter(Boolean);
 
     let list = allProducts.filter((p) => {
-      if (selectedCategories.length > 0 && !selectedCategories.includes(p.category)) return false;
+      if (selectedCategories.length > 0) {
+        const productCatNames = p.categories?.map((c: any) => c.name) || [p.category].filter(Boolean);
+        if (!productCatNames.some((name: string) => selectedCategories.includes(name))) return false;
+      }
+      if (selectedCollections.length > 0) {
+        const productCollSlugs = p.collections?.map((c: any) => c.slug) || [];
+        if (!productCollSlugs.some((slug: string) => selectedCollections.includes(slug))) return false;
+      }
       if (onlyPromos && !(typeof p.oldPrice === 'number' && p.oldPrice > p.price)) return false;
       if (onlyNew && p.badge !== 'Nouveau') return false;
-      // When query is present, text search is already handled by API
       if (keywords.length > 0) return true;
       return true;
     });
@@ -138,7 +165,7 @@ export default function BoutiqueClientPage() {
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [query, onlyNew, onlyPromos, selectedCategories, sort, allProducts]);
+  }, [query, onlyNew, onlyPromos, selectedCategories, selectedCollections, sort, allProducts]);
 
   const PAGE_SIZE = 20;
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
@@ -180,32 +207,80 @@ export default function BoutiqueClientPage() {
     };
   }, [isFilterOpen]);
 
+  const toggleFilterCat = (catId: string) => {
+    setExpandedFilterCats(prev => {
+      const next = new Set(prev);
+      if (next.has(catId)) next.delete(catId);
+      else next.add(catId);
+      return next;
+    });
+  };
+
   const FiltersContent = (
     <div className="shop-filters">
       <details className="shop-filter-accordion" open>
         <summary className="shop-filter-summary">Catégories</summary>
         <div className="shop-filter-panel">
           <div className="shop-filters-options">
-            {categories.map((cat) => {
-              const checked = selectedCategories.includes(cat);
+            {categoryTree.map((cat: any) => {
+              const catChecked = selectedCategories.includes(cat.name);
+              const isExpanded = expandedFilterCats.has(cat.id);
+              const hasColls = cat.collections.length > 0;
               return (
-                <label key={cat} className="shop-filter-option">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) => {
-                      const next = e.target.checked
-                        ? [...selectedCategories, cat]
-                        : selectedCategories.filter((c) => c !== cat);
-                      updateSearchParams((sp) => {
-                        if (next.length > 0) sp.set('category', next.join(','));
-                        else sp.delete('category');
-                        sp.set('page', '1');
-                      });
-                    }}
-                  />
-                  <span>{cat}</span>
-                </label>
+                <div key={cat.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <label className="shop-filter-option" style={{ fontWeight: 600 }}>
+                    <input
+                      type="checkbox"
+                      checked={catChecked}
+                      onChange={(e) => {
+                        const next = e.target.checked
+                          ? [...selectedCategories, cat.name]
+                          : selectedCategories.filter((c) => c !== cat.name);
+                        updateSearchParams((sp) => {
+                          if (next.length > 0) sp.set('category', next.join(','));
+                          else sp.delete('category');
+                          sp.set('page', '1');
+                        });
+                      }}
+                    />
+                    <span>{cat.name}</span>
+                    {hasColls && (
+                      <button
+                        type="button"
+                        onClick={(ev) => { ev.preventDefault(); toggleFilterCat(cat.id); }}
+                        style={{ marginLeft: 'auto', background: 'none', border: 'none', padding: 0, display: 'flex', alignItems: 'center', cursor: 'pointer', color: 'var(--color-text-muted)' }}
+                      >
+                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRightIcon size={14} />}
+                      </button>
+                    )}
+                  </label>
+                  {isExpanded && hasColls && (
+                    <div style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      {cat.collections.map((coll: any) => {
+                        const collChecked = selectedCollections.includes(coll.slug);
+                        return (
+                          <label key={coll.id} className="shop-filter-option" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                            <input
+                              type="checkbox"
+                              checked={collChecked}
+                              onChange={(e) => {
+                                const next = e.target.checked
+                                  ? [...selectedCollections, coll.slug]
+                                  : selectedCollections.filter((s) => s !== coll.slug);
+                                updateSearchParams((sp) => {
+                                  if (next.length > 0) sp.set('collection', next.join(','));
+                                  else sp.delete('collection');
+                                  sp.set('page', '1');
+                                });
+                              }}
+                            />
+                            <span>{coll.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -256,6 +331,7 @@ export default function BoutiqueClientPage() {
           updateSearchParams((sp) => {
             sp.delete('q');
             sp.delete('category');
+            sp.delete('collection');
             sp.delete('promo');
             sp.delete('new');
             sp.delete('sort');
