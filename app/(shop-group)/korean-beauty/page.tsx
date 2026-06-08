@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import './page.css';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
+import KoreanBeautyScroll from './KoreanBeautyScroll';
 
 // Côté serveur: localhost direct, côté client: URL publique
 const API_URL = typeof window === 'undefined' 
@@ -219,6 +220,7 @@ export default async function KoreanBeautyPage() {
   return (
     <>
       <main className="kb-page">
+        <KoreanBeautyScroll />
         {/* Hero */}
       <section className="kb-hero">
         <div className="container">
@@ -233,7 +235,7 @@ export default async function KoreanBeautyPage() {
       {stepsWithProducts.map((step) => {
         const visualImageUrl = banners[step.sectionKey] || step.visualImage;
         return (
-          <section className="essentials-section" key={step.id}>
+          <section className="essentials-section" key={step.id} id={`kb-step-${step.id}`}>
             <div className="container">
               {/* Step Header — like Centella's "NOS ESSENTIELS" title */}
               <div className="essentials-header-row">
