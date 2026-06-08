@@ -115,14 +115,10 @@ export default function BoutiqueClientPage() {
 
 
   const categories = useMemo(() => {
-    const predefined = [
-      'Dermo-Corner', 'Promotions !', 'K-Beauty', 'Corps', 'Visage', 'Cheveux',
-      'Hygiène Dentaire', 'Maquillage', 'Hygiène & Intimité', 'Hygiène',
-      'Accessoires', 'Minceur', 'Sport', 'Maman & Bébé', 'Hommes', 'Santé',
-      'Préoccupations', 'Compléments Alimentaires', 'Premium Hair Care'
-    ];
-    const set = new Set<string>(predefined);
-    for (const p of allProducts) set.add(p.category);
+    const set = new Set<string>();
+    for (const p of allProducts) {
+      if (p.category) set.add(p.category);
+    }
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
   }, [allProducts]);
 
