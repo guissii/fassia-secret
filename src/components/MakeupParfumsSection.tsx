@@ -13,17 +13,17 @@ type Tile = {
 const TILES: Tile[] = [
   {
     title: 'Teint',
-    href: '/maquillage-parfums',
+    href: '/maquillage-parfums?step=1',
     image: '/images/banners/teint.webp',
   },
   {
     title: 'Yeux',
-    href: '/maquillage-parfums',
+    href: '/maquillage-parfums?step=2',
     image: '/images/banners/yeux.webp',
   },
   {
     title: 'Lèvres',
-    href: '/maquillage-parfums',
+    href: '/maquillage-parfums?step=3',
     image: '/images/banners/levres.webp',
   },
   {

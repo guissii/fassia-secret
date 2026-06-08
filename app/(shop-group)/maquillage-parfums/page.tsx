@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProductCarousel } from '../../../src/components/ProductCarousel';
+import MaquillageScroll from './MaquillageScroll';
 import './page.css';
 
 // Côté serveur: localhost direct, côté client: URL publique
@@ -146,6 +147,7 @@ export default async function MaquillageParfumsPage() {
   return (
     <>
       <main className="kb-page">
+        <MaquillageScroll />
         <section className="kb-hero">
           <div className="container">
             <h1 className="kb-hero-title">
@@ -160,7 +162,7 @@ export default async function MaquillageParfumsPage() {
         {stepsWithProducts.map((step) => {
           const visualImageUrl = banners[step.sectionKey] || step.visualImage;
           return (
-            <section className="essentials-section" key={step.id}>
+            <section className="essentials-section" key={step.id} id={`mp-step-${step.id}`}>
               <div className="container">
                 <div className="essentials-header-row">
                   <div className="essentials-title-group">

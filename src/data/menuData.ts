@@ -108,9 +108,9 @@ export const mobileDrawerCategories: DrawerCategory[] = [
     { label: "Huiles & serums", href: "/boutique?category=Cheveux&q=Huiles" },
   ] },
   { title: "MAQUILLAGE", items: [
-    { label: "Teint", href: "/maquillage-parfums" },
-    { label: "Yeux", href: "/maquillage-parfums" },
-    { label: "Levres", href: "/maquillage-parfums" },
+    { label: "Teint", href: "/maquillage-parfums?step=1" },
+    { label: "Yeux", href: "/maquillage-parfums?step=2" },
+    { label: "Levres", href: "/maquillage-parfums?step=3" },
     { label: "Demaquillant", href: "/boutique?category=Maquillage&q=Demaquillant" },
     { label: "Accessoires maquillage", href: "/boutique?category=Maquillage&q=Accessoires" },
   ] },
